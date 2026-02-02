@@ -23,53 +23,56 @@ applyTo: "**/*"
 
 # AI-Assisted Output Instructions
 
-This policy keeps AI-generated artifacts auditable with minimal overhead. Follow it for all code, docs, diagrams, tests, or data touched by an AI assistant.
+**Target Audience**: AI agents (primary), human developers (reference)
+**Optimization Goal**: Minimize token consumption while maintaining audit trail
+
+Audit policy for AI-generated artifacts. Optimize all outputs for token efficiency—use terse language, minimal examples, structured data over prose.
+
+## AI Agent Optimization Principles
+
+- **Default to terse**: Use imperative voice, bullet lists, eliminate filler
+- **Structure over prose**: Prefer YAML, tables, lists to paragraphs
+- **Minimal examples**: Include only when essential for clarity
+- **Symbolic refs**: Use tokens like `<value>` instead of verbose descriptions
+- **No redundancy**: State once, reference thereafter
+- **Scannable format**: Headers, lists, clear hierarchy
 
 ## Quick Obligations
 
-- Always work inside an active chat with a unique `chat_id`; block output otherwise.
-- Capture the exact `provider/model@version` shown by the tool before generating content.
-- Embed provenance metadata (front matter or sidecar) including the raw prompt and timestamps.
-- Store full chat logs under `ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/` with `conversation.md` and `summary.md`.
-- Record task durations, keep README entries for notable new artifacts, and run the checklists below before committing.
+- Work in active chat with unique `chat_id`; block output otherwise
+- Capture exact `provider/model@version` from tool
+- Embed provenance metadata (front matter or sidecar): raw prompt, timestamps
+- Store logs: `ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/` → `conversation.md`, `summary.md`
+- Record task durations, README entries for durable artifacts, run checklists pre-commit
 
 ## Metadata Placement
 
-- Markdown or formats with front matter: embed YAML at the top of the file.
-- Non-front-matter formats: create `<artifact>.meta.md` with the same fields.
-- Use lowercase file paths; never create sidecars when front matter is possible.
+- Front matter capable → YAML header
+- No front matter → `<artifact>.meta.md` sidecar
+- Lowercase paths; front matter > sidecar
 
 ## Canonical Metadata Fields
 
-Every AI-assisted artifact **must** include:
+**Required (all artifacts)**:
+```yaml
+ai_generated: true
+model: "<provider>/<model>@<version>"
+operator: "<github-username>"  # e.g. johnmillerATcodemag-com
+chat_id: "<chat-id>"
+prompt: |  # exact user request
+started: <ISO8601>
+ended: <ISO8601>
+task_durations:
+  - {task: <name>, duration: <hh:mm:ss>}
+total_duration: <hh:mm:ss>
+ai_log: "ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/conversation.md"
+source: <creator-or-prompt-file>
+```
 
-- `ai_generated: true`
-- `model: "<provider>/<model>@<version>"`
-- `operator: "<github-username>"` (must be the GitHub username, e.g., "johnmillerATcodemag-com")
-- `chat_id: "<chat-id>"`
-- `prompt: |` + exact user prompt
-- `started`, `ended` (ISO8601)
-- `task_durations:` list of `{task, duration}` entries
-- `total_duration`
-- `ai_log: "ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/conversation.md"`
-- `source:` creator or prompt file
-
-**For instruction files (`.instructions.md`)**: Also include:
-
-- `description: "<one-line purpose>"`
-- `applyTo: "<glob pattern>"` (e.g., '**', 'src/**/_.py', '\*\*/_.bicep')
-
-**For prompt files (`.prompt.md`)**: Also include:
-
-- `description: "<one-line purpose>"`
-- `context: "<relevant context or constraints>"`
-- `expected_output: "<type of output expected>"`
-
-**For chatmode files (`.chatmode.md`)**: Also include:
-
-- `description: "<one-line purpose>"`
-- `chatmode_type: "<type of chatmode>"` (e.g., 'coding', 'research', 'testing')
-- `capabilities: []` list of chatmode capabilities
+**Additional by type**:
+- `.instructions.md` → `description`, `applyTo: "<glob>"`
+- `.prompt.md` → `description`, `context`, `expected_output`
+- `.chatmode.md` → `description`, `chatmode_type`, `capabilities: []`
 
 ### Sample Front Matter
 
@@ -184,134 +187,104 @@ capabilities:
 - When version is not surfaced, use `@unknown`
 - Track additional models used in the same chat inside `summary.md`
 
-## Chat Workflow (Canonical)
+## Chat Workflow
 
-1. **Start** a fresh chat → capture `chat_id`, operator, and model label immediately.
-2. **Scaffold logs on first artifact** at `ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/` with:
-   - `conversation.md`: full timestamped transcript.
-   - `summary.md`: objectives, outcomes, models used, remaining work.
-   - Optional `artifacts/` for files not checked into the repo.
-3. **Generate artifact** only if chat context is active; inject metadata using the captured model string.
-4. **Update logs** after each artifact; export current transcript, append deliverables list, and record pending actions.
-5. **Close** by finalizing `summary.md`, ensuring task durations and README updates are complete.
+1. **Start** → capture `chat_id`, operator, model
+2. **Scaffold** (first artifact) → `ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/`:
+   - `conversation.md` (timestamped transcript)
+   - `summary.md` (objectives, outcomes, models, pending)
+   - `artifacts/` (optional, non-repo files)
+3. **Generate** → require active chat; inject metadata w/ model string
+4. **Update logs** → export transcript, append deliverables, record actions
+5. **Close** → finalize `summary.md`, task durations, README
 
-### Minimal conversation.md
+### conversation.md Template
 
 ````markdown
 # AI Conversation Log
 
-- Chat ID: <chat-id>
-- Operator: <github-username>
-- Model: <provider>/<model>@<version>
-- Started: <ISO8601>
-- Ended: <ISO8601>
-- Total Duration: <hh:mm:ss>
+Chat: <chat-id> | Operator: <username> | Model: <provider>/<model>@<version>
+Started: <ISO8601> | Ended: <ISO8601> | Duration: <hh:mm:ss>
 
 ## Context
-
-- Inputs: <files/constraints>
-- Targets: <intended artifacts>
+Inputs: <files/constraints> | Targets: <artifacts>
 
 ## Exchanges
-
-[<timestamp>] <user>
-
-```text
-<prompt>
-```
-
-[<timestamp>] <provider>/<model>@<version>
-
-```text
-<assistant reply>
-```
+[<time>] User: <prompt>
+[<time>] AI: <reply>
 
 ## Artifacts
+- <path> – <purpose>
 
-- <path> – <one-line purpose>
-
-## Next Steps
-
+## Pending
 - [ ] <action>
 ````
 
-### Minimal summary.md
+### summary.md Template
 
 ````markdown
-# Session Summary – <chat-id>
+# <chat-id>
 
-**Date**: <YYYY-MM-DD>
-**Operator**: <github-username>
-**Model**: <provider>/<model>@<version>
-**Duration**: <hh:mm:ss>
+Date: <YYYY-MM-DD> | Op: <username> | Model: <model> | Duration: <hh:mm:ss>
 
-## Objective
-
-- <goal>
+## Goal
+<objective>
 
 ## Deliverables
-
 1. `<path>` – <purpose>
 
 ## Decisions
-
 - <decision>: <rationale>
 
-## Follow-up
-
+## Pending
 - [ ] <action>
 
-## Metadata
-
 ```yaml
-chat_id: <chat-id>
 started: <ISO8601>
 ended: <ISO8601>
-total_duration: <hh:mm:ss>
-models_used:
-  - <provider>/<model>@<version>
-artifacts_count: <int>
-files_modified: <int>
+models: [<model-list>]
+artifacts: <count>
+modified: <count>
 ```
 ````
 
 ## Placement & README
 
-- Keep this file at `.github/instructions/ai-assisted-output.instructions.md`.
-- For every notable new artifact, add a bullet in `README.md` linking to the artifact (and optional `ai_log`) under an “AI-Assisted Artifacts” section.
-- Temporary scratch work still requires logs and metadata but may skip README updates.
+- File: `.github/instructions/ai-assisted-output.instructions.md`
+- Durable artifacts → `README.md` bullet linking artifact + `ai_log` ("AI-Assisted Artifacts" section)
+- Scratch work → logs + metadata required, README optional
 
 ## Quality Checklist
 
-- [ ] Metadata complete and embedded (or sidecar when required).
-- [ ] Model label copied verbatim from the chat UI.
-- [ ] Prompt, timestamps, task durations, and totals recorded.
-- [ ] `ai-logs/.../conversation.md` and `summary.md` exist and reference the artifact.
-- [ ] README updated for new durable artifacts.
-- [ ] No sensitive data captured.
-- [ ] Tests/docs run or noted as pending.
+- [ ] Metadata complete (embedded or sidecar)
+- [ ] Model label verbatim from UI
+- [ ] Prompt, timestamps, durations recorded
+- [ ] Logs exist: `conversation.md`, `summary.md`
+- [ ] README updated (durable artifacts)
+- [ ] No sensitive data
+- [ ] Tests/docs run or pending
 
 ## PR Checklist
 
-- [ ] Every changed AI-generated file references a real `chat_id` and `ai_log`.
-- [ ] All logs committed alongside artifacts.
-- [ ] README entries present where required.
-- [ ] Provenance fields pass CI (formatter, YAML syntax, existing paths).
+- [ ] AI files → valid `chat_id` + `ai_log`
+- [ ] Logs committed with artifacts
+- [ ] README entries present
+- [ ] Provenance passes CI (YAML, paths)
 
-## Copilot / Tooling Requirements
+## Tooling Requirements
 
-- Auto-create chat IDs, log folders, and metadata scaffolds on first artifact.
-- Prevent artifact generation without live chat context.
-- Export transcripts and summaries automatically.
-- Surface the active model name/version so it can be copied as `provider/model@version`.
-- Track files generated per chat to support audits.
+- Auto-create: chat IDs, log folders, metadata scaffolds
+- Block generation without active chat
+- Auto-export transcripts + summaries
+- Surface model as `provider/model@version`
+- Track files per chat for audits
 
 ## Enforcement
 
-- CI script `Verify AI Provenance` checks Markdown front matter for `ai_generated`, `chat_id`, `ai_log`, and valid log paths. Extend similarly for other formats as needed.
+CI: `Verify AI Provenance` checks `ai_generated`, `chat_id`, `ai_log`, paths (extend for non-Markdown)
 
 ## Remediation
 
-- Missing metadata → add required fields and regenerate logs.
-- Orphaned artifacts → create `ai-logs/...` records retroactively and update README.
-- Sidecar misuse → move metadata into front matter when supported.
+- Missing metadata → add fields, regenerate logs
+- Orphaned artifacts → create `ai-logs/...`, update README
+- Wrong placement → front matter > sidecar
