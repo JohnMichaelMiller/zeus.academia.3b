@@ -34,15 +34,15 @@ Foundational C# best practices for clean, maintainable, type-safe code using mod
 
 ## Naming Conventions
 
-| Element            | Pattern              | Example                  |
-| ------------------ | -------------------- | ------------------------ |
-| Interface          | `I` + PascalCase     | `IRepository`, `IService`|
-| Private field      | `_camelCase`         | `_logger`, `_context`    |
-| Public/Protected   | PascalCase           | `GetOrder`, `UserId`     |
-| Parameter/Local    | camelCase            | `orderId`, `result`      |
-| Const              | PascalCase           | `MaxRetries`             |
-| Async method       | PascalCase + `Async` | `GetOrderAsync`          |
-| Record (immutable) | PascalCase           | `OrderId`, `Address`     |
+| Element            | Pattern              | Example                   |
+| ------------------ | -------------------- | ------------------------- |
+| Interface          | `I` + PascalCase     | `IRepository`, `IService` |
+| Private field      | `_camelCase`         | `_logger`, `_context`     |
+| Public/Protected   | PascalCase           | `GetOrder`, `UserId`      |
+| Parameter/Local    | camelCase            | `orderId`, `result`       |
+| Const              | PascalCase           | `MaxRetries`              |
+| Async method       | PascalCase + `Async` | `GetOrderAsync`           |
+| Record (immutable) | PascalCase           | `OrderId`, `Address`      |
 
 ## File Organization
 
@@ -63,19 +63,19 @@ public sealed class Order
 {
     // Fields
     private readonly List<OrderItem> _items = [];
-    
+
     // Constructors
     public Order(Guid id, DateTime createdAt)
     {
         Id = id;
         CreatedAt = createdAt;
     }
-    
+
     // Properties
     public Guid Id { get; }
     public DateTime CreatedAt { get; }
     public IReadOnlyList<OrderItem> Items => _items;
-    
+
     // Methods
     public void AddItem(OrderItem item) => _items.Add(item);
 }
@@ -116,13 +116,13 @@ public Order FindOrder(Guid id)
 
 ## Type Selection
 
-| Use Case                        | Type     | Rationale                          |
-| ------------------------------- | -------- | ---------------------------------- |
-| Immutable data (DTOs, IDs)      | `record` | Value equality, concise syntax     |
-| Mutable entities                | `class`  | Identity equality, lifecycle       |
-| Single-value wrapper            | `record` | Strong typing, no primitive obsession |
-| Behavior + state                | `class`  | Methods + encapsulation            |
-| Collection of values            | `record` | Structural equality                |
+| Use Case                   | Type     | Rationale                             |
+| -------------------------- | -------- | ------------------------------------- |
+| Immutable data (DTOs, IDs) | `record` | Value equality, concise syntax        |
+| Mutable entities           | `class`  | Identity equality, lifecycle          |
+| Single-value wrapper       | `record` | Strong typing, no primitive obsession |
+| Behavior + state           | `class`  | Methods + encapsulation               |
+| Collection of values       | `record` | Structural equality                   |
 
 **Examples:**
 
@@ -141,7 +141,7 @@ public class Order
 {
     public Guid Id { get; private set; }
     public OrderStatus Status { get; private set; }
-    
+
     public void MarkAsShipped() => Status = OrderStatus.Shipped;
 }
 ```
@@ -162,7 +162,7 @@ public class Order
 public async Task<Order?> GetOrderAsync(Guid orderId, CancellationToken ct = default)
 {
     ArgumentNullException.ThrowIfNull(orderId);
-    
+
     var order = await _repository.GetByIdAsync(orderId, ct);
     return order;
 }
@@ -195,10 +195,10 @@ public class DomainException : Exception
 public void AddItem(OrderItem item)
 {
     ArgumentNullException.ThrowIfNull(item);
-    
+
     if (_status == OrderStatus.Shipped)
         throw new DomainException("Cannot modify shipped order");
-    
+
     _items.Add(item);
 }
 ```
@@ -285,7 +285,7 @@ public class OrderService
 {
     private readonly IOrderRepository _repository;
     private readonly ILogger<OrderService> _logger;
-    
+
     public OrderService(
         IOrderRepository repository,
         ILogger<OrderService> logger)
@@ -293,7 +293,7 @@ public class OrderService
         _repository = repository;
         _logger = logger;
     }
-    
+
     public async Task<Order> CreateOrderAsync(CreateOrderRequest request, CancellationToken ct)
     {
         _logger.LogInformation("Creating order for customer {CustomerId}", request.CustomerId);
@@ -358,16 +358,16 @@ public class Order
 
 ## Anti-Patterns
 
-| ❌ Anti-Pattern              | ✅ Correct Approach               |
-| ---------------------------- | --------------------------------- |
-| Public setters on entities   | Private/init-only setters         |
-| Primitive obsession          | Value objects (records)           |
-| `.Result` or `.Wait()`       | `await` with async                |
-| Catch generic `Exception`    | Specific exception types          |
-| `var` for non-obvious types  | Explicit type declaration         |
-| Mutable static state         | Dependency injection              |
-| Service locator              | Constructor injection             |
-| String concatenation in loop | `StringBuilder` or interpolation  |
+| ❌ Anti-Pattern              | ✅ Correct Approach              |
+| ---------------------------- | -------------------------------- |
+| Public setters on entities   | Private/init-only setters        |
+| Primitive obsession          | Value objects (records)          |
+| `.Result` or `.Wait()`       | `await` with async               |
+| Catch generic `Exception`    | Specific exception types         |
+| `var` for non-obvious types  | Explicit type declaration        |
+| Mutable static state         | Dependency injection             |
+| Service locator              | Constructor injection            |
+| String concatenation in loop | `StringBuilder` or interpolation |
 
 ## Validation Checklist
 

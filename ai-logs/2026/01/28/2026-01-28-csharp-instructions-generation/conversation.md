@@ -15,6 +15,7 @@ Targets: .github/instructions/csharp-implementation.instructions.md
 [19:31] AI: Analyzing repository context to detect scope, patterns, frameworks, and conventions as specified in the prompt template.
 
 [19:33] AI: Repository analysis findings:
+
 - **No C# projects found** (.csproj files absent)
 - **No C# source files** (.cs files absent)
 - **Existing instruction:** cqrs-es-csharp-mediatr.instructions.md provides specialized CQRS/ES patterns
@@ -23,6 +24,7 @@ Targets: .github/instructions/csharp-implementation.instructions.md
 [19:35] AI: Decision: Generate general C# implementation instruction file covering foundational best practices and modern C# (11+) features. This complements the specialized CQRS/ES instructions.
 
 [19:36] AI: Generated content structure:
+
 1. Title & Overview: Modern C# Implementation Standards
 2. Naming Conventions (table format for token efficiency)
 3. File Organization (file-scoped namespaces, one type per file)
@@ -39,14 +41,16 @@ Targets: .github/instructions/csharp-implementation.instructions.md
 14. Validation Checklist (pre-commit checks)
 
 [19:45] AI: Applied token optimization:
+
 - Tables for structured data (naming, type selection, anti-patterns)
 - Imperative voice for rules (MUST/MUST NOT/SHOULD)
 - Code examples for complex patterns only
 - Cross-reference to specialized instructions
 
 [19:48] AI: Created file: .github/instructions/csharp-implementation.instructions.md
+
 - Complete AI provenance metadata
-- applyTo: "**/*.cs" (all C# files)
+- applyTo: "\*_/_.cs" (all C# files)
 - 510 lines total, ~800 tokens (within target range)
 
 [19:50] AI: Created conversation log and summary in ai-logs/2026/01/28/2026-01-28-csharp-instructions-generation/

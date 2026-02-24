@@ -14,7 +14,7 @@ Generate comprehensive C# implementation instruction file using the generate-csh
 
 - **Scope Selection**: General C# implementation (all .cs files)
   - **Rationale**: No C# codebase exists yet; provide foundational standards that complement specialized CQRS/ES instructions
-  
+
 - **Pattern Focus**: Clean Architecture, SOLID, modern C# idioms
   - **Rationale**: Broad applicability; specializations (CQRS/ES) already documented separately
 
@@ -30,11 +30,13 @@ Generate comprehensive C# implementation instruction file using the generate-csh
 ## Context Analysis
 
 **Detected Patterns:**
+
 - No C# projects/files in current repository
 - Existing CQRS/ES instruction file indicates future event-sourced architecture
 - Documentation-centric repository structure
 
 **Applied Conventions:**
+
 - File-scoped namespaces (C# 10+)
 - Nullable reference types enabled
 - Constructor injection for dependencies
@@ -43,6 +45,7 @@ Generate comprehensive C# implementation instruction file using the generate-csh
 - Record types for immutable data
 
 **Frameworks Referenced:**
+
 - .NET 8+ (modern SDK)
 - ILogger<T> (Microsoft.Extensions.Logging)
 - IOptions<T> (Microsoft.Extensions.Options)
