@@ -2,82 +2,91 @@
 ai_generated: true
 model: "anthropic/claude-sonnet-4.5@unknown"
 operator: "johnmillerATcodemag-com"
-chat_id: "2025-12-28-project-overview-generation"
+chat_id: "2026-02-24-project-overview-zeus-academia"
 prompt: |
-  submit the #file:create-project-overview.prompt.md
-started: "2025-12-28T19:00:00Z"
-ended: "2025-12-28T19:10:00Z"
+  Submit create-project-overview.prompt.md with arguments:
+  project_name: zeus.academia
+  project_type: web app
+  primary_language: C#, TypeScript
+  key_technologies: Vue 3, Pinia, REST, GraphQL, Vite, Azure Static Web Apps, ASP.NET Core, MediatR, FluentValidation
+  project_purpose: Academic Management System
+started: "2026-02-24T00:00:00Z"
+ended: "2026-02-24T00:15:00Z"
 task_durations:
-  - task: "analyze repository structure"
+  - task: "analyze project structure"
     duration: "00:03:00"
   - task: "generate overview content"
-    duration: "00:05:00"
+    duration: "00:10:00"
   - task: "optimize tokens"
     duration: "00:02:00"
-total_duration: "00:10:00"
-ai_log: "ai-logs/2025/12/28/2025-12-28-project-overview-generation/conversation.md"
+total_duration: "00:15:00"
+ai_log: "ai-logs/2026/02/24/2026-02-24-project-overview-zeus-academia/conversation.md"
 source: ".github/prompts/create-project-overview.prompt.md"
-description: "zeus.academia.3b - AI-assisted development workflow framework"
+description: "zeus.academia - Academic Management System web application"
 applyTo: "**"
 ---
 
-# Project: Zeus Academia 3B
+# Project: Zeus Academia
 
-**Purpose**: Experimental framework for AI-assisted development workflows, prompt engineering, and instruction management
-**Type**: Development framework / research project
-**Stack**: Markdown + YAML (documentation-centric)
+**Purpose**: Academic Management System for educational institutions
+**Type**: Full-stack web application
+**Stack**: C# (ASP.NET Core) + TypeScript (Vue 3)
 
 ## Architecture
 
-- **Structure**: Documentation-based configuration system
+- **Structure**: Monorepo with separated frontend/backend
+- **Frontend**: Vue 3 + Pinia (state) + Vite (build) + TypeScript
+- **Backend**: ASP.NET Core + MediatR (CQRS) + FluentValidation
+- **API**: REST + GraphQL endpoints
 - **Core Dirs**:
-  - `.github/instructions/` – AI assistant instruction files
-  - `.github/prompts/` – Reusable prompt templates
-  - `.github/chatmodes/` – Specialized chatmode configurations
-  - `.github/models/` – Model configurations
-  - `ai-logs/` – Conversation and session logs
-- **Build**: None (documentation artifacts)
+  - `src/frontend/` - Vue 3 SPA application
+  - `src/backend/` - ASP.NET Core API services
+  - `src/shared/` - Shared contracts and models
+  - `.github/instructions/` - AI assistant directives
+  - `.github/prompts/` - Reusable prompt templates
+  - `ai-logs/` - AI conversation and session logs
 
 ## Standards
 
-- **Format**: Markdown with YAML front matter
-- **Naming**:
-  - Instructions: `<purpose>.instructions.md`
-  - Prompts: `<purpose>.prompt.md`
-  - Chatmodes: `<purpose>.chatmode.md`
-- **Metadata**: Complete AI provenance required (see ai-assisted-output.instructions.md)
-- **Structure**: Token-optimized, directive-based
-- **Tests**: Manual validation, CI checks for metadata completeness
-- **Workflows**:
-  - [AI Development Process](ai-dev-process.instructions.md)
-  - [Git Workflow](git-workflow.instructions.md)
+- **C#**: .NET 8+, async/await, nullable reference types
+- **TypeScript**: Strict mode, explicit types, composition API
+- **Patterns**: CQRS (MediatR), Repository pattern, dependency injection
+- **Validation**: FluentValidation (backend), Vuelidate/custom (frontend)
+- **Naming**: PascalCase (C#), camelCase (TypeScript), kebab-case (Vue components)
+- **Tests**: xUnit (C#), Vitest (TypeScript), 80% coverage target
+- **AI Workflows**:
+  - [AI Development Process](.github/instructions/ai-dev-process.instructions.md)
+  - [Git Workflow](.github/instructions/git-workflow.instructions.md)
+  - [AI Output Policy](.github/instructions/ai-assisted-output.instructions.md)
 
 ## Environment
 
-- Target: AI assistants (GitHub Copilot, Claude, GPT-4)
-- Deploy: Git repository (no runtime)
-- Dependencies: None (self-contained)
+- **Target**: Modern browsers (Chrome/Edge/Firefox/Safari latest 2 versions)
+- **Deploy**: Azure Static Web Apps (frontend), Azure App Service (backend)
+- **Database**: Azure SQL Database or Cosmos DB
+- **Dependencies**: Azure AD B2C (auth), Azure Storage (files)
 
 ## Constraints
 
-- **Token Efficiency**: Minimize verbosity in all artifacts
-- **Provenance**: All AI-generated content must have complete metadata
-- **Auditability**: Conversation logs required for AI-assisted work
-- **Glob Patterns**: `applyTo` field must use valid glob syntax
-- **File Organization**: Hierarchical date-based structure for logs (`yyyy/mm/dd`)
+- **Security**: OAuth 2.0/OIDC authentication, RBAC authorization, HTTPS-only
+- **Performance**: API response <500ms p95, initial page load <3s
+- **Compatibility**: WCAG 2.1 AA accessibility compliance
+- **Data Privacy**: FERPA/GDPR compliance for student data
+- **Scalability**: Support 10k+ concurrent users
 
 ## Key Patterns
 
-- **Instructions**: Directive-based rules for AI assistants, applied via `applyTo` glob
-- **Prompts**: Reusable templates with arguments (`{{variable}}`)
-- **Chatmodes**: Specialized personas/workflows for specific tasks
-- **Logs**: Full conversation + summary per chat session
+- **CQRS**: Commands via MediatR for writes, queries for reads
+- **Validation**: FluentValidation rules per command/query
+- **State Management**: Pinia stores with TypeScript
+- **API Communication**: Axios (REST), Apollo Client (GraphQL)
+- **Error Handling**: Centralized error boundaries and middleware
+- **AI Provenance**: Complete metadata required for all AI-assisted artifacts
 
 ## Critical Files
 
-- `.github/instructions/ai-assisted-output.instructions.md` – Provenance policy (required reading)
-- `.github/instructions/ai-dev-process.instructions.md` – Development workflow and review process
-- `.github/instructions/git-workflow.instructions.md` – Branching, PRs, and quality gates
-- `.github/instructions/instruction-file-generation.instructions.md` – Instruction authoring guide
-- `.github/instructions/prompt-file-generation.instructions.md` – Prompt authoring guide
-- `.github/instructions/chatmode-file-generation.instructions.md` – Chatmode authoring guide
+- `.github/instructions/ai-assisted-output.instructions.md` - AI provenance policy
+- `.github/instructions/ai-dev-process.instructions.md` - Development workflow
+- `.github/instructions/git-workflow.instructions.md` - Branching and PR requirements
+- `.github/instructions/cqrs-es-csharp-mediatr.instructions.md` - CQRS implementation guide
+- `.github/instructions/csharp-implementation.instructions.md` - C# coding standards
