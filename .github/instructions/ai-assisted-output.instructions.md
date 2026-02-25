@@ -177,7 +177,7 @@ All AI chat transcripts and key outputs must be saved under `ai-logs/` in a date
 - Structure: `ai-logs/yyyy/mm/dd/<chat-id>/`
 - Required files per chat:
   - `conversation.md` — Full prompt/response transcript with timestamps (REQUIRED)
-  - `summary.md` — Session summary: objectives, key decisions, artifacts, outcomes (REQUIRED)
+  - `summary.md` — Chat summary: objectives, key decisions, artifacts, outcomes (REQUIRED)
   - `artifacts/` — Generated files not committed elsewhere (OPTIONAL)
 
 ### Copilot-Integrated Chat Management
@@ -262,9 +262,9 @@ Implementation Requirements for Copilot:
 ### summary.md Template
 
 ````markdown
-# Session Summary: <Session Title>
+# Chat Summary: <Chat Title>
 
-**Session ID**: <chat-id>
+**Chat ID**: <chat-id>
 **Date**: <YYYY-MM-DD>
 **Operator**: <username>
 **Model**: <provider>/<model>@<version>
