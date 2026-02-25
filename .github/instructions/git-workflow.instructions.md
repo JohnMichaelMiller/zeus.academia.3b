@@ -109,7 +109,7 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 **File-Level Checks:**
 
 - [ ] Front matter or sidecar exists for all modified files
-- [ ] Required fields: `ai_generated`, `model`, `operator`, `chat_id`, `prompt`, `started`, `ended`, `task_durations`, `total_duration`, `ai_log`, `source`
+- [ ] All required fields present (see [ai-assisted-output.instructions.md](ai-assisted-output.instructions.md) 🔒 canonical source)
 - [ ] `chat_id` matches conversation log filename pattern
 - [ ] `ai_log` path exists and contains `conversation.md` + `summary.md`
 - [ ] `model` format: `<provider>/<model>@<version>`
