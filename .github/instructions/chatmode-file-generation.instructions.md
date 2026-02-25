@@ -29,11 +29,9 @@ applyTo: "**/*.chatmode.md"
 
 ### AI Provenance (AI-generated files only)
 
-See [ai-assisted-output.instructions.md](ai-assisted-output.instructions.md) for complete AI provenance metadata requirements.
+See [ai-assisted-output.instructions.md](ai-assisted-output.instructions.md) for required fields (🔒 canonical source).
 
-**Required fields:** `ai_generated`, `model`, `operator`, `chat_id`, `prompt`, `started`, `ended`, `task_durations`, `total_duration`, `ai_log`, `source`
-
-**Chatmode-specific:** `description`, `chatmode_type`, `capabilities`
+**Chatmode-specific additional fields:** `description`, `chatmode_type`, `capabilities`
 
 ### Copilot chatmode Metadata
 
