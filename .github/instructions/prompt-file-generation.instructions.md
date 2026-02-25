@@ -33,11 +33,9 @@ applyTo: "**/*.prompt.md"
 
 ### AI Provenance (AI-generated files only)
 
-See [ai-assisted-output.instructions.md](ai-assisted-output.instructions.md) for complete AI provenance metadata requirements.
+See [ai-assisted-output.instructions.md](ai-assisted-output.instructions.md) for required fields (🔒 canonical source).
 
-**Required fields:** `ai_generated`, `model`, `operator`, `chat_id`, `prompt`, `started`, `ended`, `task_durations`, `total_duration`, `ai_log`, `source`
-
-**Prompt-specific:** `description`, `context`, `expected_output`
+**Prompt-specific additional fields:** `description`, `context`, `expected_output`
 
 ### Copilot Prompt Metadata
 
