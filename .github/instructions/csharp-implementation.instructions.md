@@ -23,7 +23,7 @@ applyTo: "**/*.cs"
 
 # Modern C# Implementation Standards
 
-Foundational C# best practices for clean, maintainable, type-safe code using modern language features (C# 11+).
+Foundational C# best practices for clean, maintainable, type-safe code using modern language features (C# 12+).
 
 ## Context
 
@@ -89,7 +89,7 @@ public sealed class Order
 - MUST use `?` suffix for nullable types: `string?`, `Order?`
 - MUST NOT use `!` null-forgiving operator without validation
 - MUST use null-conditional (`?.`) and null-coalescing (`??`) operators
-- MUST validate parameters with `ArgumentNullException.ThrowIfNull(param)` (C# 11+)
+- MUST validate parameters with `ArgumentNullException.ThrowIfNull(param)` (C# 12+)
 
 **Examples:**
 
@@ -226,7 +226,7 @@ public string DisplayName => $"{FirstName} {LastName}";
 public void Process() => _logger.LogInfo("Start"); ProcessInternal(); _logger.LogInfo("End");
 ```
 
-## Modern C# Features (C# 11+)
+## Modern C# Features (C# 12+)
 
 **Required Members:**
 
