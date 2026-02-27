@@ -58,6 +58,8 @@ applyTo: "**"
   - [AI Development Process](.github/instructions/ai-dev-process.instructions.md)
   - [Git Workflow](.github/instructions/git-workflow.instructions.md)
   - [AI Output Policy](.github/instructions/ai-assisted-output.instructions.md)
+  - [Custom Agents Standards](.github/instructions/custom-agents.instructions.md)
+  - [Vertical Slice Implementation](.github/instructions/vertical-slice-implementation.instructions.md)
 
 ## Environment
 
@@ -90,3 +92,4 @@ applyTo: "**"
 - `.github/instructions/git-workflow.instructions.md` - Branching and PR requirements
 - `.github/instructions/cqrs-es-csharp-mediatr.instructions.md` - CQRS implementation guide
 - `.github/instructions/csharp-implementation.instructions.md` - C# coding standards
+- `.github/instructions/vertical-slice-implementation.instructions.md` - Vertical slice structure, naming, templates, and quality checklist
