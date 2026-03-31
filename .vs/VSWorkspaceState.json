@@ -1,6 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\.github",
+    "\\.github\\models",
+    "\\.github\\models\\orm"
   ],
+  "SelectedNode": "\\.github\\models\\orm\\academia.orm",
   "PreviewInSolutionExplorer": false
 }
