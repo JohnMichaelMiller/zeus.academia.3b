@@ -52,11 +52,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm degree storage, seed expectations, and route placement | execution plan, current repo tree | approved targets and blocker notes | current codebase already contains an incompatible degree catalog |
-| Backend/domain agent | implement add and list degree behavior | Shared Kernel degree type, slice conventions | commands, queries, handlers, DTOs, endpoints | degree code rules are unclear or clash with seeded data |
-| Testing/verification agent | verify uniqueness and list behavior | implemented slice | tests and evidence | persistence allows duplicates or queries return unstable values |
+| Role                       | Responsibilities                                               | Inputs                                       | Outputs                                      | Escalate when                                                    |
+| -------------------------- | -------------------------------------------------------------- | -------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
+| Slice coordinator          | confirm degree storage, seed expectations, and route placement | execution plan, current repo tree            | approved targets and blocker notes           | current codebase already contains an incompatible degree catalog |
+| Backend/domain agent       | implement add and list degree behavior                         | Shared Kernel degree type, slice conventions | commands, queries, handlers, DTOs, endpoints | degree code rules are unclear or clash with seeded data          |
+| Testing/verification agent | verify uniqueness and list behavior                            | implemented slice                            | tests and evidence                           | persistence allows duplicates or queries return unstable values  |
 
 ## Ordered Implementation Steps
 

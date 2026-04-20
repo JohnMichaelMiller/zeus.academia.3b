@@ -50,11 +50,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm filter contract and default sort | execution plan and current query conventions | approved query surface | existing API pagination rules conflict with the needed filter set |
-| Backend/domain agent | implement filtered query, DTOs, endpoint, and mapping | academic persistence model and filter rules | search/list code path | one or more filters need data not yet exposed by registration |
-| Testing/verification agent | verify filters, pagination, and sorting | implemented slice | integration tests and evidence | query output is nondeterministic across repeated runs |
+| Role                       | Responsibilities                                      | Inputs                                       | Outputs                        | Escalate when                                                     |
+| -------------------------- | ----------------------------------------------------- | -------------------------------------------- | ------------------------------ | ----------------------------------------------------------------- |
+| Slice coordinator          | confirm filter contract and default sort              | execution plan and current query conventions | approved query surface         | existing API pagination rules conflict with the needed filter set |
+| Backend/domain agent       | implement filtered query, DTOs, endpoint, and mapping | academic persistence model and filter rules  | search/list code path          | one or more filters need data not yet exposed by registration     |
+| Testing/verification agent | verify filters, pagination, and sorting               | implemented slice                            | integration tests and evidence | query output is nondeterministic across repeated runs             |
 
 ## Ordered Implementation Steps
 

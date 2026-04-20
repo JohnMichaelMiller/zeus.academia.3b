@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm tenured-state semantics and report columns | execution plan and employment slices | approved report contract | employment-state semantics are ambiguous after multiple transitions |
-| Backend/domain agent | implement tenured report and qualification summary projection | employment state and qualification data | tenured report code path | qualification summaries need a separate read model not yet designed |
-| Testing/verification agent | verify filtered output and transition behavior | implemented slice | tests and evidence | converted academics do not appear correctly |
+| Role                       | Responsibilities                                              | Inputs                                  | Outputs                  | Escalate when                                                       |
+| -------------------------- | ------------------------------------------------------------- | --------------------------------------- | ------------------------ | ------------------------------------------------------------------- |
+| Slice coordinator          | confirm tenured-state semantics and report columns            | execution plan and employment slices    | approved report contract | employment-state semantics are ambiguous after multiple transitions |
+| Backend/domain agent       | implement tenured report and qualification summary projection | employment state and qualification data | tenured report code path | qualification summaries need a separate read model not yet designed |
+| Testing/verification agent | verify filtered output and transition behavior                | implemented slice                       | tests and evidence       | converted academics do not appear correctly                         |
 
 ## Ordered Implementation Steps
 

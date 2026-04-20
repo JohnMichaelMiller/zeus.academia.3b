@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm default threshold and date-boundary semantics | execution plan and current date-handling conventions | approved report contract | current date handling is inconsistent across employment slices |
-| Backend/domain agent | implement threshold-based report query | contract end-date data and filter rules | expiring-contracts report code path | date logic requires timezone semantics beyond current conventions |
-| Testing/verification agent | verify default and custom windows plus boundary dates | implemented slice | tests and evidence | near-boundary contracts appear inconsistently |
+| Role                       | Responsibilities                                      | Inputs                                               | Outputs                             | Escalate when                                                     |
+| -------------------------- | ----------------------------------------------------- | ---------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------- |
+| Slice coordinator          | confirm default threshold and date-boundary semantics | execution plan and current date-handling conventions | approved report contract            | current date handling is inconsistent across employment slices    |
+| Backend/domain agent       | implement threshold-based report query                | contract end-date data and filter rules              | expiring-contracts report code path | date logic requires timezone semantics beyond current conventions |
+| Testing/verification agent | verify default and custom windows plus boundary dates | implemented slice                                    | tests and evidence                  | near-boundary contracts appear inconsistently                     |
 
 ## Ordered Implementation Steps
 

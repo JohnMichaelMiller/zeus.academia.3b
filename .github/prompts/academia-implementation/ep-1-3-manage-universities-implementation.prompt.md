@@ -52,11 +52,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm catalog ownership and placement | execution plan, repo tree, existing fixtures | approved artifact map | multiple university catalogs already exist |
-| Backend/domain agent | implement add and list university behavior | Shared Kernel university type, slice conventions | commands, queries, handlers, DTOs, endpoints | code or fixtures imply conflicting university identifiers |
-| Testing/verification agent | verify uniqueness and list behavior | implemented slice | tests and evidence | duplicate handling or list output is unstable |
+| Role                       | Responsibilities                           | Inputs                                           | Outputs                                      | Escalate when                                             |
+| -------------------------- | ------------------------------------------ | ------------------------------------------------ | -------------------------------------------- | --------------------------------------------------------- |
+| Slice coordinator          | confirm catalog ownership and placement    | execution plan, repo tree, existing fixtures     | approved artifact map                        | multiple university catalogs already exist                |
+| Backend/domain agent       | implement add and list university behavior | Shared Kernel university type, slice conventions | commands, queries, handlers, DTOs, endpoints | code or fixtures imply conflicting university identifiers |
+| Testing/verification agent | verify uniqueness and list behavior        | implemented slice                                | tests and evidence                           | duplicate handling or list output is unstable             |
 
 ## Ordered Implementation Steps
 

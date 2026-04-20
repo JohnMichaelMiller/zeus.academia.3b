@@ -50,11 +50,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm route, identifier, and update flow | execution plan and current tree | approved command scope | current repo uses a different canonical identifier than the plan assumes |
-| Backend/domain agent | implement rename command, validator, handler, endpoint | registration model and existing rules | rename code path | renaming requires cross-slice side effects not called for in the plan |
-| Testing/verification agent | verify length rule, persistence, and query visibility | implemented slice | tests and evidence | updated name is not visible through read models after save |
+| Role                       | Responsibilities                                       | Inputs                                | Outputs                | Escalate when                                                            |
+| -------------------------- | ------------------------------------------------------ | ------------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
+| Slice coordinator          | confirm route, identifier, and update flow             | execution plan and current tree       | approved command scope | current repo uses a different canonical identifier than the plan assumes |
+| Backend/domain agent       | implement rename command, validator, handler, endpoint | registration model and existing rules | rename code path       | renaming requires cross-slice side effects not called for in the plan    |
+| Testing/verification agent | verify length rule, persistence, and query visibility  | implemented slice                     | tests and evidence     | updated name is not visible through read models after save               |
 
 ## Ordered Implementation Steps
 

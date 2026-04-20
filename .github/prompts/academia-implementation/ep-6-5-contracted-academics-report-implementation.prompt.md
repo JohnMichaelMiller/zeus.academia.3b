@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm contracted-state semantics and sort order | execution plan and employment slices | approved report contract | employment data does not expose current contract state cleanly |
-| Backend/domain agent | implement report query and DTOs | contract state and end-date data | contracted report code path | the report needs separate projection storage for performance |
-| Testing/verification agent | verify filtering and ascending sort order | implemented slice | tests and evidence | results are unsorted or include non-contracted academics |
+| Role                       | Responsibilities                                  | Inputs                               | Outputs                     | Escalate when                                                  |
+| -------------------------- | ------------------------------------------------- | ------------------------------------ | --------------------------- | -------------------------------------------------------------- |
+| Slice coordinator          | confirm contracted-state semantics and sort order | execution plan and employment slices | approved report contract    | employment data does not expose current contract state cleanly |
+| Backend/domain agent       | implement report query and DTOs                   | contract state and end-date data     | contracted report code path | the report needs separate projection storage for performance   |
+| Testing/verification agent | verify filtering and ascending sort order         | implemented slice                    | tests and evidence          | results are unsorted or include non-contracted academics       |
 
 ## Ordered Implementation Steps
 

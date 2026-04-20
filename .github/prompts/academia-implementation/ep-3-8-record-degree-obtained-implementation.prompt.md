@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm qualification storage and identifier strategy | execution plan and current persistence model | approved slice targets | registration stored qualifications in a way this slice cannot extend cleanly |
-| Backend/domain agent | implement command, validator, handler, endpoint | qualification rules and reference-data slices | qualification-add code path | duplicate-detection logic requires a broader data redesign |
-| Testing/verification agent | verify happy path, invalid references, and duplicate rejection | implemented slice | tests and evidence | duplicate degree records slip through under realistic data |
+| Role                       | Responsibilities                                               | Inputs                                        | Outputs                     | Escalate when                                                                |
+| -------------------------- | -------------------------------------------------------------- | --------------------------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
+| Slice coordinator          | confirm qualification storage and identifier strategy          | execution plan and current persistence model  | approved slice targets      | registration stored qualifications in a way this slice cannot extend cleanly |
+| Backend/domain agent       | implement command, validator, handler, endpoint                | qualification rules and reference-data slices | qualification-add code path | duplicate-detection logic requires a broader data redesign                   |
+| Testing/verification agent | verify happy path, invalid references, and duplicate rejection | implemented slice                             | tests and evidence          | duplicate degree records slip through under realistic data                   |
 
 ## Ordered Implementation Steps
 

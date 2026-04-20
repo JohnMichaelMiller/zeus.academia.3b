@@ -50,11 +50,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm event needs and route placement | execution plan, report dependencies, current routes | approved command contract | report dependencies require a broader event model than currently available |
-| Backend/domain agent | implement command, validator, handler, endpoint, and any rank-change event | Shared Kernel rules, ManageRanks data | rank-change code path | handler would need to assign access level directly rather than deriving it |
-| Testing/verification agent | verify valid rank change, invalid rank rejection, and access-level recalculation | implemented slice | tests and evidence | profile or report seed data still shows stale access levels |
+| Role                       | Responsibilities                                                                 | Inputs                                              | Outputs                   | Escalate when                                                              |
+| -------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------- |
+| Slice coordinator          | confirm event needs and route placement                                          | execution plan, report dependencies, current routes | approved command contract | report dependencies require a broader event model than currently available |
+| Backend/domain agent       | implement command, validator, handler, endpoint, and any rank-change event       | Shared Kernel rules, ManageRanks data               | rank-change code path     | handler would need to assign access level directly rather than deriving it |
+| Testing/verification agent | verify valid rank change, invalid rank rejection, and access-level recalculation | implemented slice                                   | tests and evidence        | profile or report seed data still shows stale access levels                |
 
 ## Ordered Implementation Steps
 

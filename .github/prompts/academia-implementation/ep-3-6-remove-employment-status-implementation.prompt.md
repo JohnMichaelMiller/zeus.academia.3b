@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm identifier, route, and expected cleared-state response | execution plan and current routes | approved command scope | existing routes imply a different employment lifecycle model |
-| Backend/domain agent | implement clear-state command, handler, endpoint | academic aggregate and current employment rules | removal code path | clearing state would violate an unstated persistence rule |
-| Testing/verification agent | verify tenure-clear and contract-clear scenarios | implemented slice | tests and evidence | either path leaves stale persisted employment data |
+| Role                       | Responsibilities                                               | Inputs                                          | Outputs                | Escalate when                                                |
+| -------------------------- | -------------------------------------------------------------- | ----------------------------------------------- | ---------------------- | ------------------------------------------------------------ |
+| Slice coordinator          | confirm identifier, route, and expected cleared-state response | execution plan and current routes               | approved command scope | existing routes imply a different employment lifecycle model |
+| Backend/domain agent       | implement clear-state command, handler, endpoint               | academic aggregate and current employment rules | removal code path      | clearing state would violate an unstated persistence rule    |
+| Testing/verification agent | verify tenure-clear and contract-clear scenarios               | implemented slice                               | tests and evidence     | either path leaves stale persisted employment data           |
 
 ## Ordered Implementation Steps
 

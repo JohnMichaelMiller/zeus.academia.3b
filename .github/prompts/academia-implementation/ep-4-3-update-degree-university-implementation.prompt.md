@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm qualification identifier strategy and route | execution plan and current qualification model | approved command contract | qualification records are not uniquely addressable in the current model |
-| Backend/domain agent | implement update command, validator, handler, endpoint | qualification model and university reference data | university-update code path | update semantics would break the academic-degree uniqueness rule |
-| Testing/verification agent | verify existing-record update and missing-record failure | implemented slice | tests and evidence | updates create new rows instead of modifying the intended record |
+| Role                       | Responsibilities                                         | Inputs                                            | Outputs                     | Escalate when                                                           |
+| -------------------------- | -------------------------------------------------------- | ------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------- |
+| Slice coordinator          | confirm qualification identifier strategy and route      | execution plan and current qualification model    | approved command contract   | qualification records are not uniquely addressable in the current model |
+| Backend/domain agent       | implement update command, validator, handler, endpoint   | qualification model and university reference data | university-update code path | update semantics would break the academic-degree uniqueness rule        |
+| Testing/verification agent | verify existing-record update and missing-record failure | implemented slice                                 | tests and evidence          | updates create new rows instead of modifying the intended record        |
 
 ## Ordered Implementation Steps
 

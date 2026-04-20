@@ -50,11 +50,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm command route and response contract | execution plan, current routes | approved command scope | employment logic appears in multiple conflicting places |
-| Backend/domain agent | implement command, handler, endpoint, and any event emission | Shared Kernel guards and academic model | tenure code path | tenure transition requires changing the Shared Kernel invariant model |
-| Testing/verification agent | verify XOR preservation and read-model visibility | implemented slice | tests and evidence | contract state is not cleared or profile output is inconsistent |
+| Role                       | Responsibilities                                             | Inputs                                  | Outputs                | Escalate when                                                         |
+| -------------------------- | ------------------------------------------------------------ | --------------------------------------- | ---------------------- | --------------------------------------------------------------------- |
+| Slice coordinator          | confirm command route and response contract                  | execution plan, current routes          | approved command scope | employment logic appears in multiple conflicting places               |
+| Backend/domain agent       | implement command, handler, endpoint, and any event emission | Shared Kernel guards and academic model | tenure code path       | tenure transition requires changing the Shared Kernel invariant model |
+| Testing/verification agent | verify XOR preservation and read-model visibility            | implemented slice                       | tests and evidence     | contract state is not cleared or profile output is inconsistent       |
 
 ## Ordered Implementation Steps
 

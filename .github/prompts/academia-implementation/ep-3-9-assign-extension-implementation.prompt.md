@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm route shape and current-assignment query scope | execution plan and existing extension model | approved command and query contract | current persistence model cannot express 1:1 uniqueness cleanly |
-| Backend/domain agent | implement assignment command, current-assignment query, handlers, and endpoints | extension pool model and academic model | extension-assignment code path | safe uniqueness requires a schema change beyond the planned constraint |
-| Testing/verification agent | verify success, duplicate use, and concurrency-sensitive cases | implemented slice | tests and evidence | handler-level checks pass but DB uniqueness still allows conflicting assignments |
+| Role                       | Responsibilities                                                                | Inputs                                      | Outputs                             | Escalate when                                                                    |
+| -------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------- |
+| Slice coordinator          | confirm route shape and current-assignment query scope                          | execution plan and existing extension model | approved command and query contract | current persistence model cannot express 1:1 uniqueness cleanly                  |
+| Backend/domain agent       | implement assignment command, current-assignment query, handlers, and endpoints | extension pool model and academic model     | extension-assignment code path      | safe uniqueness requires a schema change beyond the planned constraint           |
+| Testing/verification agent | verify success, duplicate use, and concurrency-sensitive cases                  | implemented slice                           | tests and evidence                  | handler-level checks pass but DB uniqueness still allows conflicting assignments |
 
 ## Ordered Implementation Steps
 

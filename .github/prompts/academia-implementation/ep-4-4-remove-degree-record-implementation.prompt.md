@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm removal route and qualification target strategy | execution plan and qualification model | approved command contract | qualification identity is ambiguous |
-| Backend/domain agent | implement remove command, handler, endpoint | qualification rules and current storage model | removal code path | the minimum-one-qualification rule cannot be enforced cleanly in the current aggregate |
-| Testing/verification agent | verify safe removal and last-record rejection | implemented slice | tests and evidence | the command can remove the final qualification |
+| Role                       | Responsibilities                                        | Inputs                                        | Outputs                   | Escalate when                                                                          |
+| -------------------------- | ------------------------------------------------------- | --------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
+| Slice coordinator          | confirm removal route and qualification target strategy | execution plan and qualification model        | approved command contract | qualification identity is ambiguous                                                    |
+| Backend/domain agent       | implement remove command, handler, endpoint             | qualification rules and current storage model | removal code path         | the minimum-one-qualification rule cannot be enforced cleanly in the current aggregate |
+| Testing/verification agent | verify safe removal and last-record rejection           | implemented slice                             | tests and evidence        | the command can remove the final qualification                                         |
 
 ## Ordered Implementation Steps
 

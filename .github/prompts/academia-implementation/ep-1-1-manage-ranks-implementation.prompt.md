@@ -52,11 +52,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm whether rank records are seeded, API-managed, or both | execution plan, current data setup | approved slice boundary and file targets | repo already stores rank reference data in a conflicting location |
-| Backend/domain agent | build add and list rank behavior with validation | shared kernel rank model, slice conventions | commands, queries, handlers, responses, endpoints | code tries to bypass the canonical rank codes P, SL, L |
-| Testing/verification agent | verify uniqueness, allowed codes, and queryability | implemented slice | tests and evidence | validator and persistence behavior disagree on allowed rank values |
+| Role                       | Responsibilities                                              | Inputs                                      | Outputs                                           | Escalate when                                                      |
+| -------------------------- | ------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------ |
+| Slice coordinator          | confirm whether rank records are seeded, API-managed, or both | execution plan, current data setup          | approved slice boundary and file targets          | repo already stores rank reference data in a conflicting location  |
+| Backend/domain agent       | build add and list rank behavior with validation              | shared kernel rank model, slice conventions | commands, queries, handlers, responses, endpoints | code tries to bypass the canonical rank codes P, SL, L             |
+| Testing/verification agent | verify uniqueness, allowed codes, and queryability            | implemented slice                           | tests and evidence                                | validator and persistence behavior disagree on allowed rank values |
 
 ## Ordered Implementation Steps
 

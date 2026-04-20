@@ -52,12 +52,12 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm folder roots, final type list, and sequence | execution plan, implementation plan, current source tree | approved artifact map and blocker list | current repo layout conflicts with the planned SharedKernel location |
-| Backend/domain agent | implement aggregate, value objects, result types, exceptions, and domain events | approved artifact map, business rules | domain types and invariant logic | a rule cannot be expressed cleanly without clarifying the aggregate boundary |
-| Data/persistence agent | implement EF Core mappings, indexes, and migration support | domain model, persistence standards | mappings, constraints, migration updates | a database rule would drift from the aggregate rule |
-| Testing/verification agent | add invariant tests, mapping tests, and migration validation evidence | implemented kernel artifacts | passing tests and proof of enforced rules | tests expose ambiguity in XOR, access-level derivation, or qualification rules |
+| Role                       | Responsibilities                                                                | Inputs                                                   | Outputs                                   | Escalate when                                                                  |
+| -------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------ |
+| Slice coordinator          | confirm folder roots, final type list, and sequence                             | execution plan, implementation plan, current source tree | approved artifact map and blocker list    | current repo layout conflicts with the planned SharedKernel location           |
+| Backend/domain agent       | implement aggregate, value objects, result types, exceptions, and domain events | approved artifact map, business rules                    | domain types and invariant logic          | a rule cannot be expressed cleanly without clarifying the aggregate boundary   |
+| Data/persistence agent     | implement EF Core mappings, indexes, and migration support                      | domain model, persistence standards                      | mappings, constraints, migration updates  | a database rule would drift from the aggregate rule                            |
+| Testing/verification agent | add invariant tests, mapping tests, and migration validation evidence           | implemented kernel artifacts                             | passing tests and proof of enforced rules | tests expose ambiguity in XOR, access-level derivation, or qualification rules |
 
 ## Ordered Implementation Steps
 
