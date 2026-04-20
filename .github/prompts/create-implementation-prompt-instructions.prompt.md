@@ -112,6 +112,7 @@ Include guidance for a recommended role set using the repository's reusable agen
 - `backend-domain`
 - `frontend-workflow`
 - `testing-verification`
+- `data-persistence` for schema-heavy or EF Core-backed slices
 - `report-projection` for report-centric or projection-heavy slices
 - `data-integration-doc` when supporting data, integration, or documentation work is justified
 
@@ -217,7 +218,7 @@ Require a final checklist that verifies:
 ## Additional Requirements
 
 1. Keep the generated instruction file practical and terse; prefer checklists, tables, and prompt skeletons over long prose.
-2. Include at least one example showing how `backend-domain`, `frontend-workflow`, and `testing-verification` divide work for a single slice, and note when `report-projection` should replace `backend-domain` for report-only slices.
+2. Include at least one example showing how `backend-domain`, `frontend-workflow`, and `testing-verification` divide work for a single slice, and note when `report-projection` should replace `backend-domain` for report-only slices or when `data-persistence` should be added for schema-heavy slices.
 3. Instruct authors to reuse existing custom agents from `.github/agents/` when available before inventing new roles.
 4. Require prompts to state what a human should do if an agent gets blocked or produces conflicting output.
 5. Require prompts to separate implementation instructions from demo instructions so both are independently testable.

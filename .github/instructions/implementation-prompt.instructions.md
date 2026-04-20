@@ -64,14 +64,15 @@ Implementation prompts must use role-specialized custom agents when the slice sp
 
 Recommended roles:
 
-| Role                                | Primary responsibility                                                   | Typical outputs                                |
-| ----------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------- |
-| slice-coordinator                   | Own scope, sequencing, and handoffs                                      | ordered plan, dependency decisions, blockers   |
-| backend-domain                      | Implement contracts, handlers, validation, persistence                   | backend code, API changes, domain rules        |
-| frontend-workflow                   | Implement UI, client flows, and interaction states                       | components, stores, composables, typed clients |
-| testing-verification                | Define checks, run verification, capture evidence                        | test cases, verification notes, failure gaps   |
-| Report/projection agent             | Implement read models, grouped queries, and projection-backed reporting  | report queries, DTOs, projections, aggregates  |
-| Optional data/integration/doc agent | Handle migrations, external integration, or user-facing docs when needed | scripts, integration notes, showcase support   |
+| Role                                | Primary responsibility                                                    | Typical outputs                                |
+| ----------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------- |
+| slice-coordinator                   | Own scope, sequencing, and handoffs                                       | ordered plan, dependency decisions, blockers   |
+| backend-domain                      | Implement contracts, handlers, validation, persistence                    | backend code, API changes, domain rules        |
+| frontend-workflow                   | Implement UI, client flows, and interaction states                        | components, stores, composables, typed clients |
+| testing-verification                | Define checks, run verification, capture evidence                         | test cases, verification notes, failure gaps   |
+| data-persistence                    | Implement EF Core mappings, indexes, migrations, and database constraints | mappings, indexes, migrations, schema updates  |
+| Report/projection agent             | Implement read models, grouped queries, and projection-backed reporting   | report queries, DTOs, projections, aggregates  |
+| Optional data/integration/doc agent | Handle migrations, external integration, or user-facing docs when needed  | scripts, integration notes, showcase support   |
 
 If a repository-specific agent does not exist, the prompt must say whether to:
 
@@ -82,6 +83,8 @@ If a repository-specific agent does not exist, the prompt must say whether to:
 Every prompt must define escalation triggers for missing prerequisites, contradictory repository patterns, failed verification, or ambiguity that changes the slice boundary.
 
 For report-centric slices, prefer the reusable `report-projection` agent over the generic backend/domain role when the primary work is grouped analytics, projection storage, or report-only query behavior.
+
+For schema-heavy or infrastructure-backed slices, prefer the reusable `data-persistence` agent when EF Core mappings, indexes, migrations, or database constraints are a primary concern rather than an incidental implementation detail.
 
 ## Standard Implementation Prompt Structure
 
@@ -172,6 +175,7 @@ Example for a single slice:
 | slice-coordinator    | confirm scope, inspect dependencies, assign sequence                   | hands backend and frontend agents the approved work order      |
 | backend-domain       | implement command, validator, handler, endpoint, and response contract | hands API contract and edge cases to frontend and verification |
 | frontend-workflow    | implement component, composable, store, and request handling states    | hands user flow and failure states to verification             |
+| data-persistence     | implement mappings, indexes, migrations, and integrity constraints     | hands persistence impacts and constraints to verification      |
 | report-projection    | implement projection, grouped query, and report response contracts     | hands report shape and edge cases to verification              |
 | testing-verification | define test cases, run checks, collect proof, raise failures           | returns pass/fail evidence to coordinator and human reviewer   |
 
@@ -205,6 +209,7 @@ Example for a single slice:
 | slice-coordinator    | {{coordinator_scope}} | {{coordinator_inputs}} | {{coordinator_outputs}} | {{coordinator_escalation}} |
 | backend-domain       | {{backend_scope}}     | {{backend_inputs}}     | {{backend_outputs}}     | {{backend_escalation}}     |
 | frontend-workflow    | {{frontend_scope}}    | {{frontend_inputs}}    | {{frontend_outputs}}    | {{frontend_escalation}}    |
+| data-persistence     | {{data_scope}}        | {{data_inputs}}        | {{data_outputs}}        | {{data_escalation}}        |
 | report-projection    | {{report_scope}}      | {{report_inputs}}      | {{report_outputs}}      | {{report_escalation}}      |
 | testing-verification | {{test_scope}}        | {{test_inputs}}        | {{test_outputs}}        | {{test_escalation}}        |
 

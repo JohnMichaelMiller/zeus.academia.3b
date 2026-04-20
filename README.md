@@ -18,6 +18,7 @@ The third iteration of the Zeus Academia experiment
 - [Frontend Workflow Agent Profile](.github/agents/frontend-workflow.agent.md) ([Log](ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md))
 - [Testing Verification Agent Profile](.github/agents/testing-verification.agent.md) ([Log](ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md))
 - [Data Integration Doc Agent Profile](.github/agents/data-integration-doc.agent.md) ([Log](ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md))
+- [Data Persistence Agent Profile](.github/agents/data-persistence.agent.md) ([Log](ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md))
 - [Report Projection Agent Profile](.github/agents/report-projection.agent.md) ([Log](ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md))
 - [Product Manager Agent Prompt](.github/prompts/create-product-manager-agent.prompt.md) ([Log](ai-logs/2026/02/25/2026-02-25-product-manager-agent-prompt/conversation.md))
 - [Product Manager Agent Profile](.github/agents/product-manager.agent.md) ([Log](ai-logs/2026/02/25/2026-02-25-product-manager-agent-prompt/conversation.md))
