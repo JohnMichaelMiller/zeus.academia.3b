@@ -73,6 +73,7 @@ Create a token-optimized `.instructions.md` file with coding standards and best 
 - Code structure patterns
 - Required imports/dependencies
 - Configuration approach
+- Organize by feature domain and use-case first (`src/features/<Feature>/<UseCase>/`), with cross-cutting artifacts in `src/shared/`
 
 ### 4. Common Patterns
 
@@ -117,8 +118,8 @@ Create a token-optimized `.instructions.md` file with coding standards and best 
 
 **applyTo Patterns**:
 
-- Frontend (Vue): `src/frontend/**/*.{vue,ts}`
-- Backend (C#): `src/backend/**/*.cs`
+- Frontend (Vue): `src/features/**/*.{vue,ts}`
+- Backend (C#): `src/features/**/*.cs` and `src/shared/**/*.cs`
 - Tests (C#): `tests/**/*.cs` or `**/*.test.cs`
 - Tests (TS): `src/**/*.{test,spec}.ts`
 - Config: `**/*.config.{js,ts}` or specific files
@@ -197,7 +198,7 @@ tags: [tech-name, category, language]
 - Template syntax and directives
 - Performance (v-once, v-memo, lazy loading)
 
-**applyTo**: `src/frontend/**/*.{vue,ts}`
+**applyTo**: `src/features/**/*.{vue,ts}`
 
 ### Backend (ASP.NET Core, C#)
 
@@ -212,7 +213,7 @@ tags: [tech-name, category, language]
 - Async/await best practices
 - Nullable reference types
 
-**applyTo**: `src/backend/**/*.cs`
+**applyTo**: `src/features/**/*.cs` (or `src/**/*.cs` when shared infrastructure is in `src/shared/`)
 
 ### CQRS (MediatR)
 
@@ -226,7 +227,7 @@ tags: [tech-name, category, language]
 - Unit of work
 - Transaction handling
 
-**applyTo**: `src/backend/**/*.cs`
+**applyTo**: `src/features/**/*.cs`
 
 ### Validation (FluentValidation)
 
@@ -239,7 +240,7 @@ tags: [tech-name, category, language]
 - Error message patterns
 - Integration with MediatR
 
-**applyTo**: `src/backend/**/*Validator.cs`
+**applyTo**: `src/**/*Validator.cs`
 
 ### State Management (Pinia)
 
@@ -253,7 +254,7 @@ tags: [tech-name, category, language]
 - TypeScript typing
 - Persistence patterns
 
-**applyTo**: `src/frontend/stores/**/*.ts`
+**applyTo**: `src/features/**/*.ts`
 
 ### Testing (xUnit, Vitest)
 
@@ -305,6 +306,7 @@ tags: [tech-name, category, language]
 ❌ Including basic syntax tutorials (assume competence)
 ❌ Omitting performance or security considerations
 ❌ Not specifying when to use vs avoid patterns
+❌ Reintroducing layered root assumptions like `src/backend/` and `src/frontend/` instead of feature-domain folders
 
 ## Success Criteria
 

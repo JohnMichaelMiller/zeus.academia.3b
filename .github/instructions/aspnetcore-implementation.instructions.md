@@ -23,8 +23,8 @@ total_duration: "00:10:00"
 ai_log: "ai-logs/2026/02/24/2026-02-24-project-overview-zeus-academia/conversation.md"
 source: ".github/prompts/create-technology-instructions.prompt.md"
 name: "ASP.NET Core Standards"
-description: "ASP.NET Core API development standards and best practices"
-applyTo: "src/backend/**/*.cs"
+description: "ASP.NET Core API development standards and best practices within feature-domain folders"
+applyTo: "src/**/*.cs"
 tags: [aspnetcore, backend, csharp, api, rest]
 ---
 
@@ -44,12 +44,10 @@ tags: [aspnetcore, backend, csharp, api, rest]
 
 ## File Organization
 
-- `src/backend/Api/` - API layer (controllers, endpoints)
-- `src/backend/Api/Controllers/` - MVC controllers
-- `src/backend/Api/Endpoints/` - Minimal API endpoints
-- `src/backend/Application/` - Business logic (commands, queries, handlers)
-- `src/backend/Domain/` - Domain models and interfaces
-- `src/backend/Infrastructure/` - Data access, external services
+- `src/features/<Feature>/<UseCase>/` - Co-locate endpoints, request models, handlers, and mappings for one use-case
+- `src/features/<Feature>/Shared/` - Feature-scoped backend components reused by multiple use-cases in the same feature domain
+- `src/shared/` - Cross-cutting middleware, primitives, and infrastructure abstractions
+- Keep controllers or minimal API extensions close to the use-case they expose
 - Naming: PascalCase for all files matching class names
 
 ## Standard Patterns
@@ -57,13 +55,16 @@ tags: [aspnetcore, backend, csharp, api, rest]
 ### Minimal API Endpoints
 
 ```csharp
-// Api/Endpoints/StudentEndpoints.cs
+// src/features/Students/GetStudents/StudentEndpoints.cs
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Zeus.Academia.Application.Students.Commands;
-using Zeus.Academia.Application.Students.Queries;
+using Zeus.Academia.Features.Students.CreateStudent;
+using Zeus.Academia.Features.Students.DeleteStudent;
+using Zeus.Academia.Features.Students.GetStudent;
+using Zeus.Academia.Features.Students.GetStudents;
+using Zeus.Academia.Features.Students.UpdateStudent;
 
-namespace Zeus.Academia.Api.Endpoints;
+namespace Zeus.Academia.Features.Students.GetStudents;
 
 public static class StudentEndpoints
 {
@@ -160,14 +161,15 @@ public static class StudentEndpoints
 ### Controller Pattern (for complex logic)
 
 ```csharp
-// Api/Controllers/EnrollmentController.cs
+// src/features/Enrollment/GetEnrollment/EnrollmentController.cs
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Zeus.Academia.Application.Enrollments.Commands;
-using Zeus.Academia.Application.Enrollments.Queries;
+using Zeus.Academia.Features.Enrollment.EnrollStudent;
+using Zeus.Academia.Features.Enrollment.GetEnrollment;
+using Zeus.Academia.Features.Enrollment.GetEnrollments;
 
-namespace Zeus.Academia.Api.Controllers;
+namespace Zeus.Academia.Features.Enrollment.GetEnrollment;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -246,7 +248,7 @@ public class EnrollmentController : ControllerBase
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
-using Zeus.Academia.Api.Endpoints;
+using Zeus.Academia.Features.Students.GetStudents;
 using Zeus.Academia.Application;
 using Zeus.Academia.Infrastructure;
 
@@ -320,12 +322,12 @@ public partial class Program { }
 ### Middleware Pattern
 
 ```csharp
-// Api/Middleware/ExceptionHandlingMiddleware.cs
+// src/shared/Middleware/ExceptionHandlingMiddleware.cs
 using System.Net;
 using System.Text.Json;
 using FluentValidation;
 
-namespace Zeus.Academia.Api.Middleware;
+namespace Zeus.Academia.Shared.Middleware;
 
 public class ExceptionHandlingMiddleware
 {

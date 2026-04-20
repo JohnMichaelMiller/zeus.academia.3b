@@ -23,8 +23,8 @@ total_duration: "00:10:00"
 ai_log: "ai-logs/2026/02/24/2026-02-24-project-overview-zeus-academia/conversation.md"
 source: ".github/prompts/create-technology-instructions.prompt.md"
 name: "Vue 3 Standards"
-description: "Vue 3 coding standards and best practices for Academic Management System frontend"
-applyTo: "src/frontend/**/*.{vue,ts}"
+description: "Vue 3 coding standards and best practices for feature-domain UI implementation"
+applyTo: "src/**/*.{vue,ts}"
 tags: [vue3, frontend, typescript, composition-api, sfc]
 ---
 
@@ -44,12 +44,11 @@ tags: [vue3, frontend, typescript, composition-api, sfc]
 
 ## File Organization
 
-- `src/frontend/components/` - Reusable components (PascalCase)
-- `src/frontend/views/` - Route-level page components
-- `src/frontend/composables/` - Reusable composition functions (use prefix)
-- `src/frontend/stores/` - Pinia stores
-- `src/frontend/router/` - Vue Router configuration
-- `src/frontend/types/` - TypeScript interfaces and types
+- `src/features/<Feature>/<UseCase>/` - Co-locate page components, composables, stores, route modules, and UI-facing types for one use-case
+- `src/features/<Feature>/Shared/` - Feature-scoped Vue components or composables reused within the same feature domain
+- `src/shared/components/` - Cross-cutting UI components
+- `src/shared/composables/` - Cross-cutting composition functions
+- `src/shared/router/` - Router bootstrap and global guards
 - Naming: `ComponentName.vue`, `useFeatureName.ts` (composables)
 
 ## Standard Patterns
@@ -58,49 +57,51 @@ tags: [vue3, frontend, typescript, composition-api, sfc]
 
 ```vue
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import type { PropType } from 'vue'
+import { ref, computed, onMounted } from "vue";
+import type { PropType } from "vue";
 
 interface Props {
-  userId: string
-  isActive?: boolean
+  userId: string;
+  isActive?: boolean;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  update: [value: string]
-  close: []
-}>()
+  update: [value: string];
+  close: [];
+}>();
 
 // Local state
-const loading = ref(false)
-const userData = ref<User | null>(null)
+const loading = ref(false);
+const userData = ref<User | null>(null);
 
 // Computed properties
-const displayName = computed(() => 
-  userData.value ? `${userData.value.firstName} ${userData.value.lastName}` : ''
-)
+const displayName = computed(() =>
+  userData.value
+    ? `${userData.value.firstName} ${userData.value.lastName}`
+    : "",
+);
 
 // Methods
 const loadUser = async () => {
-  loading.value = true
+  loading.value = true;
   try {
-    userData.value = await fetchUser(props.userId)
+    userData.value = await fetchUser(props.userId);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // Lifecycle
 onMounted(() => {
-  loadUser()
-})
+  loadUser();
+});
 
 // Expose for parent access (optional)
 defineExpose({
-  refresh: loadUser
-})
+  refresh: loadUser,
+});
 </script>
 
 <template>
@@ -110,9 +111,7 @@ defineExpose({
     </template>
     <template v-else-if="userData">
       <h2>{{ displayName }}</h2>
-      <button @click="emit('update', userData.id)">
-        Update
-      </button>
+      <button @click="emit('update', userData.id)">Update</button>
     </template>
   </div>
 </template>
@@ -130,59 +129,59 @@ defineExpose({
 ### Composable Pattern
 
 ```typescript
-// composables/useStudentEnrollment.ts
-import { ref, computed } from 'vue'
-import type { Ref } from 'vue'
-import { useEnrollmentStore } from '@/stores/enrollment'
+// src/features/enrollment/listStudentEnrollments/useStudentEnrollment.ts
+import { ref, computed } from "vue";
+import type { Ref } from "vue";
+import { useEnrollmentStore } from "./useEnrollmentStore";
 
 export interface UseStudentEnrollmentOptions {
-  autoLoad?: boolean
+  autoLoad?: boolean;
 }
 
 export function useStudentEnrollment(
   studentId: Ref<string>,
-  options: UseStudentEnrollmentOptions = {}
+  options: UseStudentEnrollmentOptions = {},
 ) {
-  const store = useEnrollmentStore()
-  const loading = ref(false)
-  const error = ref<Error | null>(null)
-  
-  const enrollments = computed(() => 
-    store.getEnrollmentsByStudent(studentId.value)
-  )
-  
+  const store = useEnrollmentStore();
+  const loading = ref(false);
+  const error = ref<Error | null>(null);
+
+  const enrollments = computed(() =>
+    store.getEnrollmentsByStudent(studentId.value),
+  );
+
   const activeEnrollments = computed(() =>
-    enrollments.value.filter(e => e.status === 'active')
-  )
-  
+    enrollments.value.filter((e) => e.status === "active"),
+  );
+
   async function loadEnrollments() {
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
     try {
-      await store.fetchEnrollments(studentId.value)
+      await store.fetchEnrollments(studentId.value);
     } catch (e) {
-      error.value = e as Error
+      error.value = e as Error;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
-  
+
   async function enroll(courseId: string) {
-    await store.enrollStudent(studentId.value, courseId)
+    await store.enrollStudent(studentId.value, courseId);
   }
-  
+
   if (options.autoLoad) {
-    loadEnrollments()
+    loadEnrollments();
   }
-  
+
   return {
     enrollments,
     activeEnrollments,
     loading,
     error,
     loadEnrollments,
-    enroll
-  }
+    enroll,
+  };
 }
 ```
 
@@ -194,32 +193,32 @@ export function useStudentEnrollment(
 ```typescript
 // Using TypeScript interface (preferred)
 interface Props {
-  title: string
-  count: number
-  items: Array<{ id: string; name: string }>
-  status?: 'active' | 'inactive'
+  title: string;
+  count: number;
+  items: Array<{ id: string; name: string }>;
+  status?: "active" | "inactive";
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  status: 'active'
-})
+  status: "active",
+});
 
 // With runtime validation (when needed)
 const props = defineProps({
   title: {
     type: String,
-    required: true
+    required: true,
   },
   count: {
     type: Number,
     required: true,
-    validator: (value: number) => value >= 0
+    validator: (value: number) => value >= 0,
   },
   status: {
-    type: String as PropType<'active' | 'inactive'>,
-    default: 'active'
-  }
-})
+    type: String as PropType<"active" | "inactive">,
+    default: "active",
+  },
+});
 ```
 
 **Usage**: Always type props; use runtime validation for complex constraints
@@ -228,13 +227,13 @@ const props = defineProps({
 ### Template Refs
 
 ```typescript
-const inputRef = ref<HTMLInputElement | null>(null)
-const componentRef = ref<InstanceType<typeof MyComponent> | null>(null)
+const inputRef = ref<HTMLInputElement | null>(null);
+const componentRef = ref<InstanceType<typeof MyComponent> | null>(null);
 
 onMounted(() => {
-  inputRef.value?.focus()
-  componentRef.value?.refresh()
-})
+  inputRef.value?.focus();
+  componentRef.value?.refresh();
+});
 ```
 
 ```vue
@@ -249,10 +248,10 @@ onMounted(() => {
 
 ## Integration
 
-- **Pinia**: Import stores with `useXxxStore()` from `@/stores/xxx`
+- **Pinia**: Import stores from the same use-case folder first, then promote to `src/features/<Feature>/Shared/` or `src/shared/` only when reuse is proven
 - **Router**: Use `useRouter()` and `useRoute()` for navigation
 - **API**: Axios instance from `@/services/api`
-- **Auth**: Azure AD B2C via `@/composables/useAuth`
+- **Auth**: Azure AD B2C via `@/shared/composables/useAuth`
 - **Validation**: Vuelidate for form validation (frontend-only)
 
 ## Performance Optimization
@@ -260,18 +259,18 @@ onMounted(() => {
 - **Lazy Loading**: Routes and heavy components
 
 ```typescript
-// router/index.ts
+// src/shared/router/index.ts
 const routes = [
   {
-    path: '/students',
-    component: () => import('@/views/StudentList.vue')
-  }
-]
+    path: "/students",
+    component: () => import("@/features/students/listStudents/StudentList.vue"),
+  },
+];
 
 // In component
-const HeavyChart = defineAsyncComponent(() =>
-  import('@/components/HeavyChart.vue')
-)
+const HeavyChart = defineAsyncComponent(
+  () => import("@/shared/components/HeavyChart.vue"),
+);
 ```
 
 - **v-once**: Static content that never changes
@@ -301,17 +300,17 @@ const HeavyChart = defineAsyncComponent(() =>
 
 ```typescript
 // Clean up subscriptions
-const unsubscribe = ref<(() => void) | null>(null)
+const unsubscribe = ref<(() => void) | null>(null);
 
 onMounted(() => {
   unsubscribe.value = store.$onAction((action) => {
-    console.log(action)
-  })
-})
+    console.log(action);
+  });
+});
 
 onUnmounted(() => {
-  unsubscribe.value?.()
-})
+  unsubscribe.value?.();
+});
 ```
 
 ## Validation Checklist

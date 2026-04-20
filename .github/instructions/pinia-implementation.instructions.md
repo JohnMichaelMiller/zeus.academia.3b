@@ -23,8 +23,8 @@ total_duration: "00:10:00"
 ai_log: "ai-logs/2026/02/24/2026-02-24-project-overview-zeus-academia/conversation.md"
 source: ".github/prompts/create-technology-instructions.prompt.md"
 name: "Pinia Standards"
-description: "Pinia state management standards and best practices for Vue 3 application"
-applyTo: "src/frontend/stores/**/*.ts"
+description: "Pinia state management standards and best practices for feature-domain folders"
+applyTo: "src/**/*.ts"
 tags: [pinia, state-management, frontend, typescript, vue3]
 ---
 
@@ -38,14 +38,15 @@ tags: [pinia, state-management, frontend, typescript, vue3]
 
 - **Composition Stores**: Use setup stores (not options stores)
 - **TypeScript**: Full type safety for state, getters, and actions
-- **Modularity**: One store per domain/feature
+- **Modularity**: One store per use-case or narrowly shared feature concern
 - **Naming**: `use<Feature>Store` pattern
 - **Reactivity**: Leverage Vue 3 reactivity system
 
 ## File Organization
 
-- `src/frontend/stores/` - All Pinia stores
-- `src/frontend/stores/index.ts` - Pinia instance configuration
+- `src/features/<Feature>/<UseCase>/` - Keep the primary store for a use-case beside its component, API client, and route module
+- `src/features/<Feature>/Shared/` - Feature-scoped stores reused within the same feature domain
+- `src/shared/stores/index.ts` - Pinia instance configuration and truly cross-cutting stores
 - Naming: `useEnrollmentStore.ts`, `useAuthStore.ts`, `useStudentStore.ts`
 - One store per file
 
@@ -54,155 +55,156 @@ tags: [pinia, state-management, frontend, typescript, vue3]
 ### Store Structure (Setup Style)
 
 ```typescript
-// stores/useStudentStore.ts
-import { ref, computed } from 'vue'
-import { defineStore } from 'pinia'
-import type { Student, StudentFilters } from '@/types/student'
-import { studentApi } from '@/services/api/students'
+// src/features/students/listStudents/useStudentStore.ts
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
+import type { Student, StudentFilters } from "../shared/student.types";
+import { studentApi } from "../shared/studentApi";
 
-export const useStudentStore = defineStore('student', () => {
+export const useStudentStore = defineStore("student", () => {
   // State
-  const students = ref<Student[]>([])
-  const selectedStudent = ref<Student | null>(null)
-  const loading = ref(false)
-  const error = ref<Error | null>(null)
+  const students = ref<Student[]>([]);
+  const selectedStudent = ref<Student | null>(null);
+  const loading = ref(false);
+  const error = ref<Error | null>(null);
   const filters = ref<StudentFilters>({
-    status: 'active',
-    searchTerm: ''
-  })
-  
+    status: "active",
+    searchTerm: "",
+  });
+
   // Getters (computed)
   const activeStudents = computed(() =>
-    students.value.filter(s => s.status === 'active')
-  )
-  
+    students.value.filter((s) => s.status === "active"),
+  );
+
   const filteredStudents = computed(() => {
-    let result = students.value
-    
+    let result = students.value;
+
     if (filters.value.status) {
-      result = result.filter(s => s.status === filters.value.status)
+      result = result.filter((s) => s.status === filters.value.status);
     }
-    
+
     if (filters.value.searchTerm) {
-      const term = filters.value.searchTerm.toLowerCase()
-      result = result.filter(s =>
-        s.firstName.toLowerCase().includes(term) ||
-        s.lastName.toLowerCase().includes(term) ||
-        s.email.toLowerCase().includes(term)
-      )
+      const term = filters.value.searchTerm.toLowerCase();
+      result = result.filter(
+        (s) =>
+          s.firstName.toLowerCase().includes(term) ||
+          s.lastName.toLowerCase().includes(term) ||
+          s.email.toLowerCase().includes(term),
+      );
     }
-    
-    return result
-  })
-  
-  const studentCount = computed(() => students.value.length)
-  
+
+    return result;
+  });
+
+  const studentCount = computed(() => students.value.length);
+
   // Actions
   async function fetchStudents() {
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
     try {
-      const response = await studentApi.getAll()
-      students.value = response.data
+      const response = await studentApi.getAll();
+      students.value = response.data;
     } catch (e) {
-      error.value = e as Error
-      throw e
+      error.value = e as Error;
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
-  
+
   async function fetchStudent(id: string) {
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
     try {
-      const response = await studentApi.getById(id)
-      selectedStudent.value = response.data
-      return response.data
+      const response = await studentApi.getById(id);
+      selectedStudent.value = response.data;
+      return response.data;
     } catch (e) {
-      error.value = e as Error
-      throw e
+      error.value = e as Error;
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
-  
-  async function createStudent(data: Omit<Student, 'id'>) {
-    loading.value = true
-    error.value = null
+
+  async function createStudent(data: Omit<Student, "id">) {
+    loading.value = true;
+    error.value = null;
     try {
-      const response = await studentApi.create(data)
-      students.value.push(response.data)
-      return response.data
+      const response = await studentApi.create(data);
+      students.value.push(response.data);
+      return response.data;
     } catch (e) {
-      error.value = e as Error
-      throw e
+      error.value = e as Error;
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
-  
+
   async function updateStudent(id: string, data: Partial<Student>) {
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
     try {
-      const response = await studentApi.update(id, data)
-      const index = students.value.findIndex(s => s.id === id)
+      const response = await studentApi.update(id, data);
+      const index = students.value.findIndex((s) => s.id === id);
       if (index !== -1) {
-        students.value[index] = response.data
+        students.value[index] = response.data;
       }
       if (selectedStudent.value?.id === id) {
-        selectedStudent.value = response.data
+        selectedStudent.value = response.data;
       }
-      return response.data
+      return response.data;
     } catch (e) {
-      error.value = e as Error
-      throw e
+      error.value = e as Error;
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
-  
+
   async function deleteStudent(id: string) {
-    loading.value = true
-    error.value = null
+    loading.value = true;
+    error.value = null;
     try {
-      await studentApi.delete(id)
-      students.value = students.value.filter(s => s.id !== id)
+      await studentApi.delete(id);
+      students.value = students.value.filter((s) => s.id !== id);
       if (selectedStudent.value?.id === id) {
-        selectedStudent.value = null
+        selectedStudent.value = null;
       }
     } catch (e) {
-      error.value = e as Error
-      throw e
+      error.value = e as Error;
+      throw e;
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
-  
+
   function setFilters(newFilters: Partial<StudentFilters>) {
-    filters.value = { ...filters.value, ...newFilters }
+    filters.value = { ...filters.value, ...newFilters };
   }
-  
+
   function clearFilters() {
     filters.value = {
-      status: 'active',
-      searchTerm: ''
-    }
+      status: "active",
+      searchTerm: "",
+    };
   }
-  
+
   function selectStudent(student: Student | null) {
-    selectedStudent.value = student
+    selectedStudent.value = student;
   }
-  
+
   function $reset() {
-    students.value = []
-    selectedStudent.value = null
-    loading.value = false
-    error.value = null
-    clearFilters()
+    students.value = [];
+    selectedStudent.value = null;
+    loading.value = false;
+    error.value = null;
+    clearFilters();
   }
-  
+
   return {
     // State
     students,
@@ -223,9 +225,9 @@ export const useStudentStore = defineStore('student', () => {
     setFilters,
     clearFilters,
     selectStudent,
-    $reset
-  }
-})
+    $reset,
+  };
+});
 ```
 
 **Usage**: Standard CRUD store with filtering and selection
@@ -234,37 +236,37 @@ export const useStudentStore = defineStore('student', () => {
 ### Store Composition
 
 ```typescript
-// stores/useEnrollmentStore.ts
-import { ref, computed } from 'vue'
-import { defineStore } from 'pinia'
-import { useStudentStore } from './useStudentStore'
-import { useCourseStore } from './useCourseStore'
-import type { Enrollment } from '@/types/enrollment'
+// src/features/enrollment/createEnrollment/useEnrollmentStore.ts
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
+import { useStudentStore } from "./useStudentStore";
+import { useCourseStore } from "./useCourseStore";
+import type { Enrollment } from "../shared/enrollment.types";
 
-export const useEnrollmentStore = defineStore('enrollment', () => {
-  const studentStore = useStudentStore()
-  const courseStore = useCourseStore()
-  
-  const enrollments = ref<Enrollment[]>([])
-  
+export const useEnrollmentStore = defineStore("enrollment", () => {
+  const studentStore = useStudentStore();
+  const courseStore = useCourseStore();
+
+  const enrollments = ref<Enrollment[]>([]);
+
   const enrichedEnrollments = computed(() =>
-    enrollments.value.map(enrollment => ({
+    enrollments.value.map((enrollment) => ({
       ...enrollment,
-      student: studentStore.students.find(s => s.id === enrollment.studentId),
-      course: courseStore.courses.find(c => c.id === enrollment.courseId)
-    }))
-  )
-  
+      student: studentStore.students.find((s) => s.id === enrollment.studentId),
+      course: courseStore.courses.find((c) => c.id === enrollment.courseId),
+    })),
+  );
+
   async function enrollStudent(studentId: string, courseId: string) {
     // Implementation
   }
-  
+
   return {
     enrollments,
     enrichedEnrollments,
-    enrollStudent
-  }
-})
+    enrollStudent,
+  };
+});
 ```
 
 **Usage**: Compose multiple stores for related functionality
@@ -273,40 +275,44 @@ export const useEnrollmentStore = defineStore('enrollment', () => {
 ### Persisted State
 
 ```typescript
-// stores/useAuthStore.ts
-import { ref, computed } from 'vue'
-import { defineStore } from 'pinia'
+// src/shared/stores/useAuthStore.ts
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
 
-export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string | null>(localStorage.getItem('auth_token'))
-  const user = ref<User | null>(null)
-  
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
-  
-  async function login(credentials: LoginCredentials) {
-    const response = await authApi.login(credentials)
-    token.value = response.token
-    user.value = response.user
-    localStorage.setItem('auth_token', response.token)
-  }
-  
-  function logout() {
-    token.value = null
-    user.value = null
-    localStorage.removeItem('auth_token')
-  }
-  
-  return {
-    token,
-    user,
-    isAuthenticated,
-    login,
-    logout
-  }
-}, {
-  // Alternative: use pinia-plugin-persistedstate
-  persist: false // Handle manually for sensitive data
-})
+export const useAuthStore = defineStore(
+  "auth",
+  () => {
+    const token = ref<string | null>(localStorage.getItem("auth_token"));
+    const user = ref<User | null>(null);
+
+    const isAuthenticated = computed(() => !!token.value && !!user.value);
+
+    async function login(credentials: LoginCredentials) {
+      const response = await authApi.login(credentials);
+      token.value = response.token;
+      user.value = response.user;
+      localStorage.setItem("auth_token", response.token);
+    }
+
+    function logout() {
+      token.value = null;
+      user.value = null;
+      localStorage.removeItem("auth_token");
+    }
+
+    return {
+      token,
+      user,
+      isAuthenticated,
+      login,
+      logout,
+    };
+  },
+  {
+    // Alternative: use pinia-plugin-persistedstate
+    persist: false, // Handle manually for sensitive data
+  },
+);
 ```
 
 **Usage**: Manual persistence for auth tokens and user preferences
@@ -316,20 +322,20 @@ export const useAuthStore = defineStore('auth', () => {
 
 ```typescript
 async function updateStudentStatus(id: string, status: StudentStatus) {
-  const student = students.value.find(s => s.id === id)
-  if (!student) return
-  
+  const student = students.value.find((s) => s.id === id);
+  if (!student) return;
+
   // Optimistic update
-  const originalStatus = student.status
-  student.status = status
-  
+  const originalStatus = student.status;
+  student.status = status;
+
   try {
-    await studentApi.updateStatus(id, status)
+    await studentApi.updateStatus(id, status);
   } catch (e) {
     // Rollback on error
-    student.status = originalStatus
-    error.value = e as Error
-    throw e
+    student.status = originalStatus;
+    error.value = e as Error;
+    throw e;
   }
 }
 ```
@@ -347,61 +353,71 @@ async function updateStudentStatus(id: string, status: StudentStatus) {
 
 ```typescript
 // main.ts
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import App from './App.vue'
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import App from "./App.vue";
 
-const app = createApp(App)
-const pinia = createPinia()
+const app = createApp(App);
+const pinia = createPinia();
 
-app.use(pinia)
-app.mount('#app')
+app.use(pinia);
+app.mount("#app");
 ```
 
 ## Testing Patterns
 
 ```typescript
-// __tests__/stores/useStudentStore.spec.ts
-import { setActivePinia, createPinia } from 'pinia'
-import { useStudentStore } from '@/stores/useStudentStore'
-import { vi } from 'vitest'
+// src/features/students/listStudents/__tests__/useStudentStore.spec.ts
+import { setActivePinia, createPinia } from "pinia";
+import { useStudentStore } from "../useStudentStore";
+import { vi } from "vitest";
 
-describe('useStudentStore', () => {
+describe("useStudentStore", () => {
   beforeEach(() => {
-    setActivePinia(createPinia())
-  })
-  
-  it('fetches students', async () => {
-    const store = useStudentStore()
-    
+    setActivePinia(createPinia());
+  });
+
+  it("fetches students", async () => {
+    const store = useStudentStore();
+
     // Mock API
-    vi.mock('@/services/api/students', () => ({
+    vi.mock("@/services/api/students", () => ({
       studentApi: {
         getAll: vi.fn().mockResolvedValue({
-          data: [{ id: '1', name: 'John Doe' }]
-        })
-      }
-    }))
-    
-    await store.fetchStudents()
-    
-    expect(store.students).toHaveLength(1)
-    expect(store.loading).toBe(false)
-  })
-  
-  it('filters students by search term', () => {
-    const store = useStudentStore()
+          data: [{ id: "1", name: "John Doe" }],
+        }),
+      },
+    }));
+
+    await store.fetchStudents();
+
+    expect(store.students).toHaveLength(1);
+    expect(store.loading).toBe(false);
+  });
+
+  it("filters students by search term", () => {
+    const store = useStudentStore();
     store.students = [
-      { id: '1', firstName: 'John', lastName: 'Doe', email: 'john@example.com' },
-      { id: '2', firstName: 'Jane', lastName: 'Smith', email: 'jane@example.com' }
-    ]
-    
-    store.setFilters({ searchTerm: 'john' })
-    
-    expect(store.filteredStudents).toHaveLength(1)
-    expect(store.filteredStudents[0].firstName).toBe('John')
-  })
-})
+      {
+        id: "1",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john@example.com",
+      },
+      {
+        id: "2",
+        firstName: "Jane",
+        lastName: "Smith",
+        email: "jane@example.com",
+      },
+    ];
+
+    store.setFilters({ searchTerm: "john" });
+
+    expect(store.filteredStudents).toHaveLength(1);
+    expect(store.filteredStudents[0].firstName).toBe("John");
+  });
+});
 ```
 
 ## Validation Checklist

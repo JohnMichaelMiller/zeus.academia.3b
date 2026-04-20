@@ -34,14 +34,13 @@ applyTo: "**"
 
 ## Architecture
 
-- **Structure**: Monorepo with separated frontend/backend
-- **Frontend**: Vue 3 + Pinia (state) + Vite (build) + TypeScript
-- **Backend**: ASP.NET Core + MediatR (CQRS) + FluentValidation
+- **Structure**: Monorepo with application code organized by feature domain under `src/features/`
+- **UI Stack**: Vue 3 + Pinia (state) + Vite (build) + TypeScript
+- **Server Stack**: ASP.NET Core + MediatR (CQRS) + FluentValidation
 - **API**: REST + GraphQL endpoints
 - **Core Dirs**:
-  - `src/frontend/` - Vue 3 SPA application
-  - `src/backend/` - ASP.NET Core API services
-  - `src/shared/` - Shared contracts and models
+  - `src/features/` - Feature domains containing co-located use-case folders and their UI/API artifacts
+  - `src/shared/` - Shared primitives, contracts, and cross-cutting building blocks
   - `.github/instructions/` - AI assistant directives
   - `.github/prompts/` - Reusable prompt templates
   - `ai-logs/` - AI conversation and session logs
@@ -80,8 +79,9 @@ applyTo: "**"
 ## Key Patterns
 
 - **CQRS**: Commands via MediatR for writes, queries for reads
+- **Vertical Slices**: Organize by feature domain first, then by use-case folder inside `src/features/`
 - **Validation**: FluentValidation rules per command/query
-- **State Management**: Pinia stores with TypeScript
+- **State Management**: Pinia stores scoped to the relevant feature domain and use-case
 - **API Communication**: Axios (REST), Apollo Client (GraphQL)
 - **Error Handling**: Centralized error boundaries and middleware
 - **AI Provenance**: Complete metadata required for all AI-assisted artifacts
@@ -94,4 +94,4 @@ applyTo: "**"
 - `.github/instructions/implementation-prompt-generation.instructions.md` - Standards for slice implementation prompt files
 - `.github/instructions/cqrs-es-csharp-mediatr.instructions.md` - CQRS implementation guide
 - `.github/instructions/csharp-implementation.instructions.md` - C# coding standards
-- `.github/instructions/vertical-slice-implementation.instructions.md` - Vertical slice structure, naming, templates, and quality checklist
+- `.github/instructions/vertical-slice-implementation.instructions.md` - Feature-domain and use-case structure, naming, templates, and quality checklist
