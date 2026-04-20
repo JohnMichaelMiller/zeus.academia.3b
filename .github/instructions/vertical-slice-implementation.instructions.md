@@ -18,82 +18,92 @@ total_duration: "00:20:00"
 ai_log: "ai-logs/2026/02/26/2026-02-26-vertical-slice-instructions-generation/conversation.md"
 source: ".github/prompts/create-vertical-slice-implementation-instructions.prompt.md"
 description: "Vertical slice architecture implementation standards"
-applyTo: "src/**/*.cs"
+applyTo: ["src/features/**/*.cs", "src/features/**/*.{vue,ts}"]
 ---
 
-# Vertical Slice Architecture — Implementation Standards
+# Vertical Slice Architecture — Full-Stack Implementation Standards
 
-Standards for implementing features as self-contained vertical slices in the zeus.academia ASP.NET Core + MediatR + EF Core application.
+Standards for implementing feature domains as collections of self-contained use-case folders in the zeus.academia application.
 
 ## 1. Core Principle
 
-A **vertical slice** is one cohesive use-case that spans all application layers from HTTP endpoint through handler logic to database persistence. Each slice:
+Use the following terms consistently:
 
-- Owns its own command/query, handler, validator, response DTO, and endpoint mapping.
-- Has **no compile-time dependency on any other feature slice**.
-- Communicates cross-feature only via **domain events** or the **shared kernel** — never by direct namespace reference.
-- Prefers **duplication within a slice** over coupling between slices.
+- A `feature domain` is a top-level folder under `src/features/`, such as `Enrollment`.
+- A `use-case` is a child folder under a feature domain, such as `CreateEnrollment` or `GetEnrollmentById`.
 
-## 2. Folder Structure
+A vertical slice is one cohesive use-case that spans all relevant layers from route to persistence. Organize code by feature domain first and by use-case second, so each use-case folder owns its command or query, validation, mapping, endpoint, UI, client, store, and route registration inside one folder tree.
 
-One top-level folder per feature domain; one sub-folder per use-case:
+- Own each use-case end-to-end inside a single use-case folder.
+- Allow no compile-time dependency on another feature domain's private slice artifacts.
+- Use the shared kernel only for primitives and cross-cutting building blocks.
+- Prefer duplication within a use-case over coupling between slices.
+- Keep all artifacts for the same use-case together under the same feature-domain tree.
 
+## 2. Canonical Folder Structure
+
+One top-level folder per feature domain and one child folder per use-case.
+
+```text
+src/features/
+└── Enrollment/
+    ├── CreateEnrollment/
+    │   ├── CreateEnrollmentCommand.cs
+    │   ├── CreateEnrollmentCommandValidator.cs
+    │   ├── CreateEnrollmentHandler.cs
+    │   ├── CreateEnrollmentResponse.cs
+    │   ├── CreateEnrollmentEndpoint.cs
+    │   ├── CreateEnrollmentMappings.cs
+    │   ├── CreateEnrollmentForm.vue
+    │   ├── useCreateEnrollment.ts
+    │   ├── useCreateEnrollmentStore.ts
+    │   ├── createEnrollmentApi.ts
+    │   ├── createEnrollmentTypes.ts
+    │   └── createEnrollmentRoute.ts
+    ├── GetEnrollmentById/
+    │   ├── GetEnrollmentByIdQuery.cs
+    │   ├── GetEnrollmentByIdHandler.cs
+    │   ├── GetEnrollmentByIdResponse.cs
+    │   └── GetEnrollmentByIdEndpoint.cs
+    └── ListEnrollments/
+        └── ...
 ```
-src/backend/Features/
-└── <FeatureName>/
-    ├── Commands/
-    │   ├── Create<FeatureName>/
-    │   │   ├── Create<FeatureName>Command.cs        # IRequest<Result<T>>
-    │   │   ├── Create<FeatureName>Handler.cs        # IRequestHandler
-    │   │   ├── Create<FeatureName>Validator.cs      # AbstractValidator
-    │   │   └── Create<FeatureName>Response.cs       # Slice-private DTO
-    │   └── Update<FeatureName>/
-    │       ├── Update<FeatureName>Command.cs
-    │       ├── Update<FeatureName>Handler.cs
-    │       ├── Update<FeatureName>Validator.cs
-    │       └── Update<FeatureName>Response.cs
-    ├── Queries/
-    │   ├── Get<FeatureName>ById/
-    │   │   ├── Get<FeatureName>ByIdQuery.cs
-    │   │   ├── Get<FeatureName>ByIdHandler.cs
-    │   │   └── Get<FeatureName>ByIdResponse.cs
-    │   └── List<FeatureName>s/
-    │       ├── List<FeatureName>sQuery.cs
-    │       ├── List<FeatureName>sHandler.cs
-    │       └── List<FeatureName>sResponse.cs
-    ├── <FeatureName>Endpoints.cs                   # Minimal API route registration
-    └── <FeatureName>MappingProfile.cs              # Mapping (AutoMapper or manual)
-```
 
-**Rules:**
+Rules:
 
-- File name MUST match type name exactly (`CreateEnrollmentCommand.cs` → `CreateEnrollmentCommand`).
-- Validators MUST live beside their command/query — never in a shared `Validators/` folder.
-- Response DTOs are slice-private — never reference them from another feature's namespace.
-- Empty `Update` or `Delete` use-case folders are fine; scaffold only what the slice needs.
+- Do not split slice code between separate layer roots.
+- Do not introduce `Commands/`, `Queries/`, `api/`, `components/`, `stores/`, `types/`, or `routes/` as the primary organizational axis for a use-case.
+- File names must match their primary type or exported symbol exactly.
+- Validators live beside their command or query.
+- Response DTOs and UI contracts are use-case-private until promoted deliberately.
+- Optional feature-domain aggregators are acceptable only for composing use-case endpoints or routes; use-case behavior still lives in the use-case folders.
 
 ## 3. Naming Conventions
 
-| Artifact        | Pattern                     | Example                            |
-| --------------- | --------------------------- | ---------------------------------- |
-| Command         | `<Verb><Feature>Command`    | `CreateEnrollmentCommand`          |
-| Query           | `<Verb><Feature>Query`      | `GetEnrollmentByIdQuery`           |
-| Command handler | `<Command>Handler`          | `CreateEnrollmentHandler`          |
-| Query handler   | `<Query>Handler`            | `GetEnrollmentByIdHandler`         |
-| Validator       | `<CommandOrQuery>Validator` | `CreateEnrollmentCommandValidator` |
-| Response DTO    | `<CommandOrQuery>Response`  | `CreateEnrollmentResponse`         |
-| Endpoint class  | `<Feature>Endpoints`        | `EnrollmentEndpoints`              |
-| Mapping profile | `<Feature>MappingProfile`   | `EnrollmentMappingProfile`         |
-| Test class      | `<Handler>Tests`            | `CreateEnrollmentHandlerTests`     |
+In the patterns below, `Feature` means the feature-domain name. `Verb<Feature>` means a specific use-case folder inside that feature domain.
 
-**Verb guidance:** `Create`, `Update`, `Delete`, `Enroll`, `Assign`, `Submit`, `Approve`, `Reject`, `Get`, `List`, `Search`.
+| Artifact       | Pattern                     | Example                            |
+| -------------- | --------------------------- | ---------------------------------- |
+| Command        | `<Verb><Feature>Command`    | `CreateEnrollmentCommand`          |
+| Query          | `<Verb><Feature>Query`      | `GetEnrollmentByIdQuery`           |
+| Handler        | `<CommandOrQuery>Handler`   | `CreateEnrollmentHandler`          |
+| Validator      | `<CommandOrQuery>Validator` | `CreateEnrollmentCommandValidator` |
+| Response DTO   | `<CommandOrQuery>Response`  | `CreateEnrollmentResponse`         |
+| Endpoint class | `<CommandOrQuery>Endpoint`  | `CreateEnrollmentEndpoint`         |
+| Mapping helper | `<CommandOrQuery>Mappings`  | `CreateEnrollmentMappings`         |
+| API client     | `<verb><feature>Api.ts`     | `createEnrollmentApi.ts`           |
+| Pinia store    | `use<Verb><Feature>Store`   | `useCreateEnrollmentStore`         |
+| Composable     | `use<Verb><Feature>`        | `useCreateEnrollment`              |
+| Vue component  | `<Verb><Feature><View>.vue` | `CreateEnrollmentForm.vue`         |
+| Route module   | `<verb><feature>Route.ts`   | `createEnrollmentRoute.ts`         |
+| Test class     | `<Handler>Tests`            | `CreateEnrollmentHandlerTests`     |
 
-## 4. Implementation Templates
+## 4. Slice Templates
 
 ### 4.1 Command
 
 ```csharp
-namespace Zeus.Academia.Features.Enrollment.Commands.CreateEnrollment;
+namespace Zeus.Academia.Features.Enrollment.CreateEnrollment;
 
 public sealed record CreateEnrollmentCommand(
     Guid StudentId,
@@ -101,43 +111,10 @@ public sealed record CreateEnrollmentCommand(
     DateOnly RequestedDate) : IRequest<Result<CreateEnrollmentResponse>>;
 ```
 
-### 4.2 Handler
+### 4.2 Validator
 
 ```csharp
-namespace Zeus.Academia.Features.Enrollment.Commands.CreateEnrollment;
-
-public sealed class CreateEnrollmentHandler(AppDbContext db)
-    : IRequestHandler<CreateEnrollmentCommand, Result<CreateEnrollmentResponse>>
-{
-    public async Task<Result<CreateEnrollmentResponse>> Handle(
-        CreateEnrollmentCommand request,
-        CancellationToken cancellationToken)
-    {
-        // 1. Domain guard — check for duplicate enrollment
-        var exists = await db.Enrollments
-            .AnyAsync(e => e.StudentId == request.StudentId
-                        && e.CourseId  == request.CourseId, cancellationToken);
-        if (exists)
-            return Result<CreateEnrollmentResponse>.Failure("Student is already enrolled in this course.");
-
-        // 2. Create aggregate
-        var enrollment = Enrollment.Create(request.StudentId, request.CourseId, request.RequestedDate);
-
-        // 3. Persist
-        db.Enrollments.Add(enrollment);
-        await db.SaveChangesAsync(cancellationToken);
-
-        // 4. Return slice-private response
-        return Result<CreateEnrollmentResponse>.Success(
-            new CreateEnrollmentResponse(enrollment.Id, enrollment.Status));
-    }
-}
-```
-
-### 4.3 Validator
-
-```csharp
-namespace Zeus.Academia.Features.Enrollment.Commands.CreateEnrollment;
+namespace Zeus.Academia.Features.Enrollment.CreateEnrollment;
 
 public sealed class CreateEnrollmentCommandValidator : AbstractValidator<CreateEnrollmentCommand>
 {
@@ -150,109 +127,86 @@ public sealed class CreateEnrollmentCommandValidator : AbstractValidator<CreateE
 }
 ```
 
+### 4.3 Handler
+
+```csharp
+namespace Zeus.Academia.Features.Enrollment.CreateEnrollment;
+
+public sealed class CreateEnrollmentHandler(AppDbContext db)
+    : IRequestHandler<CreateEnrollmentCommand, Result<CreateEnrollmentResponse>>
+{
+    public async Task<Result<CreateEnrollmentResponse>> Handle(
+        CreateEnrollmentCommand request,
+        CancellationToken cancellationToken)
+    {
+        var exists = await db.Enrollments
+            .AnyAsync(e => e.StudentId == request.StudentId
+                        && e.CourseId == request.CourseId, cancellationToken);
+
+        if (exists)
+        {
+            return Result<CreateEnrollmentResponse>.Failure("Student is already enrolled in this course.");
+        }
+
+        var enrollment = Enrollment.Create(request.StudentId, request.CourseId, request.RequestedDate);
+
+        db.Enrollments.Add(enrollment);
+        await db.SaveChangesAsync(cancellationToken);
+
+        return Result<CreateEnrollmentResponse>.Success(
+            new CreateEnrollmentResponse(enrollment.Id, enrollment.Status));
+    }
+}
+```
+
 ### 4.4 Response DTO
 
 ```csharp
-namespace Zeus.Academia.Features.Enrollment.Commands.CreateEnrollment;
+namespace Zeus.Academia.Features.Enrollment.CreateEnrollment;
 
 public sealed record CreateEnrollmentResponse(Guid EnrollmentId, EnrollmentStatus Status);
 ```
 
-### 4.5 Minimal API Endpoint
+### 4.5 Endpoint
 
 ```csharp
-namespace Zeus.Academia.Features.Enrollment;
+namespace Zeus.Academia.Features.Enrollment.CreateEnrollment;
 
-public static class EnrollmentEndpoints
+public static class CreateEnrollmentEndpoint
 {
-    public static IEndpointRouteBuilder MapEnrollmentEndpoints(this IEndpointRouteBuilder app)
+    public static RouteGroupBuilder MapCreateEnrollment(this RouteGroupBuilder group)
     {
-        var group = app.MapGroup("/api/enrollments")
-                       .WithTags("Enrollment")
-                       .RequireAuthorization();
-
-        group.MapPost("/", async (CreateEnrollmentCommand cmd, ISender sender, CancellationToken ct) =>
+        group.MapPost("/", async (CreateEnrollmentCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(cmd, ct);
+            var result = await sender.Send(command, ct);
+
             return result.IsSuccess
                 ? Results.Created($"/api/enrollments/{result.Value.EnrollmentId}", result.Value)
                 : Results.Problem(result.Error);
         })
         .WithName("CreateEnrollment")
         .Produces<CreateEnrollmentResponse>(StatusCodes.Status201Created)
-        .ProducesValidationProblem()
-        .ProducesProblem(StatusCodes.Status409Conflict);
+        .ProducesValidationProblem();
 
-        group.MapGet("/{id:guid}", async (Guid id, ISender sender, CancellationToken ct) =>
-        {
-            var result = await sender.Send(new GetEnrollmentByIdQuery(id), ct);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.NotFound();
-        })
-        .WithName("GetEnrollmentById")
-        .Produces<GetEnrollmentByIdResponse>();
-
-        return app;
+        return group;
     }
 }
 ```
 
-### 4.6 Program.cs Registration
+### 4.6 Query Pattern
 
 ```csharp
-// Register all feature endpoints via a single aggregator
-app.MapEnrollmentEndpoints();
-app.MapGradingEndpoints();
-// ...
+namespace Zeus.Academia.Features.Enrollment.GetEnrollmentById;
 
-// MediatR and validators auto-discovered — no per-handler registration needed:
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
-```
-
-## 5. Shared Kernel Rules
-
-**Path:** `src/backend/SharedKernel/`
-
-| Allowed                                                      | Prohibited                                |
-| ------------------------------------------------------------ | ----------------------------------------- |
-| Primitive value objects (`StudentId`, `CourseCode`)          | Feature-specific DTOs or responses        |
-| `Result<T>` and `Error` types                                | Feature validators or business rules      |
-| Domain event base types and interfaces                       | Cross-feature service interfaces          |
-| Base entity / aggregate root                                 | Anything that imports a feature namespace |
-| Common exceptions (`NotFoundException`, `ConflictException`) | —                                         |
-
-**Promotion rule:** Promote a concept to the shared kernel only after it appears in ≥ 3 independent slices. Prefer inline duplication until then.
-
-## 6. Cross-Slice Communication
-
-**Never** call one feature's handler from another feature's handler. Use domain events:
-
-```csharp
-// In EnrollmentHandler — raise event after persist
-enrollment.RaiseDomainEvent(new StudentEnrolledEvent(enrollment.Id, enrollment.StudentId));
-await db.SaveChangesAsync(cancellationToken);   // event dispatched in SaveChanges pipeline
-
-// In a different feature — react independently
-public sealed class SendEnrollmentConfirmationHandler(IEmailService email)
-    : INotificationHandler<StudentEnrolledEvent>
-{
-    public async Task Handle(StudentEnrolledEvent notification, CancellationToken ct)
-        => await email.SendEnrollmentConfirmationAsync(notification.StudentId, ct);
-}
-```
-
-## 7. Query Handler Pattern
-
-Queries MUST NOT mutate state. Prefer direct EF Core projections over loading full aggregates:
-
-```csharp
 public sealed class GetEnrollmentByIdHandler(AppDbContext db)
     : IRequestHandler<GetEnrollmentByIdQuery, Result<GetEnrollmentByIdResponse>>
 {
     public async Task<Result<GetEnrollmentByIdResponse>> Handle(
-        GetEnrollmentByIdQuery request, CancellationToken cancellationToken)
+        GetEnrollmentByIdQuery request,
+        CancellationToken cancellationToken)
     {
         var response = await db.Enrollments
+            .AsNoTracking()
             .Where(e => e.Id == request.EnrollmentId)
             .Select(e => new GetEnrollmentByIdResponse(e.Id, e.StudentId, e.CourseId, e.Status, e.CreatedAt))
             .FirstOrDefaultAsync(cancellationToken);
@@ -264,14 +218,178 @@ public sealed class GetEnrollmentByIdHandler(AppDbContext db)
 }
 ```
 
+### 4.7 API Client
+
+```ts
+import { apiClient } from "@/shared/apiClient";
+import type {
+  CreateEnrollmentRequest,
+  CreateEnrollmentResponse,
+} from "./createEnrollmentTypes";
+
+export const createEnrollmentApi = {
+  async create(
+    payload: CreateEnrollmentRequest,
+  ): Promise<CreateEnrollmentResponse> {
+    const { data } = await apiClient.post<CreateEnrollmentResponse>(
+      "/api/enrollments",
+      payload,
+    );
+    return data;
+  },
+};
+```
+
+### 4.8 Pinia Store
+
+```ts
+import { defineStore } from "pinia";
+import { createEnrollmentApi } from "./createEnrollmentApi";
+import type {
+  CreateEnrollmentRequest,
+  CreateEnrollmentResponse,
+} from "./createEnrollmentTypes";
+
+export const useCreateEnrollmentStore = defineStore("createEnrollment", {
+  state: () => ({
+    isSaving: false,
+    created: null as CreateEnrollmentResponse | null,
+  }),
+  actions: {
+    async create(payload: CreateEnrollmentRequest) {
+      this.isSaving = true;
+      try {
+        this.created = await createEnrollmentApi.create(payload);
+      } finally {
+        this.isSaving = false;
+      }
+    },
+  },
+});
+```
+
+### 4.9 Composable
+
+```ts
+import { reactive } from "vue";
+import { useCreateEnrollmentStore } from "./useCreateEnrollmentStore";
+import type { CreateEnrollmentRequest } from "./createEnrollmentTypes";
+
+export function useCreateEnrollment() {
+  const store = useCreateEnrollmentStore();
+  const form = reactive<CreateEnrollmentRequest>({
+    studentId: "",
+    courseId: "",
+    requestedDate: "",
+  });
+
+  async function submit() {
+    await store.create({ ...form });
+  }
+
+  return {
+    form,
+    store,
+    submit,
+  };
+}
+```
+
+### 4.10 Vue Component
+
+```vue
+<script setup lang="ts">
+import { useCreateEnrollment } from "./useCreateEnrollment";
+
+const { form, store, submit } = useCreateEnrollment();
+</script>
+
+<template>
+  <form @submit.prevent="submit">
+    <button :disabled="store.isSaving" type="submit">Save</button>
+  </form>
+</template>
+```
+
+### 4.11 Route Module
+
+```ts
+import type { RouteRecordRaw } from "vue-router";
+import CreateEnrollmentForm from "./CreateEnrollmentForm.vue";
+
+export const createEnrollmentRoute: RouteRecordRaw = {
+  path: "/enrollments/create",
+  name: "create-enrollment",
+  component: CreateEnrollmentForm,
+};
+```
+
+## 5. Registration Pattern
+
+- Create one route group per feature domain in `Program.cs`, then map one endpoint extension per use-case from the corresponding use-case folders under `src/features/`.
+- Discover MediatR handlers via assembly scanning; do not register handlers one by one.
+- Discover validators via `AddValidatorsFromAssembly`; do not register validators one by one.
+- Import route modules from each use-case folder into the router aggregator.
+- Keep Pinia stores local to the use-case unless three or more slices need the same state concept.
+
+```csharp
+var enrollmentGroup = app.MapGroup("/api/enrollments")
+    .WithTags("Enrollment")
+    .RequireAuthorization();
+
+enrollmentGroup.MapCreateEnrollment();
+enrollmentGroup.MapGetEnrollmentById();
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+```
+
+## 6. Shared Kernel Rules
+
+Path: `src/shared/` or `src/features/Shared/`
+
+Allowed:
+
+- Primitive value objects
+- `Result<T>` and error types
+- Domain event abstractions
+- Base entity and aggregate root types
+- Common exceptions
+
+Prohibited:
+
+- Feature-domain specific DTOs or UI contracts
+- Use-case specific validators or handlers
+- Business rules that belong to one use-case
+- Anything that imports a feature-domain private namespace
+
+Promote a concept to the shared kernel only after it appears in at least three independent use-cases.
+
+## 7. Cross-Slice Communication
+
+Never call another feature domain's handler directly. Use domain events or shared infrastructure abstractions.
+
+```csharp
+enrollment.RaiseDomainEvent(new StudentEnrolledEvent(enrollment.Id, enrollment.StudentId));
+await db.SaveChangesAsync(cancellationToken);
+
+public sealed class SendEnrollmentConfirmationHandler(IEmailService email)
+    : INotificationHandler<StudentEnrolledEvent>
+{
+    public async Task Handle(StudentEnrolledEvent notification, CancellationToken ct)
+        => await email.SendEnrollmentConfirmationAsync(notification.StudentId, ct);
+}
+```
+
 ## 8. Testing Conventions
 
-- **One test class per handler:** `CreateEnrollmentHandlerTests`.
-- **Test file path mirrors source:**
-  `tests/backend/Features/Enrollment/Commands/CreateEnrollment/CreateEnrollmentHandlerTests.cs`
-- **Never mock `DbContext`** — use `SqliteInMemory` or a local SQL Server test container.
-- **Integration tests** validate the full slice: request → handler → db round-trip → response.
-- **Unit tests** validate validators in isolation (no db required).
+- Mirror the source layout in tests: `tests/features/Enrollment/CreateEnrollment/CreateEnrollmentHandlerTests.cs`.
+- Never mock `DbContext`; use `SqliteInMemory` or a real test container.
+- Cover the full use-case path from request through persistence.
+- Test validators separately for failure-path detail.
+- Place UI tests under the same use-case folder, for example `src/features/Enrollment/CreateEnrollment/__tests__/CreateEnrollmentForm.spec.ts`.
+- Cover component rendering, store behavior, and API error handling.
+- Keep request and response types aligned with the DTO contract.
 
 ```csharp
 public sealed class CreateEnrollmentHandlerTests(AppDbContextFactory factory)
@@ -280,66 +398,46 @@ public sealed class CreateEnrollmentHandlerTests(AppDbContextFactory factory)
     [Fact]
     public async Task Handle_ValidCommand_CreatesEnrollmentAndReturnsSuccess()
     {
-        // Arrange
         using var db = factory.CreateContext();
         var handler = new CreateEnrollmentHandler(db);
-        var cmd = new CreateEnrollmentCommand(Guid.NewGuid(), Guid.NewGuid(), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)));
+        var command = new CreateEnrollmentCommand(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)));
 
-        // Act
-        var result = await handler.Handle(cmd, CancellationToken.None);
+        var result = await handler.Handle(command, CancellationToken.None);
 
-        // Assert
         result.IsSuccess.Should().BeTrue();
         db.Enrollments.Should().ContainSingle(e => e.Id == result.Value.EnrollmentId);
-    }
-
-    [Fact]
-    public async Task Handle_DuplicateEnrollment_ReturnsFailure()
-    {
-        // Arrange — seed existing enrollment
-        using var db = factory.CreateContext();
-        var studentId = Guid.NewGuid();
-        var courseId  = Guid.NewGuid();
-        db.Enrollments.Add(Enrollment.Create(studentId, courseId, DateOnly.FromDateTime(DateTime.UtcNow)));
-        await db.SaveChangesAsync();
-
-        var handler = new CreateEnrollmentHandler(db);
-        var cmd = new CreateEnrollmentCommand(studentId, courseId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)));
-
-        // Act
-        var result = await handler.Handle(cmd, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.Should().BeFalse();
     }
 }
 ```
 
 ## 9. Anti-Patterns
 
-| Anti-Pattern                                           | Instead                                                                                      |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| Shared `Services/` folder used by multiple features    | Inline the logic in the handler; promote to shared kernel only at ≥3 uses                    |
-| Generic `BaseHandler<T>` or `CrudHandler<T>`           | One concrete, explicit handler per use-case                                                  |
-| Handler calls another feature's handler directly       | Publish a domain event; react in an `INotificationHandler`                                   |
-| Response DTO imported from another feature's namespace | Keep DTOs slice-private; promote to shared kernel consciously                                |
-| Validators in a global or shared `Validators/` folder  | Co-locate each validator with its command/query                                              |
-| Anemic domain model — all logic in handlers            | Encapsulate invariants and guards in the domain entity/aggregate                             |
-| `DbContext` mocked in tests                            | Use `SqliteInMemory` or test containers for realistic persistence tests                      |
-| Registering handlers/validators manually in DI         | Use assembly-scan registration (`RegisterServicesFromAssembly`, `AddValidatorsFromAssembly`) |
+| Anti-Pattern                                                             | Instead                                                             |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| Splitting a slice between separate layer roots                           | Keep the full slice under `src/features/<Feature>/<UseCase>/...`    |
+| Splitting a use-case across `Commands/Queries` folders                   | Keep every artifact for the use-case in its use-case folder         |
+| Splitting a use-case across `api/components/stores/types/routes` folders | Keep every artifact for the use-case in its use-case folder         |
+| Generic `BaseHandler<T>` or `CrudHandler<T>`                             | Write one explicit handler per use-case                             |
+| Direct handler-to-handler calls across feature domains                   | Publish a domain event and react independently                      |
+| Reusing response DTOs across feature domains                             | Keep DTOs slice-private unless deliberately promoted                |
+| Shared `Validators/` folder                                              | Co-locate validators with their command or query                    |
+| One monolithic Pinia store for the whole app                             | Use one store per use-case unless a shared abstraction is justified |
 
 ## 10. Per-Slice Quality Checklist
 
-Before marking a slice complete:
+Before marking a use-case complete:
 
-- [ ] Folder name matches the use-case name exactly
-- [ ] Command/Query is a `sealed record`
-- [ ] Handler is `sealed` and has no public state
-- [ ] Validator is co-located with its command/query
-- [ ] Response DTO is slice-private (no cross-feature imports)
-- [ ] Endpoint method is in `<Feature>Endpoints` and maps to a distinct HTTP verb + route
-- [ ] Handler registered via assembly scan (not manually)
-- [ ] Integration test covers the happy path
-- [ ] Integration test covers at least one failure/validation path
-- [ ] No `using` import referencing another feature's namespace
-- [ ] Domain events raised (not direct handler calls) for cross-feature side effects
+- [ ] Feature-domain folder matches the domain name.
+- [ ] Use-case folder matches the use-case name exactly.
+- [ ] All artifacts for the use-case live under the same `src/features/<Feature>/<UseCase>/` tree.
+- [ ] Command or query is a `sealed record`.
+- [ ] Handler is `sealed` and has no public mutable state.
+- [ ] Validator is co-located with its command or query.
+- [ ] Endpoint file lives in the same use-case folder.
+- [ ] Component, API client, store, composable, route, and types live in the same use-case folder.
+- [ ] Handler and validator rely on assembly scanning, not manual DI registration.
+- [ ] Tests mirror the slice structure.
+- [ ] No code imports another feature domain's private slice artifacts.

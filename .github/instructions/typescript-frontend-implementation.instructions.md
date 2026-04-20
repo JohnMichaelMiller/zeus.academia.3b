@@ -23,8 +23,8 @@ total_duration: "00:10:00"
 ai_log: "ai-logs/2026/02/24/2026-02-24-project-overview-zeus-academia/conversation.md"
 source: ".github/prompts/create-technology-instructions.prompt.md"
 name: "TypeScript Frontend Standards"
-description: "TypeScript coding standards for Vue 3 frontend application"
-applyTo: "src/frontend/**/*.ts"
+description: "TypeScript coding standards for Vue 3 feature-domain implementation"
+applyTo: "src/**/*.ts"
 tags: [typescript, frontend, type-safety, vue3]
 ---
 
@@ -44,10 +44,10 @@ tags: [typescript, frontend, type-safety, vue3]
 
 ## File Organization
 
-- `src/frontend/types/` - Shared type definitions and interfaces
-- `src/frontend/types/api/` - API response/request types
-- `src/frontend/types/models/` - Domain models
-- `src/frontend/types/enums.ts` - Enums and constants
+- `src/features/<Feature>/Shared/` - Feature-scoped type definitions shared across related use-cases
+- `src/features/<Feature>/<UseCase>/` - Keep use-case private request, response, and view-model types close to the code that uses them
+- `src/shared/types/` - Cross-cutting utility types and application-wide contracts
+- `src/shared/types/enums.ts` - Shared enums and constants
 - Naming: PascalCase for types/interfaces, camelCase for files
 
 ## Standard Patterns
@@ -55,7 +55,7 @@ tags: [typescript, frontend, type-safety, vue3]
 ### Type Definitions
 
 ```typescript
-// types/models/student.ts
+// src/features/students/shared/student.types.ts
 export interface Student {
   id: string;
   firstName: string;
@@ -89,7 +89,7 @@ export type ReadonlyStudent = Readonly<Student>;
 ### API Types
 
 ```typescript
-// types/api/responses.ts
+// src/shared/types/api/responses.ts
 export interface ApiResponse<T> {
   data: T;
   status: number;
@@ -110,7 +110,7 @@ export interface ApiError {
   details?: Record<string, string[]>;
 }
 
-// types/api/students.ts
+// src/features/students/shared/studentApi.types.ts
 export interface GetStudentsRequest {
   page?: number;
   pageSize?: number;
@@ -129,7 +129,7 @@ export type CreateStudentResponse = ApiResponse<Student>;
 ### Type Guards
 
 ```typescript
-// types/guards.ts
+// src/features/students/shared/guards.ts
 export function isStudent(value: unknown): value is Student {
   return (
     typeof value === "object" &&
@@ -168,7 +168,7 @@ try {
 ### Generic Utilities
 
 ```typescript
-// types/utils.ts
+// src/shared/types/utils.ts
 export type Nullable<T> = T | null;
 export type Optional<T> = T | undefined;
 export type DeepPartial<T> = {
@@ -216,7 +216,7 @@ export const UserRoleLabels: Record<UserRole, string> = {
 ### Function Types
 
 ```typescript
-// types/functions.ts
+// src/shared/types/functions.ts
 export type AsyncFunction<T = void> = () => Promise<T>;
 export type EventHandler<T = Event> = (event: T) => void;
 export type Validator<T> = (value: T) => boolean | string;
@@ -236,7 +236,7 @@ interface Props {
 ### Discriminated Unions
 
 ```typescript
-// types/api/results.ts
+// src/shared/types/api/results.ts
 export type ApiResult<T, E = ApiError> =
   | { success: true; data: T }
   | { success: false; error: E };

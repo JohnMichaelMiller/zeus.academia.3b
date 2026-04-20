@@ -23,8 +23,8 @@ total_duration: "00:10:00"
 ai_log: "ai-logs/2026/02/24/2026-02-24-project-overview-zeus-academia/conversation.md"
 source: ".github/prompts/create-technology-instructions.prompt.md"
 name: "MediatR CQRS Standards"
-description: "MediatR implementation standards for CQRS pattern in Academic Management System"
-applyTo: "src/backend/Application/**/*.cs"
+description: "MediatR implementation standards for CQRS pattern in feature-domain folders"
+applyTo: "src/**/*.cs"
 tags: [mediatr, cqrs, backend, csharp, commands, queries]
 ---
 
@@ -45,21 +45,20 @@ tags: [mediatr, cqrs, backend, csharp, commands, queries]
 
 ## File Organization
 
-- `Application/Students/Commands/` - Student-related commands
-- `Application/Students/Queries/` - Student-related queries
-- `Application/Students/Handlers/` - Command and query handlers
-- `Application/Common/Behaviors/` - Pipeline behaviors
-- Pattern: `<Action><Entity>Command.cs`, `Get<Entity>Query.cs`, `<Command>Handler.cs`
+- `src/features/<Feature>/<UseCase>/` - Keep the request, handler, DTOs, and mapping for one command or query together
+- `src/features/<Feature>/Shared/` - Feature-scoped abstractions used by multiple use-cases in the same feature domain
+- `src/shared/Behaviors/` - Cross-cutting MediatR pipeline behaviors
+- Pattern: `<Action><Entity>Command.cs`, `Get<Entity>Query.cs`, `<RequestName>Handler.cs`
 
 ## Standard Patterns
 
 ### Command Pattern
 
 ```csharp
-// Application/Students/Commands/CreateStudentCommand.cs
+// src/features/Students/CreateStudent/CreateStudentCommand.cs
 using MediatR;
 
-namespace Zeus.Academia.Application.Students.Commands;
+namespace Zeus.Academia.Features.Students.CreateStudent;
 
 public sealed record CreateStudentCommand(
     string FirstName,
@@ -68,12 +67,12 @@ public sealed record CreateStudentCommand(
     DateTime DateOfBirth
 ) : IRequest<StudentDto>;
 
-// Application/Students/Handlers/CreateStudentCommandHandler.cs
+// src/features/Students/CreateStudent/CreateStudentCommandHandler.cs
 using MediatR;
 using Zeus.Academia.Domain.Entities;
 using Zeus.Academia.Domain.Repositories;
 
-namespace Zeus.Academia.Application.Students.Handlers;
+namespace Zeus.Academia.Features.Students.CreateStudent;
 
 public sealed class CreateStudentCommandHandler
     : IRequestHandler<CreateStudentCommand, StudentDto>
@@ -117,18 +116,18 @@ public sealed class CreateStudentCommandHandler
 ### Query Pattern
 
 ```csharp
-// Application/Students/Queries/GetStudentQuery.cs
+// src/features/Students/GetStudent/GetStudentQuery.cs
 using MediatR;
 
-namespace Zeus.Academia.Application.Students.Queries;
+namespace Zeus.Academia.Features.Students.GetStudent;
 
 public sealed record GetStudentQuery(string Id) : IRequest<StudentDto?>;
 
-// Application/Students/Handlers/GetStudentQueryHandler.cs
+// src/features/Students/GetStudent/GetStudentQueryHandler.cs
 using MediatR;
 using Zeus.Academia.Domain.Repositories;
 
-namespace Zeus.Academia.Application.Students.Handlers;
+namespace Zeus.Academia.Features.Students.GetStudent;
 
 public sealed class GetStudentQueryHandler
     : IRequestHandler<GetStudentQuery, StudentDto?>
@@ -164,10 +163,10 @@ public sealed class GetStudentQueryHandler
 ### Query with Filtering and Pagination
 
 ```csharp
-// Application/Students/Queries/GetStudentsQuery.cs
+// src/features/Students/GetStudents/GetStudentsQuery.cs
 using MediatR;
 
-namespace Zeus.Academia.Application.Students.Queries;
+namespace Zeus.Academia.Features.Students.GetStudents;
 
 public sealed record GetStudentsQuery(
     int Page = 1,
@@ -213,10 +212,10 @@ public sealed class GetStudentsQueryHandler
 ### Void Command (No Return Value)
 
 ```csharp
-// Application/Students/Commands/DeleteStudentCommand.cs
+// src/features/Students/DeleteStudent/DeleteStudentCommand.cs
 using MediatR;
 
-namespace Zeus.Academia.Application.Students.Commands;
+namespace Zeus.Academia.Features.Students.DeleteStudent;
 
 public sealed record DeleteStudentCommand(string Id) : IRequest<Unit>;
 
@@ -257,11 +256,11 @@ public sealed class DeleteStudentCommandHandler
 ### Pipeline Behaviors
 
 ```csharp
-// Application/Common/Behaviors/ValidationBehavior.cs
+// src/shared/Behaviors/ValidationBehavior.cs
 using FluentValidation;
 using MediatR;
 
-namespace Zeus.Academia.Application.Common.Behaviors;
+namespace Zeus.Academia.Shared.Behaviors;
 
 public sealed class ValidationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
@@ -299,11 +298,11 @@ public sealed class ValidationBehavior<TRequest, TResponse>
     }
 }
 
-// Application/Common/Behaviors/LoggingBehavior.cs
+// src/shared/Behaviors/LoggingBehavior.cs
 using MediatR;
 using System.Diagnostics;
 
-namespace Zeus.Academia.Application.Common.Behaviors;
+namespace Zeus.Academia.Shared.Behaviors;
 
 public sealed class LoggingBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
@@ -355,12 +354,12 @@ public sealed class LoggingBehavior<TRequest, TResponse>
 ## Dependency Injection Setup
 
 ```csharp
-// Application/DependencyInjection.cs
+// src/shared/DependencyInjection/MediatRRegistration.cs
 using System.Reflection;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Zeus.Academia.Application.Common.Behaviors;
+using Zeus.Academia.Shared.Behaviors;
 
 namespace Zeus.Academia.Application;
 

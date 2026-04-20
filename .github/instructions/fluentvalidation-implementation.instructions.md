@@ -23,8 +23,8 @@ total_duration: "00:10:00"
 ai_log: "ai-logs/2026/02/24/2026-02-24-project-overview-zeus-academia/conversation.md"
 source: ".github/prompts/create-technology-instructions.prompt.md"
 name: "FluentValidation Standards"
-description: "FluentValidation standards for command/query validation in MediatR pipeline"
-applyTo: "src/backend/Application/**/*Validator.cs"
+description: "FluentValidation standards for command/query validation in feature-domain folders"
+applyTo: "src/**/*Validator.cs"
 tags: [fluentvalidation, validation, backend, csharp, mediatr]
 ---
 
@@ -44,21 +44,22 @@ tags: [fluentvalidation, validation, backend, csharp, mediatr]
 
 ## File Organization
 
-- `Application/<Feature>/Validators/` - Feature-specific validators
-- `Application/Common/Validators/` - Shared validators and rules
+- `src/features/<Feature>/<UseCase>/` - Keep the validator with the request it protects
+- `src/features/<Feature>/Shared/Validation/` - Feature-scoped validators reused by multiple use-cases in one feature domain
+- `src/shared/Validation/` - Cross-cutting validators and reusable rules
 - Naming: `<Command>Validator.cs`, `<Query>Validator.cs`
-- Location: Same folder as command/query or in Validators subfolder
+- Location: Same folder as the command/query unless multiple validators in the same use-case justify a `Validation/` subfolder
 
 ## Standard Patterns
 
 ### Basic Command Validator
 
 ```csharp
-// Application/Students/Validators/CreateStudentCommandValidator.cs
+// src/features/Students/CreateStudent/CreateStudentCommandValidator.cs
 using FluentValidation;
-using Zeus.Academia.Application.Students.Commands;
+using Zeus.Academia.Features.Students.CreateStudent;
 
-namespace Zeus.Academia.Application.Students.Validators;
+namespace Zeus.Academia.Features.Students.CreateStudent;
 
 public sealed class CreateStudentCommandValidator
     : AbstractValidator<CreateStudentCommand>
@@ -90,11 +91,11 @@ public sealed class CreateStudentCommandValidator
 ### Validator with Conditional Rules
 
 ```csharp
-// Application/Enrollments/Validators/EnrollStudentCommandValidator.cs
+// src/features/Enrollments/EnrollStudent/EnrollStudentCommandValidator.cs
 using FluentValidation;
-using Zeus.Academia.Application.Enrollments.Commands;
+using Zeus.Academia.Features.Enrollments.EnrollStudent;
 
-namespace Zeus.Academia.Application.Enrollments.Validators;
+namespace Zeus.Academia.Features.Enrollments.EnrollStudent;
 
 public sealed class EnrollStudentCommandValidator
     : AbstractValidator<EnrollStudentCommand>
@@ -145,12 +146,12 @@ public sealed class EnrollStudentCommandValidator
 ### Validator with Async Rules
 
 ```csharp
-// Application/Students/Validators/UpdateStudentCommandValidator.cs
+// src/features/Students/UpdateStudent/UpdateStudentCommandValidator.cs
 using FluentValidation;
-using Zeus.Academia.Application.Students.Commands;
+using Zeus.Academia.Features.Students.UpdateStudent;
 using Zeus.Academia.Domain.Repositories;
 
-namespace Zeus.Academia.Application.Students.Validators;
+namespace Zeus.Academia.Features.Students.UpdateStudent;
 
 public sealed class UpdateStudentCommandValidator
     : AbstractValidator<UpdateStudentCommand>
@@ -209,7 +210,7 @@ public sealed class UpdateStudentCommandValidator
 ### Nested Object Validation
 
 ```csharp
-// Application/Courses/Commands/CreateCourseCommand.cs
+// src/features/Courses/CreateCourse/CreateCourseCommand.cs
 public sealed record CreateCourseCommand(
     string Title,
     string Code,
@@ -230,7 +231,7 @@ public sealed record CourseModule(
     int OrderIndex
 );
 
-// Application/Courses/Validators/CreateCourseCommandValidator.cs
+// src/features/Courses/CreateCourse/CreateCourseCommandValidator.cs
 public sealed class CreateCourseCommandValidator
     : AbstractValidator<CreateCourseCommand>
 {
@@ -270,7 +271,7 @@ public sealed class CourseScheduleValidator : AbstractValidator<CourseSchedule>
         RuleFor(x => x.DayOfWeek)
             .IsInEnum();
 
-        RuleFor(x => x.StartTime)   
+        RuleFor(x => x.StartTime)
             .NotEmpty()
             .LessThan(x => x.EndTime).WithMessage("Start time must be before end time");
 
@@ -304,10 +305,10 @@ public sealed class CourseModuleValidator : AbstractValidator<CourseModule>
 ### Common Validation Rules
 
 ```csharp
-// Application/Common/Validators/CommonRules.cs
+// src/shared/Validation/CommonRules.cs
 using FluentValidation;
 
-namespace Zeus.Academia.Application.Common.Validators;
+namespace Zeus.Academia.Shared.Validation;
 
 public static class CommonRules
 {
@@ -424,7 +425,7 @@ public sealed class StudentValidator : AbstractValidator<CreateStudentCommand>
 Pipeline behavior automatically validates (see MediatR instructions):
 
 ```csharp
-// Application/Common/Behaviors/ValidationBehavior.cs
+// src/shared/Behaviors/ValidationBehavior.cs
 public sealed class ValidationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

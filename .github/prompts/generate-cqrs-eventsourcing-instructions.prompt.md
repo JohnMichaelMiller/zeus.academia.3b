@@ -96,10 +96,10 @@ Table:
 **Structure Table:**
 | Component | Purpose | Location |
 |-----------|---------|----------|
-| Command | Intent to change | `Commands/<Aggregate>/` |
-| Handler | Validate → load → execute → persist events | `Commands/<Aggregate>/` |
-| Aggregate | Apply events → produce new events | `Domain/Aggregates/` |
-| Event | State change record | `Domain/Events/` |
+| Command | Intent to change | `src/features/<Feature>/<UseCase>/` |
+| Handler | Validate → load → execute → persist events | `src/features/<Feature>/<UseCase>/` |
+| Aggregate | Apply events → produce new events | `src/features/<Feature>/Shared/Domain/` or use-case folder |
+| Event | State change record | `src/features/<Feature>/Shared/Domain/Events/` or use-case folder |
 
 **Rules:**
 
@@ -289,23 +289,21 @@ subscribeToAll(checkpoint) {
 
 ```
 src/
-├── Application/
-│   ├── Commands/
-│   │   └── <Aggregate>/
-│   │       ├── <Name>Command.{{ext}}
-│   │       └── <Name>CommandHandler.{{ext}}
-│   ├── Queries/
-│   │   └── <Context>/
-│   │       ├── <Name>Query.{{ext}}
-│   │       └── <Name>QueryHandler.{{ext}}
-│   └── Projections/
-│       └── <Name>Projection.{{ext}}
-├── Domain/
-│   ├── Aggregates/
-│   │   └── <Aggregate>.{{ext}}
-│   └── Events/
-│       └── <Name>Event.{{ext}}
-├── Infrastructure/
+├── features/
+│   └── <Feature>/
+│       ├── <UseCase>/
+│       │   ├── <Name>Command.{{ext}}
+│       │   ├── <Name>CommandHandler.{{ext}}
+│       │   ├── <Name>Query.{{ext}}
+│       │   ├── <Name>QueryHandler.{{ext}}
+│       │   └── <Name>Projection.{{ext}}
+│       └── Shared/
+│           └── Domain/
+│               ├── Aggregates/
+│               │   └── <Aggregate>.{{ext}}
+│               └── Events/
+│                   └── <Name>Event.{{ext}}
+├── shared/
 │   ├── EventStore/
 │   │   ├── EventStoreRepository.{{ext}}
 │   │   └── SnapshotStore.{{ext}}
@@ -324,14 +322,15 @@ src/
 
 #### 12. Anti-Patterns
 
-| ❌ DON'T                            | ✅ DO                              |
-| ----------------------------------- | ---------------------------------- |
-| Query event store for reads         | Use projections/read models        |
-| Mutate aggregate state directly     | Apply events to rebuild state      |
-| Delete events                       | Mark with `Deleted` event          |
-| Share events between aggregates     | Events belong to one stream        |
-| Load multiple aggregates in command | One command = one aggregate        |
-| Skip snapshot for large streams     | Snapshot at threshold (>50 events) |
+| ❌ DON'T                                              | ✅ DO                                                                                                 |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Query event store for reads                           | Use projections/read models                                                                           |
+| Mutate aggregate state directly                       | Apply events to rebuild state                                                                         |
+| Delete events                                         | Mark with `Deleted` event                                                                             |
+| Share events between aggregates                       | Events belong to one stream                                                                           |
+| Load multiple aggregates in command                   | One command = one aggregate                                                                           |
+| Skip snapshot for large streams                       | Snapshot at threshold (>50 events)                                                                    |
+| Organize by `Application/Domain/Infrastructure` roots | Organize by `src/features/<Feature>/<UseCase>/` and use `src/shared/` only for cross-cutting concerns |
 
 #### 13. Event Schema Evolution
 

@@ -61,10 +61,11 @@ Before generating instructions, analyze the repository to derive missing argumen
 
 2. **{{patterns}}** - Detect from:
    - Existing `.instructions.md` files (e.g., `cqrs-es-csharp-mediatr.instructions.md`)
-   - Code structure: separate Domain/Application/Infrastructure folders → DDD/Clean Architecture
-   - Base class names: `EntityBase`, `CommandHandler`, `QueryHandler` → specific patterns
-   - Presence of MediatR `IRequestHandler` → CQRS
-   - Repository interfaces → Repository pattern
+
+- Code structure: feature-domain and use-case folders under `src/features/` with cross-cutting abstractions in `src/shared/` → Vertical Slice + DDD/Clean Architecture
+- Base class names: `EntityBase`, `CommandHandler`, `QueryHandler` → specific patterns
+- Presence of MediatR `IRequestHandler` → CQRS
+- Repository interfaces → Repository pattern
 
 3. **{{frameworks}}** - Extract from:
    - `.csproj` files: `<PackageReference>` elements
@@ -338,7 +339,7 @@ Conventions: Records for value objects, sealed classes, private setters
 ````markdown
 ---
 description: "Domain entity implementation with DDD patterns"
-applyTo: "src/**/Domain/Entities/**/*.cs"
+applyTo: "src/features/**/*.cs"
 ---
 
 # Domain Entity Patterns
