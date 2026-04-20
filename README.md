@@ -9,6 +9,7 @@ The third iteration of the Zeus Academia experiment
 - [Backend Slice Implementer Agent Profile](.github/agents/backend-slice-implementer.agent.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
 - [Blog Author Agent Profile](.github/agents/blog-author.agent.md) ([Log](ai-logs/2026/04/20/2026-04-20-blog-author-agent-conversion/conversation.md))
 - [Academia Execution Plan](.github/models/workflows/academia-execution-plan.md) ([Log](ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md))
+- [Academia Slice Implementation Prompts](.github/prompts/academia-implementation/README.md) ([Log](ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md))
 - [Implementation Prompt Standards](.github/instructions/implementation-prompt.instructions.md) ([Log](ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md))
 - [Implementation Prompt Instruction Prompt](.github/prompts/create-implementation-prompt-instructions.prompt.md) ([Log](ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md))
 - [Create Academia Execution Plan Prompt](.github/prompts/create-academia-execution-plan.prompt.md) ([Log](ai-logs/2026/04/20/2026-04-20-create-academia-execution-plan-prompt/conversation.md))
