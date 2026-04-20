@@ -64,6 +64,7 @@ applyTo: "**"
   - [AI Output Policy](.github/instructions/ai-assisted-output.instructions.md)
   - [Custom Agents Standards](.github/instructions/custom-agents.instructions.md)
   - [Implementation Prompt Generation](.github/instructions/implementation-prompt-generation.instructions.md)
+  - [Implementation Prompt Standards](.github/instructions/implementation-prompt.instructions.md)
   - [Vertical Slice Implementation](.github/instructions/vertical-slice-implementation.instructions.md)
 
 ## Environment
