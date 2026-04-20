@@ -51,11 +51,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm route and projection shape | execution plan, current repo tree | approved query scope | current academic data model cannot return all required fields without revisiting registration |
-| Backend/domain agent | implement query, handler, response, and endpoint | registration data model, Shared Kernel types | profile query code path | qualifications or extension data need a new shared projection strategy |
-| Testing/verification agent | verify happy path and not-found behavior | implemented slice | integration tests and evidence | returned profile omits derived or joined data required by the plan |
+| Role                       | Responsibilities                                 | Inputs                                       | Outputs                        | Escalate when                                                                                 |
+| -------------------------- | ------------------------------------------------ | -------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
+| Slice coordinator          | confirm route and projection shape               | execution plan, current repo tree            | approved query scope           | current academic data model cannot return all required fields without revisiting registration |
+| Backend/domain agent       | implement query, handler, response, and endpoint | registration data model, Shared Kernel types | profile query code path        | qualifications or extension data need a new shared projection strategy                        |
+| Testing/verification agent | verify happy path and not-found behavior         | implemented slice                            | integration tests and evidence | returned profile omits derived or joined data required by the plan                            |
 
 ## Ordered Implementation Steps
 

@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm deregistration semantics, retention rules, and event shape | execution plan and current lifecycle model | approved command contract | retention rules are ambiguous or conflict with persistence behavior |
-| Backend/domain agent | implement command, handler, endpoint, cleanup, and event publication | academic model, extension lifecycle, event contracts | deregistration code path | cleanup or retention requires a larger archival design |
-| Testing/verification agent | verify extension release, history retention, and event emission | implemented slice | tests and evidence | deregistration leaves assigned extensions behind or loses required history |
+| Role                       | Responsibilities                                                     | Inputs                                               | Outputs                   | Escalate when                                                              |
+| -------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------- |
+| Slice coordinator          | confirm deregistration semantics, retention rules, and event shape   | execution plan and current lifecycle model           | approved command contract | retention rules are ambiguous or conflict with persistence behavior        |
+| Backend/domain agent       | implement command, handler, endpoint, cleanup, and event publication | academic model, extension lifecycle, event contracts | deregistration code path  | cleanup or retention requires a larger archival design                     |
+| Testing/verification agent | verify extension release, history retention, and event emission      | implemented slice                                    | tests and evidence        | deregistration leaves assigned extensions behind or loses required history |
 
 ## Ordered Implementation Steps
 

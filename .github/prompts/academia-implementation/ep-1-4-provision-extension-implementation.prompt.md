@@ -52,11 +52,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm extension storage model and route placement | execution plan, repo tree, persistence root | approved artifact targets and dependency notes | extension state is already modeled elsewhere in a conflicting way |
-| Backend/domain agent | implement provision and deprovision command behavior | Shared Kernel Extension model, slice conventions | commands, validators, handlers, endpoints | extNr formatting or identity semantics are unclear |
-| Testing/verification agent | verify numeric format, uniqueness, and assignment guard | implemented slice and business rules | tests and evidence | deprovision logic cannot reliably detect assigned extensions |
+| Role                       | Responsibilities                                        | Inputs                                           | Outputs                                        | Escalate when                                                     |
+| -------------------------- | ------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------- | ----------------------------------------------------------------- |
+| Slice coordinator          | confirm extension storage model and route placement     | execution plan, repo tree, persistence root      | approved artifact targets and dependency notes | extension state is already modeled elsewhere in a conflicting way |
+| Backend/domain agent       | implement provision and deprovision command behavior    | Shared Kernel Extension model, slice conventions | commands, validators, handlers, endpoints      | extNr formatting or identity semantics are unclear                |
+| Testing/verification agent | verify numeric format, uniqueness, and assignment guard | implemented slice and business rules             | tests and evidence                             | deprovision logic cannot reliably detect assigned extensions      |
 
 ## Ordered Implementation Steps
 

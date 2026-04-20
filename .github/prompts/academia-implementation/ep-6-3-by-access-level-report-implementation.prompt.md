@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm output shape and route | execution plan and report conventions | approved report contract | the current model does not surface derived access level cleanly for reporting |
-| Backend/domain agent | implement grouped access-level report | current academic state and derivation rules | access-level report code path | the report would need direct writes to access level state |
-| Testing/verification agent | verify INT, NAT, LOC counts and post-change updates | implemented slice | tests and evidence | grouped results diverge from rank-derived expectations |
+| Role                       | Responsibilities                                    | Inputs                                      | Outputs                       | Escalate when                                                                 |
+| -------------------------- | --------------------------------------------------- | ------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------- |
+| Slice coordinator          | confirm output shape and route                      | execution plan and report conventions       | approved report contract      | the current model does not surface derived access level cleanly for reporting |
+| Backend/domain agent       | implement grouped access-level report               | current academic state and derivation rules | access-level report code path | the report would need direct writes to access level state                     |
+| Testing/verification agent | verify INT, NAT, LOC counts and post-change updates | implemented slice                           | tests and evidence            | grouped results diverge from rank-derived expectations                        |
 
 ## Ordered Implementation Steps
 

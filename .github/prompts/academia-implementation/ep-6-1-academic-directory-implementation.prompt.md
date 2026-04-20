@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm report route, active-record semantics, and projection strategy | execution plan and current read patterns | approved report contract | reporting requires a projection store not yet present |
-| Backend/domain agent | implement directory query, projection, DTOs, endpoint | stable lifecycle data and shared paging patterns | directory report code path | active/inactive semantics are unclear after deregistration |
-| Testing/verification agent | verify report completeness and performance on seeded data | implemented slice | tests and evidence | report output diverges from source-of-truth slice data |
+| Role                       | Responsibilities                                                       | Inputs                                           | Outputs                    | Escalate when                                              |
+| -------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------ | -------------------------- | ---------------------------------------------------------- |
+| Slice coordinator          | confirm report route, active-record semantics, and projection strategy | execution plan and current read patterns         | approved report contract   | reporting requires a projection store not yet present      |
+| Backend/domain agent       | implement directory query, projection, DTOs, endpoint                  | stable lifecycle data and shared paging patterns | directory report code path | active/inactive semantics are unclear after deregistration |
+| Testing/verification agent | verify report completeness and performance on seeded data              | implemented slice                                | tests and evidence         | report output diverges from source-of-truth slice data     |
 
 ## Ordered Implementation Steps
 

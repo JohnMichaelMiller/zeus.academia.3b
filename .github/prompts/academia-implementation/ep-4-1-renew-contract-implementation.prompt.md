@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm route and current contract-state precondition | execution plan and employment slices | approved command contract | current employment state model cannot distinguish contracted academics reliably |
-| Backend/domain agent | implement renew command, validator, handler, endpoint | AssignContract semantics and Shared Kernel rules | renewal code path | renewal requires a broader employment redesign |
-| Testing/verification agent | verify contracted-only and future-date behavior | implemented slice | tests and evidence | a renewal succeeds without an existing contract |
+| Role                       | Responsibilities                                      | Inputs                                           | Outputs                   | Escalate when                                                                   |
+| -------------------------- | ----------------------------------------------------- | ------------------------------------------------ | ------------------------- | ------------------------------------------------------------------------------- |
+| Slice coordinator          | confirm route and current contract-state precondition | execution plan and employment slices             | approved command contract | current employment state model cannot distinguish contracted academics reliably |
+| Backend/domain agent       | implement renew command, validator, handler, endpoint | AssignContract semantics and Shared Kernel rules | renewal code path         | renewal requires a broader employment redesign                                  |
+| Testing/verification agent | verify contracted-only and future-date behavior       | implemented slice                                | tests and evidence        | a renewal succeeds without an existing contract                                 |
 
 ## Ordered Implementation Steps
 

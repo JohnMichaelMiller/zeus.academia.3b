@@ -52,11 +52,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm endpoint route, transaction boundary, and prerequisite readiness | execution plan, current repo tree, reference-data slices | approved implementation sequence and blocker list | any prerequisite slice is incomplete or lacks integration proof |
-| Backend/domain agent | implement command, validator, handler, endpoint, mappings, and persistence workflow | Shared Kernel, reference-data contracts, slice conventions | registration code path and response contract | qualification or extension rules require changing Shared Kernel behavior |
-| Testing/verification agent | verify valid registration, duplicate empNr, invalid references, and extension conflicts | implemented slice and prerequisite data | integration-first tests and evidence | registration is not atomic or leaves partial data behind |
+| Role                       | Responsibilities                                                                        | Inputs                                                     | Outputs                                           | Escalate when                                                            |
+| -------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
+| Slice coordinator          | confirm endpoint route, transaction boundary, and prerequisite readiness                | execution plan, current repo tree, reference-data slices   | approved implementation sequence and blocker list | any prerequisite slice is incomplete or lacks integration proof          |
+| Backend/domain agent       | implement command, validator, handler, endpoint, mappings, and persistence workflow     | Shared Kernel, reference-data contracts, slice conventions | registration code path and response contract      | qualification or extension rules require changing Shared Kernel behavior |
+| Testing/verification agent | verify valid registration, duplicate empNr, invalid references, and extension conflicts | implemented slice and prerequisite data                    | integration-first tests and evidence              | registration is not atomic or leaves partial data behind                 |
 
 ## Ordered Implementation Steps
 

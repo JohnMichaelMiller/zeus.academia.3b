@@ -48,11 +48,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm grouped report shapes and route strategy | execution plan and qualification query conventions | approved report contract | degree-grouped and university-grouped outputs need different projection models |
-| Backend/domain agent | implement grouped qualification reports | qualification state and grouping rules | qualification report code path | grouped reporting exposes unresolved duplication in qualification storage |
-| Testing/verification agent | verify counts and grouped listings after qualification mutations | implemented slice | tests and evidence | counts drift after add, update, or remove operations |
+| Role                       | Responsibilities                                                 | Inputs                                             | Outputs                        | Escalate when                                                                  |
+| -------------------------- | ---------------------------------------------------------------- | -------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------ |
+| Slice coordinator          | confirm grouped report shapes and route strategy                 | execution plan and qualification query conventions | approved report contract       | degree-grouped and university-grouped outputs need different projection models |
+| Backend/domain agent       | implement grouped qualification reports                          | qualification state and grouping rules             | qualification report code path | grouped reporting exposes unresolved duplication in qualification storage      |
+| Testing/verification agent | verify counts and grouped listings after qualification mutations | implemented slice                                  | tests and evidence             | counts drift after add, update, or remove operations                           |
 
 ## Ordered Implementation Steps
 

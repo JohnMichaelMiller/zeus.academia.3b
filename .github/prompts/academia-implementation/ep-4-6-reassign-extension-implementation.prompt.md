@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm transaction boundary and route | execution plan and existing extension flows | approved command contract | persistence cannot guarantee atomic transition with the current model |
-| Backend/domain agent | implement reassign command, handler, endpoint | extension assignment model and uniqueness rules | reassignment code path | atomicity requires broader infrastructure changes |
-| Testing/verification agent | verify valid reassignments and rollback behavior | implemented slice | tests and evidence | partial updates survive after a failed reassignment |
+| Role                       | Responsibilities                                 | Inputs                                          | Outputs                   | Escalate when                                                         |
+| -------------------------- | ------------------------------------------------ | ----------------------------------------------- | ------------------------- | --------------------------------------------------------------------- |
+| Slice coordinator          | confirm transaction boundary and route           | execution plan and existing extension flows     | approved command contract | persistence cannot guarantee atomic transition with the current model |
+| Backend/domain agent       | implement reassign command, handler, endpoint    | extension assignment model and uniqueness rules | reassignment code path    | atomicity requires broader infrastructure changes                     |
+| Testing/verification agent | verify valid reassignments and rollback behavior | implemented slice                               | tests and evidence        | partial updates survive after a failed reassignment                   |
 
 ## Ordered Implementation Steps
 

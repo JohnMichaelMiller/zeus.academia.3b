@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm route and released-state semantics | execution plan and extension slices | approved command contract | current model does not expose a clear released state |
-| Backend/domain agent | implement release command, handler, endpoint | extension assignment model | release code path | release behavior would conflict with deregistration cleanup |
-| Testing/verification agent | verify state cleanup and returned availability | implemented slice | tests and evidence | released extensions do not re-enter the available pool |
+| Role                       | Responsibilities                               | Inputs                              | Outputs                   | Escalate when                                               |
+| -------------------------- | ---------------------------------------------- | ----------------------------------- | ------------------------- | ----------------------------------------------------------- |
+| Slice coordinator          | confirm route and released-state semantics     | execution plan and extension slices | approved command contract | current model does not expose a clear released state        |
+| Backend/domain agent       | implement release command, handler, endpoint   | extension assignment model          | release code path         | release behavior would conflict with deregistration cleanup |
+| Testing/verification agent | verify state cleanup and returned availability | implemented slice                   | tests and evidence        | released extensions do not re-enter the available pool      |
 
 ## Ordered Implementation Steps
 

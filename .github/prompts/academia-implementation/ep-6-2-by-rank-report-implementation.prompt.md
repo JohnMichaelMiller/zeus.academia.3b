@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm grouping output and route shape | execution plan and report conventions | approved report contract | rank grouping requires a projection strategy not yet chosen |
-| Backend/domain agent | implement grouped query and response contracts | current academic rank state and access-level derivation | by-rank report code path | grouped output would duplicate logic already owned elsewhere |
-| Testing/verification agent | verify counts, listing accuracy, and reaction to rank changes | implemented slice | tests and evidence | counts drift after rank changes |
+| Role                       | Responsibilities                                              | Inputs                                                  | Outputs                  | Escalate when                                                |
+| -------------------------- | ------------------------------------------------------------- | ------------------------------------------------------- | ------------------------ | ------------------------------------------------------------ |
+| Slice coordinator          | confirm grouping output and route shape                       | execution plan and report conventions                   | approved report contract | rank grouping requires a projection strategy not yet chosen  |
+| Backend/domain agent       | implement grouped query and response contracts                | current academic rank state and access-level derivation | by-rank report code path | grouped output would duplicate logic already owned elsewhere |
+| Testing/verification agent | verify counts, listing accuracy, and reaction to rank changes | implemented slice                                       | tests and evidence       | counts drift after rank changes                              |
 
 ## Ordered Implementation Steps
 

@@ -50,11 +50,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm route and date semantics | execution plan and current API conventions | approved command contract | local time handling is ambiguous for future-date validation |
-| Backend/domain agent | implement command, validator, handler, endpoint | Shared Kernel rules and academic model | contract-assignment code path | contract date semantics conflict with current domain primitives |
-| Testing/verification agent | verify future-date enforcement and XOR behavior | implemented slice | tests and evidence | contracted state is persisted with invalid or current dates |
+| Role                       | Responsibilities                                | Inputs                                     | Outputs                       | Escalate when                                                   |
+| -------------------------- | ----------------------------------------------- | ------------------------------------------ | ----------------------------- | --------------------------------------------------------------- |
+| Slice coordinator          | confirm route and date semantics                | execution plan and current API conventions | approved command contract     | local time handling is ambiguous for future-date validation     |
+| Backend/domain agent       | implement command, validator, handler, endpoint | Shared Kernel rules and academic model     | contract-assignment code path | contract date semantics conflict with current domain primitives |
+| Testing/verification agent | verify future-date enforcement and XOR behavior | implemented slice                          | tests and evidence            | contracted state is persisted with invalid or current dates     |
 
 ## Ordered Implementation Steps
 

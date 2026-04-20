@@ -49,11 +49,11 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| Slice coordinator | confirm whether one endpoint or multiple endpoints best match current conventions | execution plan and current API style | approved query surface | current API conventions make the planned query modes unclear |
-| Backend/domain agent | implement qualification queries and response DTOs | qualification model and shared paging rules | list-qualifications code path | one query mode needs a different storage/projection strategy |
-| Testing/verification agent | verify all query modes and empty-result handling | implemented slice | tests and evidence | query modes return inconsistent shapes |
+| Role                       | Responsibilities                                                                  | Inputs                                      | Outputs                       | Escalate when                                                |
+| -------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------- | ------------------------------------------------------------ |
+| Slice coordinator          | confirm whether one endpoint or multiple endpoints best match current conventions | execution plan and current API style        | approved query surface        | current API conventions make the planned query modes unclear |
+| Backend/domain agent       | implement qualification queries and response DTOs                                 | qualification model and shared paging rules | list-qualifications code path | one query mode needs a different storage/projection strategy |
+| Testing/verification agent | verify all query modes and empty-result handling                                  | implemented slice                           | tests and evidence            | query modes return inconsistent shapes                       |
 
 ## Ordered Implementation Steps
 
