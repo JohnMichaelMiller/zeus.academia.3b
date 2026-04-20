@@ -54,20 +54,20 @@ mode: agent
 
 | Role                       | Responsibilities                                                                | Inputs                                                   | Outputs                                   | Escalate when                                                                  |
 | -------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------ |
-| Slice coordinator          | confirm folder roots, final type list, and sequence                             | execution plan, implementation plan, current source tree | approved artifact map and blocker list    | current repo layout conflicts with the planned SharedKernel location           |
-| Backend/domain agent       | implement aggregate, value objects, result types, exceptions, and domain events | approved artifact map, business rules                    | domain types and invariant logic          | a rule cannot be expressed cleanly without clarifying the aggregate boundary   |
+| slice-coordinator          | confirm folder roots, final type list, and sequence                             | execution plan, implementation plan, current source tree | approved artifact map and blocker list    | current repo layout conflicts with the planned SharedKernel location           |
+| backend-domain       | implement aggregate, value objects, result types, exceptions, and domain events | approved artifact map, business rules                    | domain types and invariant logic          | a rule cannot be expressed cleanly without clarifying the aggregate boundary   |
 | Data/persistence agent     | implement EF Core mappings, indexes, and migration support                      | domain model, persistence standards                      | mappings, constraints, migration updates  | a database rule would drift from the aggregate rule                            |
-| Testing/verification agent | add invariant tests, mapping tests, and migration validation evidence           | implemented kernel artifacts                             | passing tests and proof of enforced rules | tests expose ambiguity in XOR, access-level derivation, or qualification rules |
+| testing-verification | add invariant tests, mapping tests, and migration validation evidence           | implemented kernel artifacts                             | passing tests and proof of enforced rules | tests expose ambiguity in XOR, access-level derivation, or qualification rules |
 
 ## Ordered Implementation Steps
 
 1. Confirm the Shared Kernel boundary and file roots.
    Targets: src/backend/SharedKernel/, persistence project root, and tests/ root or current equivalents.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: artifact list is approved for Academic, Rank, AccessLevel, Degree, University, Extension, AcademicQualification, Result<T>, Error, domain events, and common exceptions.
 2. Implement the domain model and invariant methods.
    Targets: Shared Kernel aggregate and value-object files, especially Academic employment guards and Rank to AccessLevel derivation.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: the aggregate enforces tenured XOR contracted state and AccessLevel is derived only from Rank.
 3. Implement persistence mappings and hard database constraints.
    Targets: EF Core entity configurations, indexes, and base migration updates for empNr uniqueness and extension uniqueness.
@@ -75,11 +75,11 @@ mode: agent
    Validation before next step: mappings align with domain rules and no persistence rule contradicts the aggregate.
 4. Add reusable error/result plumbing and domain event contracts.
    Targets: Shared Kernel result types, error primitives, event interfaces, and common exceptions.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: later slices can consume common result and exception types without redefining them.
 5. Verify invariants and persistence behavior.
    Targets: unit tests, mapping tests, and migration validation.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: all foundational tests pass and failures clearly identify which invariant broke.
 
 ## Verification and Acceptance Criteria

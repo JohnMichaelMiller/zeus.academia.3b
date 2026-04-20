@@ -54,27 +54,27 @@ mode: agent
 
 | Role                       | Responsibilities                                              | Inputs                                      | Outputs                                           | Escalate when                                                      |
 | -------------------------- | ------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------ |
-| Slice coordinator          | confirm whether rank records are seeded, API-managed, or both | execution plan, current data setup          | approved slice boundary and file targets          | repo already stores rank reference data in a conflicting location  |
-| Backend/domain agent       | build add and list rank behavior with validation              | shared kernel rank model, slice conventions | commands, queries, handlers, responses, endpoints | code tries to bypass the canonical rank codes P, SL, L             |
-| Testing/verification agent | verify uniqueness, allowed codes, and queryability            | implemented slice                           | tests and evidence                                | validator and persistence behavior disagree on allowed rank values |
+| slice-coordinator          | confirm whether rank records are seeded, API-managed, or both | execution plan, current data setup          | approved slice boundary and file targets          | repo already stores rank reference data in a conflicting location  |
+| backend-domain       | build add and list rank behavior with validation              | shared kernel rank model, slice conventions | commands, queries, handlers, responses, endpoints | code tries to bypass the canonical rank codes P, SL, L             |
+| testing-verification | verify uniqueness, allowed codes, and queryability            | implemented slice                           | tests and evidence                                | validator and persistence behavior disagree on allowed rank values |
 
 ## Ordered Implementation Steps
 
 1. Confirm how rank data is stored and exposed.
    Targets: src/features/ReferenceData/ManageRanks/ or current equivalent, persistence registration, seed data path.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: one canonical approach is selected for add/list behavior and existing seed data conflicts are resolved.
 2. Implement add-rank command behavior.
    Targets: AddRank command, validator, handler, response, endpoint, and mapping helpers within the ManageRanks slice folder.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: only P, SL, and L are accepted and duplicates are rejected deterministically.
 3. Implement rank listing query behavior.
    Targets: ListRanks query, handler, response contract, and endpoint.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: returned data exposes stable rank codes and their access-level mapping.
 4. Add tests and verification evidence.
    Targets: validator tests, handler tests, integration tests for uniqueness and list behavior.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: add and list flows both pass with valid and invalid inputs.
 
 ## Verification and Acceptance Criteria

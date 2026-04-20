@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                        | Inputs                                        | Outputs                   | Escalate when                                                                          |
 | -------------------------- | ------------------------------------------------------- | --------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| Slice coordinator          | confirm removal route and qualification target strategy | execution plan and qualification model        | approved command contract | qualification identity is ambiguous                                                    |
-| Backend/domain agent       | implement remove command, handler, endpoint             | qualification rules and current storage model | removal code path         | the minimum-one-qualification rule cannot be enforced cleanly in the current aggregate |
-| Testing/verification agent | verify safe removal and last-record rejection           | implemented slice                             | tests and evidence        | the command can remove the final qualification                                         |
+| slice-coordinator          | confirm removal route and qualification target strategy | execution plan and qualification model        | approved command contract | qualification identity is ambiguous                                                    |
+| backend-domain       | implement remove command, handler, endpoint             | qualification rules and current storage model | removal code path         | the minimum-one-qualification rule cannot be enforced cleanly in the current aggregate |
+| testing-verification | verify safe removal and last-record rejection           | implemented slice                             | tests and evidence        | the command can remove the final qualification                                         |
 
 ## Ordered Implementation Steps
 
 1. Confirm qualification targeting and removal semantics.
    Targets: src/features/Qualifications/RemoveDegreeRecord/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: success, missing-record, and last-record behaviors are explicit.
 2. Implement removal behavior.
    Targets: command, handler, endpoint.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: an academic with multiple qualifications can remove one while the last remaining qualification is protected.
 3. Verify invariant preservation.
    Targets: tests for valid removal, missing qualification, and last-qualification rejection.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: qualification reads remain consistent after valid removal.
 
 ## Verification and Acceptance Criteria

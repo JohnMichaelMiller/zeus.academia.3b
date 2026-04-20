@@ -52,23 +52,23 @@ mode: agent
 
 | Role                       | Responsibilities                                      | Inputs                                       | Outputs                        | Escalate when                                                     |
 | -------------------------- | ----------------------------------------------------- | -------------------------------------------- | ------------------------------ | ----------------------------------------------------------------- |
-| Slice coordinator          | confirm filter contract and default sort              | execution plan and current query conventions | approved query surface         | existing API pagination rules conflict with the needed filter set |
-| Backend/domain agent       | implement filtered query, DTOs, endpoint, and mapping | academic persistence model and filter rules  | search/list code path          | one or more filters need data not yet exposed by registration     |
-| Testing/verification agent | verify filters, pagination, and sorting               | implemented slice                            | integration tests and evidence | query output is nondeterministic across repeated runs             |
+| slice-coordinator          | confirm filter contract and default sort              | execution plan and current query conventions | approved query surface         | existing API pagination rules conflict with the needed filter set |
+| backend-domain       | implement filtered query, DTOs, endpoint, and mapping | academic persistence model and filter rules  | search/list code path          | one or more filters need data not yet exposed by registration     |
+| testing-verification | verify filters, pagination, and sorting               | implemented slice                            | integration tests and evidence | query output is nondeterministic across repeated runs             |
 
 ## Ordered Implementation Steps
 
 1. Confirm the filter contract.
    Targets: src/features/Academics/SearchListAcademics/ or equivalent, shared paging types, endpoint contract.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: filters include name, rank, access level, employment status, degree, and university.
 2. Implement the query and endpoint.
    Targets: query, handler, response DTOs, endpoint, and mappings.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: query is read-optimized and supports stable sorting and pagination.
 3. Verify filtering behavior.
    Targets: integration tests for each filter family plus pagination and sort cases.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: seeded data returns predictable subsets and ordering.
 
 ## Verification and Acceptance Criteria

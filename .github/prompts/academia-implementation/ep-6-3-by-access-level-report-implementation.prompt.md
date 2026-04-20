@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                    | Inputs                                      | Outputs                       | Escalate when                                                                 |
 | -------------------------- | --------------------------------------------------- | ------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------- |
-| Slice coordinator          | confirm output shape and route                      | execution plan and report conventions       | approved report contract      | the current model does not surface derived access level cleanly for reporting |
-| Backend/domain agent       | implement grouped access-level report               | current academic state and derivation rules | access-level report code path | the report would need direct writes to access level state                     |
-| Testing/verification agent | verify INT, NAT, LOC counts and post-change updates | implemented slice                           | tests and evidence            | grouped results diverge from rank-derived expectations                        |
+| slice-coordinator          | confirm output shape and route                      | execution plan and report conventions       | approved report contract      | the current model does not surface derived access level cleanly for reporting |
+| report-projection       | implement grouped access-level report               | current academic state and derivation rules | access-level report code path | the report would need direct writes to access level state                     |
+| testing-verification | verify INT, NAT, LOC counts and post-change updates | implemented slice                           | tests and evidence            | grouped results diverge from rank-derived expectations                        |
 
 ## Ordered Implementation Steps
 
 1. Confirm grouping contract and route.
    Targets: src/features/Reports/ByAccessLevelReport/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: output groups around INT, NAT, and LOC only.
 2. Implement the report query.
    Targets: query, handler, DTOs, endpoint.
-   Owner: Backend/domain agent.
+   Owner: report-projection.
    Validation before next step: grouped results are derived from current rank state.
 3. Verify grouped behavior.
    Targets: tests for base counts and updates after rank changes.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: P, SL, and L consistently map to INT, NAT, and LOC in report output.
 
 ## Verification and Acceptance Criteria

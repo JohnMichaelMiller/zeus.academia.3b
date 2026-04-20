@@ -50,23 +50,23 @@ mode: agent
 
 | Role                       | Responsibilities                                                 | Inputs                                             | Outputs                        | Escalate when                                                                  |
 | -------------------------- | ---------------------------------------------------------------- | -------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------ |
-| Slice coordinator          | confirm grouped report shapes and route strategy                 | execution plan and qualification query conventions | approved report contract       | degree-grouped and university-grouped outputs need different projection models |
-| Backend/domain agent       | implement grouped qualification reports                          | qualification state and grouping rules             | qualification report code path | grouped reporting exposes unresolved duplication in qualification storage      |
-| Testing/verification agent | verify counts and grouped listings after qualification mutations | implemented slice                                  | tests and evidence             | counts drift after add, update, or remove operations                           |
+| slice-coordinator          | confirm grouped report shapes and route strategy                 | execution plan and qualification query conventions | approved report contract       | degree-grouped and university-grouped outputs need different projection models |
+| report-projection       | implement grouped qualification reports                          | qualification state and grouping rules             | qualification report code path | grouped reporting exposes unresolved duplication in qualification storage      |
+| testing-verification | verify counts and grouped listings after qualification mutations | implemented slice                                  | tests and evidence             | counts drift after add, update, or remove operations                           |
 
 ## Ordered Implementation Steps
 
 1. Confirm grouped report contracts.
    Targets: src/features/Reports/QualificationReports/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: both degree-grouped and university-grouped outputs are explicit.
 2. Implement grouped report queries.
    Targets: queries, handlers, DTOs, endpoints.
-   Owner: Backend/domain agent.
+   Owner: report-projection.
    Validation before next step: counts and member listings align with current qualification state.
 3. Verify grouped accuracy.
    Targets: tests for base counts plus add, update, and remove qualification effects.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: both grouped outputs stay synchronized with source slices.
 
 ## Verification and Acceptance Criteria

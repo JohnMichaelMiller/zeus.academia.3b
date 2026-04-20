@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                  | Inputs                               | Outputs                     | Escalate when                                                  |
 | -------------------------- | ------------------------------------------------- | ------------------------------------ | --------------------------- | -------------------------------------------------------------- |
-| Slice coordinator          | confirm contracted-state semantics and sort order | execution plan and employment slices | approved report contract    | employment data does not expose current contract state cleanly |
-| Backend/domain agent       | implement report query and DTOs                   | contract state and end-date data     | contracted report code path | the report needs separate projection storage for performance   |
-| Testing/verification agent | verify filtering and ascending sort order         | implemented slice                    | tests and evidence          | results are unsorted or include non-contracted academics       |
+| slice-coordinator          | confirm contracted-state semantics and sort order | execution plan and employment slices | approved report contract    | employment data does not expose current contract state cleanly |
+| report-projection       | implement report query and DTOs                   | contract state and end-date data     | contracted report code path | the report needs separate projection storage for performance   |
+| testing-verification | verify filtering and ascending sort order         | implemented slice                    | tests and evidence          | results are unsorted or include non-contracted academics       |
 
 ## Ordered Implementation Steps
 
 1. Confirm filter and sort contract.
    Targets: src/features/Reports/ContractedAcademicsReport/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: only current contracts are included and sort order is ascending by end date.
 2. Implement the report query.
    Targets: query, handler, DTOs, endpoint.
-   Owner: Backend/domain agent.
+   Owner: report-projection.
    Validation before next step: results reflect current contract state and sort correctly.
 3. Verify report behavior.
    Targets: tests for filtering, sort order, and updated dates after renewal.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: report accuracy is stable on representative data.
 
 ## Verification and Acceptance Criteria

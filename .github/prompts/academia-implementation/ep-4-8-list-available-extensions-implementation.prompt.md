@@ -50,23 +50,23 @@ mode: agent
 
 | Role                       | Responsibilities                                       | Inputs                                        | Outputs                      | Escalate when                                                      |
 | -------------------------- | ------------------------------------------------------ | --------------------------------------------- | ---------------------------- | ------------------------------------------------------------------ |
-| Slice coordinator          | confirm route and response shape                       | execution plan and existing extension queries | approved query contract      | current model cannot distinguish provisioned from assigned clearly |
-| Backend/domain agent       | implement available-extension query, handler, endpoint | extension pool and assignment model           | availability query code path | availability requires a separate projection store                  |
-| Testing/verification agent | verify pool accuracy after assign and release flows    | implemented slice                             | tests and evidence           | query results lag behind current assignment state                  |
+| slice-coordinator          | confirm route and response shape                       | execution plan and existing extension queries | approved query contract      | current model cannot distinguish provisioned from assigned clearly |
+| backend-domain       | implement available-extension query, handler, endpoint | extension pool and assignment model           | availability query code path | availability requires a separate projection store                  |
+| testing-verification | verify pool accuracy after assign and release flows    | implemented slice                             | tests and evidence           | query results lag behind current assignment state                  |
 
 ## Ordered Implementation Steps
 
 1. Confirm availability semantics and route.
    Targets: src/features/Extensions/ListAvailableExtensions/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: only provisioned, unassigned extensions are considered available.
 2. Implement the query.
    Targets: query, handler, response DTOs, endpoint.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: results exclude assigned extensions and include released ones.
 3. Verify availability behavior.
    Targets: tests for initial availability, post-assignment exclusion, and post-release inclusion.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: query results track lifecycle transitions accurately.
 
 ## Verification and Acceptance Criteria

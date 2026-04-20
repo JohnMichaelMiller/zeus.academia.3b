@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                                       | Inputs                                           | Outputs                    | Escalate when                                              |
 | -------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------ | -------------------------- | ---------------------------------------------------------- |
-| Slice coordinator          | confirm report route, active-record semantics, and projection strategy | execution plan and current read patterns         | approved report contract   | reporting requires a projection store not yet present      |
-| Backend/domain agent       | implement directory query, projection, DTOs, endpoint                  | stable lifecycle data and shared paging patterns | directory report code path | active/inactive semantics are unclear after deregistration |
-| Testing/verification agent | verify report completeness and performance on seeded data              | implemented slice                                | tests and evidence         | report output diverges from source-of-truth slice data     |
+| slice-coordinator          | confirm report route, active-record semantics, and projection strategy | execution plan and current read patterns         | approved report contract   | reporting requires a projection store not yet present      |
+| report-projection       | implement directory query, projection, DTOs, endpoint                  | stable lifecycle data and shared paging patterns | directory report code path | active/inactive semantics are unclear after deregistration |
+| testing-verification | verify report completeness and performance on seeded data              | implemented slice                                | tests and evidence         | report output diverges from source-of-truth slice data     |
 
 ## Ordered Implementation Steps
 
 1. Confirm directory projection shape and route.
    Targets: src/features/Reports/AcademicDirectory/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: required columns include name, rank, access level, extension, and employment status.
 2. Implement the directory report.
    Targets: query, handler, response DTOs, endpoint, and projection logic if needed.
-   Owner: Backend/domain agent.
+   Owner: report-projection.
    Validation before next step: the report returns stable, read-optimized results.
 3. Verify accuracy and performance.
    Targets: integration tests and representative seeded-data checks.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: report output matches current academic state and performs acceptably.
 
 ## Verification and Acceptance Criteria

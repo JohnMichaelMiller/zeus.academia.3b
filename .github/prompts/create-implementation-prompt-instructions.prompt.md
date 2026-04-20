@@ -97,7 +97,7 @@ Require the instruction file to tell authors to ground each prompt in repository
 
 ### 3. Agent-Oriented Implementation Roles
 
-Require every implementation prompt to define a role model using custom agents.
+Require every implementation prompt to define a role model using reusable custom agents when the repository already provides them.
 
 The instruction file must require:
 
@@ -106,13 +106,14 @@ The instruction file must require:
 - escalation triggers for unresolved ambiguity, missing prerequisites, or conflicting patterns
 - a fallback pattern when a repository-specific custom agent does not yet exist
 
-Include guidance for a recommended role set such as:
+Include guidance for a recommended role set using the repository's reusable agent names:
 
-- slice coordinator or implementation lead
-- backend/API or domain agent
-- frontend/UI or workflow agent
-- testing/verification agent
-- optional data, integration, or documentation agent when justified
+- `slice-coordinator`
+- `backend-domain`
+- `frontend-workflow`
+- `testing-verification`
+- `report-projection` for report-centric or projection-heavy slices
+- `data-integration-doc` when supporting data, integration, or documentation work is justified
 
 ### 4. Required Structure of an Implementation Prompt
 
@@ -216,7 +217,7 @@ Require a final checklist that verifies:
 ## Additional Requirements
 
 1. Keep the generated instruction file practical and terse; prefer checklists, tables, and prompt skeletons over long prose.
-2. Include at least one example showing how backend, frontend, and testing roles divide work for a single slice.
+2. Include at least one example showing how `backend-domain`, `frontend-workflow`, and `testing-verification` divide work for a single slice, and note when `report-projection` should replace `backend-domain` for report-only slices.
 3. Instruct authors to reuse existing custom agents from `.github/agents/` when available before inventing new roles.
 4. Require prompts to state what a human should do if an agent gets blocked or produces conflicting output.
 5. Require prompts to separate implementation instructions from demo instructions so both are independently testable.

@@ -54,27 +54,27 @@ mode: agent
 
 | Role                       | Responsibilities                                                                        | Inputs                                                     | Outputs                                           | Escalate when                                                            |
 | -------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
-| Slice coordinator          | confirm endpoint route, transaction boundary, and prerequisite readiness                | execution plan, current repo tree, reference-data slices   | approved implementation sequence and blocker list | any prerequisite slice is incomplete or lacks integration proof          |
-| Backend/domain agent       | implement command, validator, handler, endpoint, mappings, and persistence workflow     | Shared Kernel, reference-data contracts, slice conventions | registration code path and response contract      | qualification or extension rules require changing Shared Kernel behavior |
-| Testing/verification agent | verify valid registration, duplicate empNr, invalid references, and extension conflicts | implemented slice and prerequisite data                    | integration-first tests and evidence              | registration is not atomic or leaves partial data behind                 |
+| slice-coordinator          | confirm endpoint route, transaction boundary, and prerequisite readiness                | execution plan, current repo tree, reference-data slices   | approved implementation sequence and blocker list | any prerequisite slice is incomplete or lacks integration proof          |
+| backend-domain       | implement command, validator, handler, endpoint, mappings, and persistence workflow     | Shared Kernel, reference-data contracts, slice conventions | registration code path and response contract      | qualification or extension rules require changing Shared Kernel behavior |
+| testing-verification | verify valid registration, duplicate empNr, invalid references, and extension conflicts | implemented slice and prerequisite data                    | integration-first tests and evidence              | registration is not atomic or leaves partial data behind                 |
 
 ## Ordered Implementation Steps
 
 1. Confirm prerequisite slices and final slice targets.
    Targets: src/features/Academics/RegisterAcademic/ or current equivalent, prerequisite endpoints/data, and persistence transaction boundary.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: rank, degree, university, and extension reference data are available for test scenarios.
 2. Implement the registration contract and validator.
    Targets: RegisterAcademic command, request/response types, validator, and mapping helpers.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: empNr length, EmpName length, qualification minimum, and extension availability are all validated before persistence.
 3. Implement the handler and endpoint atomically.
    Targets: handler, endpoint, persistence mapping, and transaction flow for academic creation, qualification creation, and extension linkage.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: successful registration persists one academic with derived access level, at least one qualification, and one assigned extension.
 4. Add integration-first verification.
    Targets: integration tests, validator tests, and any required fixtures.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: duplicate empNr, invalid rank, missing qualification, and unavailable extension cases all fail cleanly without partial writes.
 
 ## Verification and Acceptance Criteria

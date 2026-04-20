@@ -66,10 +66,11 @@ Recommended roles:
 
 | Role                                | Primary responsibility                                                   | Typical outputs                                |
 | ----------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------- |
-| Slice coordinator                   | Own scope, sequencing, and handoffs                                      | ordered plan, dependency decisions, blockers   |
-| Backend/domain agent                | Implement contracts, handlers, validation, persistence                   | backend code, API changes, domain rules        |
-| Frontend/workflow agent             | Implement UI, client flows, and interaction states                       | components, stores, composables, typed clients |
-| Testing/verification agent          | Define checks, run verification, capture evidence                        | test cases, verification notes, failure gaps   |
+| slice-coordinator                   | Own scope, sequencing, and handoffs                                      | ordered plan, dependency decisions, blockers   |
+| backend-domain                      | Implement contracts, handlers, validation, persistence                   | backend code, API changes, domain rules        |
+| frontend-workflow                   | Implement UI, client flows, and interaction states                       | components, stores, composables, typed clients |
+| testing-verification                | Define checks, run verification, capture evidence                        | test cases, verification notes, failure gaps   |
+| Report/projection agent             | Implement read models, grouped queries, and projection-backed reporting  | report queries, DTOs, projections, aggregates  |
 | Optional data/integration/doc agent | Handle migrations, external integration, or user-facing docs when needed | scripts, integration notes, showcase support   |
 
 If a repository-specific agent does not exist, the prompt must say whether to:
@@ -79,6 +80,8 @@ If a repository-specific agent does not exist, the prompt must say whether to:
 - stop and ask for a new reusable agent profile when the role will recur
 
 Every prompt must define escalation triggers for missing prerequisites, contradictory repository patterns, failed verification, or ambiguity that changes the slice boundary.
+
+For report-centric slices, prefer the reusable `report-projection` agent over the generic backend/domain role when the primary work is grouped analytics, projection storage, or report-only query behavior.
 
 ## Standard Implementation Prompt Structure
 
@@ -109,12 +112,12 @@ Reject vague instructions such as "implement the UI" or "wire up the backend" wi
 
 Use this step format:
 
-| Step | Goal                                    | Targets                                   | Owner                      | Validation before next step           |
-| ---- | --------------------------------------- | ----------------------------------------- | -------------------------- | ------------------------------------- |
-| 1    | Confirm slice boundary and dependencies | named files and prior slices              | slice coordinator          | boundary accepted and blockers listed |
-| 2    | Implement backend behavior              | specific command/query/endpoint files     | backend/domain agent       | API behavior matches rules            |
-| 3    | Implement frontend flow                 | specific component/store/composable files | frontend/workflow agent    | UI states align with API behavior     |
-| 4    | Verify and capture evidence             | tests, logs, screenshots, notes           | testing/verification agent | evidence recorded and gaps called out |
+| Step | Goal                                    | Targets                                   | Owner                | Validation before next step           |
+| ---- | --------------------------------------- | ----------------------------------------- | -------------------- | ------------------------------------- |
+| 1    | Confirm slice boundary and dependencies | named files and prior slices              | slice-coordinator    | boundary accepted and blockers listed |
+| 2    | Implement backend behavior              | specific command/query/endpoint files     | backend-domain       | API behavior matches rules            |
+| 3    | Implement frontend flow                 | specific component/store/composable files | frontend-workflow    | UI states align with API behavior     |
+| 4    | Verify and capture evidence             | tests, logs, screenshots, notes           | testing-verification | evidence recorded and gaps called out |
 
 ## Acceptance Criteria Standards
 
@@ -164,12 +167,13 @@ Use showcase steps to prove user or stakeholder value, not internal implementati
 
 Example for a single slice:
 
-| Role                       | Scope for the slice                                                    | Handoff                                                        |
-| -------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------- |
-| Slice coordinator          | confirm scope, inspect dependencies, assign sequence                   | hands backend and frontend agents the approved work order      |
-| Backend/domain agent       | implement command, validator, handler, endpoint, and response contract | hands API contract and edge cases to frontend and verification |
-| Frontend/workflow agent    | implement component, composable, store, and request handling states    | hands user flow and failure states to verification             |
-| Testing/verification agent | define test cases, run checks, collect proof, raise failures           | returns pass/fail evidence to coordinator and human reviewer   |
+| Role                 | Scope for the slice                                                    | Handoff                                                        |
+| -------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------- |
+| slice-coordinator    | confirm scope, inspect dependencies, assign sequence                   | hands backend and frontend agents the approved work order      |
+| backend-domain       | implement command, validator, handler, endpoint, and response contract | hands API contract and edge cases to frontend and verification |
+| frontend-workflow    | implement component, composable, store, and request handling states    | hands user flow and failure states to verification             |
+| report-projection    | implement projection, grouped query, and report response contracts     | hands report shape and edge cases to verification              |
+| testing-verification | define test cases, run checks, collect proof, raise failures           | returns pass/fail evidence to coordinator and human reviewer   |
 
 ## Reusable Prompt Template
 
@@ -196,12 +200,13 @@ Example for a single slice:
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities      | Inputs                 | Outputs                 | Escalate when              |
-| -------------------------- | --------------------- | ---------------------- | ----------------------- | -------------------------- |
-| Slice coordinator          | {{coordinator_scope}} | {{coordinator_inputs}} | {{coordinator_outputs}} | {{coordinator_escalation}} |
-| Backend/domain agent       | {{backend_scope}}     | {{backend_inputs}}     | {{backend_outputs}}     | {{backend_escalation}}     |
-| Frontend/workflow agent    | {{frontend_scope}}    | {{frontend_inputs}}    | {{frontend_outputs}}    | {{frontend_escalation}}    |
-| Testing/verification agent | {{test_scope}}        | {{test_inputs}}        | {{test_outputs}}        | {{test_escalation}}        |
+| Role                 | Responsibilities      | Inputs                 | Outputs                 | Escalate when              |
+| -------------------- | --------------------- | ---------------------- | ----------------------- | -------------------------- |
+| slice-coordinator    | {{coordinator_scope}} | {{coordinator_inputs}} | {{coordinator_outputs}} | {{coordinator_escalation}} |
+| backend-domain       | {{backend_scope}}     | {{backend_inputs}}     | {{backend_outputs}}     | {{backend_escalation}}     |
+| frontend-workflow    | {{frontend_scope}}    | {{frontend_inputs}}    | {{frontend_outputs}}    | {{frontend_escalation}}    |
+| report-projection    | {{report_scope}}      | {{report_inputs}}      | {{report_outputs}}      | {{report_escalation}}      |
+| testing-verification | {{test_scope}}        | {{test_inputs}}        | {{test_outputs}}        | {{test_escalation}}        |
 
 ## Ordered Implementation Steps
 

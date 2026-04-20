@@ -52,23 +52,23 @@ mode: agent
 
 | Role                       | Responsibilities                                | Inputs                                     | Outputs                       | Escalate when                                                   |
 | -------------------------- | ----------------------------------------------- | ------------------------------------------ | ----------------------------- | --------------------------------------------------------------- |
-| Slice coordinator          | confirm route and date semantics                | execution plan and current API conventions | approved command contract     | local time handling is ambiguous for future-date validation     |
-| Backend/domain agent       | implement command, validator, handler, endpoint | Shared Kernel rules and academic model     | contract-assignment code path | contract date semantics conflict with current domain primitives |
-| Testing/verification agent | verify future-date enforcement and XOR behavior | implemented slice                          | tests and evidence            | contracted state is persisted with invalid or current dates     |
+| slice-coordinator          | confirm route and date semantics                | execution plan and current API conventions | approved command contract     | local time handling is ambiguous for future-date validation     |
+| backend-domain       | implement command, validator, handler, endpoint | Shared Kernel rules and academic model     | contract-assignment code path | contract date semantics conflict with current domain primitives |
+| testing-verification | verify future-date enforcement and XOR behavior | implemented slice                          | tests and evidence            | contracted state is persisted with invalid or current dates     |
 
 ## Ordered Implementation Steps
 
 1. Confirm the contract-date semantics.
    Targets: src/features/Employment/AssignContract/ or equivalent and shared date handling.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: the definition of future date is explicit and testable.
 2. Implement assign-contract behavior.
    Targets: command, validator, handler, endpoint, and mappings.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: valid future dates persist and tenured state is cleared.
 3. Verify command behavior.
    Targets: tests for valid assignment, current/past date rejection, and profile assertions.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: the command path preserves XOR employment rules.
 
 ## Verification and Acceptance Criteria

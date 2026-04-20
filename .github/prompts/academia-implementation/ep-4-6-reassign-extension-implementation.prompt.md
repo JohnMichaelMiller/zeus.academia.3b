@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                 | Inputs                                          | Outputs                   | Escalate when                                                         |
 | -------------------------- | ------------------------------------------------ | ----------------------------------------------- | ------------------------- | --------------------------------------------------------------------- |
-| Slice coordinator          | confirm transaction boundary and route           | execution plan and existing extension flows     | approved command contract | persistence cannot guarantee atomic transition with the current model |
-| Backend/domain agent       | implement reassign command, handler, endpoint    | extension assignment model and uniqueness rules | reassignment code path    | atomicity requires broader infrastructure changes                     |
-| Testing/verification agent | verify valid reassignments and rollback behavior | implemented slice                               | tests and evidence        | partial updates survive after a failed reassignment                   |
+| slice-coordinator          | confirm transaction boundary and route           | execution plan and existing extension flows     | approved command contract | persistence cannot guarantee atomic transition with the current model |
+| backend-domain       | implement reassign command, handler, endpoint    | extension assignment model and uniqueness rules | reassignment code path    | atomicity requires broader infrastructure changes                     |
+| testing-verification | verify valid reassignments and rollback behavior | implemented slice                               | tests and evidence        | partial updates survive after a failed reassignment                   |
 
 ## Ordered Implementation Steps
 
 1. Confirm reassignment semantics and transaction boundary.
    Targets: src/features/Extensions/ReassignExtension/ or equivalent and persistence transaction handling.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: source release and target assignment happen in one atomic flow.
 2. Implement reassignment behavior.
    Targets: command, handler, endpoint.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: source extension is released only when the target assignment can succeed.
 3. Verify atomic behavior.
    Targets: tests for valid reassign, invalid target, and rollback on failure.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: 1:1 uniqueness remains intact after success and failure.
 
 ## Verification and Acceptance Criteria

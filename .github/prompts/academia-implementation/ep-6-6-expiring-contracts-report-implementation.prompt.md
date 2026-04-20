@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                      | Inputs                                               | Outputs                             | Escalate when                                                     |
 | -------------------------- | ----------------------------------------------------- | ---------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------- |
-| Slice coordinator          | confirm default threshold and date-boundary semantics | execution plan and current date-handling conventions | approved report contract            | current date handling is inconsistent across employment slices    |
-| Backend/domain agent       | implement threshold-based report query                | contract end-date data and filter rules              | expiring-contracts report code path | date logic requires timezone semantics beyond current conventions |
-| Testing/verification agent | verify default and custom windows plus boundary dates | implemented slice                                    | tests and evidence                  | near-boundary contracts appear inconsistently                     |
+| slice-coordinator          | confirm default threshold and date-boundary semantics | execution plan and current date-handling conventions | approved report contract            | current date handling is inconsistent across employment slices    |
+| report-projection       | implement threshold-based report query                | contract end-date data and filter rules              | expiring-contracts report code path | date logic requires timezone semantics beyond current conventions |
+| testing-verification | verify default and custom windows plus boundary dates | implemented slice                                    | tests and evidence                  | near-boundary contracts appear inconsistently                     |
 
 ## Ordered Implementation Steps
 
 1. Confirm threshold defaults and boundary rules.
    Targets: src/features/Reports/ExpiringContractsReport/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: default threshold is 90 days and custom threshold behavior is defined.
 2. Implement the report query.
    Targets: query, handler, DTOs, endpoint.
-   Owner: Backend/domain agent.
+   Owner: report-projection.
    Validation before next step: report includes contracts expiring within the configured window only.
 3. Verify threshold behavior.
    Targets: tests for default threshold, custom threshold, and boundary-date cases.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: date-window behavior is deterministic.
 
 ## Verification and Acceptance Criteria

@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                                 | Inputs                                      | Outputs                       | Escalate when                                                   |
 | -------------------------- | ---------------------------------------------------------------- | ------------------------------------------- | ----------------------------- | --------------------------------------------------------------- |
-| Slice coordinator          | confirm whether the report is counts-only or counts-plus-details | execution plan and reporting conventions    | approved report contract      | active-academic semantics remain ambiguous after deregistration |
-| Backend/domain agent       | implement grouped distribution query and DTOs                    | current academic state and derivation rules | distribution report code path | active-state filtering requires a broader lifecycle redesign    |
-| Testing/verification agent | verify totals, grouping, and post-change updates                 | implemented slice                           | tests and evidence            | totals do not match current active academics                    |
+| slice-coordinator          | confirm whether the report is counts-only or counts-plus-details | execution plan and reporting conventions    | approved report contract      | active-academic semantics remain ambiguous after deregistration |
+| report-projection       | implement grouped distribution query and DTOs                    | current academic state and derivation rules | distribution report code path | active-state filtering requires a broader lifecycle redesign    |
+| testing-verification | verify totals, grouping, and post-change updates                 | implemented slice                           | tests and evidence            | totals do not match current active academics                    |
 
 ## Ordered Implementation Steps
 
 1. Confirm distribution contract and active-state semantics.
    Targets: src/features/Reports/AccessLevelDistributionReport/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: report output and active-record filtering are explicit.
 2. Implement the report query.
    Targets: query, handler, DTOs, endpoint.
-   Owner: Backend/domain agent.
+   Owner: report-projection.
    Validation before next step: totals are grouped accurately by INT, NAT, and LOC.
 3. Verify grouped totals.
    Targets: tests for base counts, post-rank-change updates, and post-deregistration totals.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: report totals match the current active academic population.
 
 ## Verification and Acceptance Criteria

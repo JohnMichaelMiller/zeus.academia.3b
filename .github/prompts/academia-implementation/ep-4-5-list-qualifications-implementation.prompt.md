@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                                                  | Inputs                                      | Outputs                       | Escalate when                                                |
 | -------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------- | ------------------------------------------------------------ |
-| Slice coordinator          | confirm whether one endpoint or multiple endpoints best match current conventions | execution plan and current API style        | approved query surface        | current API conventions make the planned query modes unclear |
-| Backend/domain agent       | implement qualification queries and response DTOs                                 | qualification model and shared paging rules | list-qualifications code path | one query mode needs a different storage/projection strategy |
-| Testing/verification agent | verify all query modes and empty-result handling                                  | implemented slice                           | tests and evidence            | query modes return inconsistent shapes                       |
+| slice-coordinator          | confirm whether one endpoint or multiple endpoints best match current conventions | execution plan and current API style        | approved query surface        | current API conventions make the planned query modes unclear |
+| backend-domain       | implement qualification queries and response DTOs                                 | qualification model and shared paging rules | list-qualifications code path | one query mode needs a different storage/projection strategy |
+| testing-verification | verify all query modes and empty-result handling                                  | implemented slice                           | tests and evidence            | query modes return inconsistent shapes                       |
 
 ## Ordered Implementation Steps
 
 1. Confirm query modes and response shape.
    Targets: src/features/Qualifications/ListQualifications/ or equivalent and any shared paging types.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: by-academic, by-degree, and by-university behaviors are explicit.
 2. Implement qualification queries.
    Targets: queries, handlers, response DTOs, endpoints.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: all query modes are read-only and return stable contracts.
 3. Verify the query modes.
    Targets: tests for all three filters plus empty-result scenarios.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: returned qualification sets match the seeded data accurately.
 
 ## Verification and Acceptance Criteria
