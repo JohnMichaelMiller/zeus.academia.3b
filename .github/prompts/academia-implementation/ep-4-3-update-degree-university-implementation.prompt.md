@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                         | Inputs                                            | Outputs                     | Escalate when                                                           |
 | -------------------------- | -------------------------------------------------------- | ------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------- |
-| Slice coordinator          | confirm qualification identifier strategy and route      | execution plan and current qualification model    | approved command contract   | qualification records are not uniquely addressable in the current model |
-| Backend/domain agent       | implement update command, validator, handler, endpoint   | qualification model and university reference data | university-update code path | update semantics would break the academic-degree uniqueness rule        |
-| Testing/verification agent | verify existing-record update and missing-record failure | implemented slice                                 | tests and evidence          | updates create new rows instead of modifying the intended record        |
+| slice-coordinator          | confirm qualification identifier strategy and route      | execution plan and current qualification model    | approved command contract   | qualification records are not uniquely addressable in the current model |
+| backend-domain       | implement update command, validator, handler, endpoint   | qualification model and university reference data | university-update code path | update semantics would break the academic-degree uniqueness rule        |
+| testing-verification | verify existing-record update and missing-record failure | implemented slice                                 | tests and evidence          | updates create new rows instead of modifying the intended record        |
 
 ## Ordered Implementation Steps
 
 1. Confirm qualification identity and update route.
    Targets: src/features/Qualifications/UpdateDegreeUniversity/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: the target qualification can be identified unambiguously.
 2. Implement update behavior.
    Targets: command, validator, handler, endpoint.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: only existing qualification records are updated and new university references are valid.
 3. Verify update behavior.
    Targets: tests for successful update, missing qualification, invalid university, and read-model visibility.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: the updated university is visible and no duplicate qualification is created.
 
 ## Verification and Acceptance Criteria

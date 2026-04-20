@@ -52,23 +52,23 @@ mode: agent
 
 | Role                       | Responsibilities                                                                 | Inputs                                              | Outputs                   | Escalate when                                                              |
 | -------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------- |
-| Slice coordinator          | confirm event needs and route placement                                          | execution plan, report dependencies, current routes | approved command contract | report dependencies require a broader event model than currently available |
-| Backend/domain agent       | implement command, validator, handler, endpoint, and any rank-change event       | Shared Kernel rules, ManageRanks data               | rank-change code path     | handler would need to assign access level directly rather than deriving it |
-| Testing/verification agent | verify valid rank change, invalid rank rejection, and access-level recalculation | implemented slice                                   | tests and evidence        | profile or report seed data still shows stale access levels                |
+| slice-coordinator          | confirm event needs and route placement                                          | execution plan, report dependencies, current routes | approved command contract | report dependencies require a broader event model than currently available |
+| backend-domain       | implement command, validator, handler, endpoint, and any rank-change event       | Shared Kernel rules, ManageRanks data               | rank-change code path     | handler would need to assign access level directly rather than deriving it |
+| testing-verification | verify valid rank change, invalid rank rejection, and access-level recalculation | implemented slice                                   | tests and evidence        | profile or report seed data still shows stale access levels                |
 
 ## Ordered Implementation Steps
 
 1. Confirm route, identifier, and event expectations.
    Targets: src/features/Academics/ChangeRank/ or equivalent and any domain-event registration.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: accepted rank source and downstream notification behavior are explicit.
 2. Implement change-rank behavior.
    Targets: command, validator, handler, endpoint, mappings, and optional RankChanged event.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: only valid rank codes are accepted and access level is recalculated from the aggregate rule.
 3. Verify read-model consistency.
    Targets: tests for valid change, invalid rank, missing academic, and profile/read-model assertions.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: changed rank and derived access level are immediately visible.
 
 ## Verification and Acceptance Criteria

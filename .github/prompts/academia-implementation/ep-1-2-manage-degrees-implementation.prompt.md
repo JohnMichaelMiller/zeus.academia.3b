@@ -54,27 +54,27 @@ mode: agent
 
 | Role                       | Responsibilities                                               | Inputs                                       | Outputs                                      | Escalate when                                                    |
 | -------------------------- | -------------------------------------------------------------- | -------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
-| Slice coordinator          | confirm degree storage, seed expectations, and route placement | execution plan, current repo tree            | approved targets and blocker notes           | current codebase already contains an incompatible degree catalog |
-| Backend/domain agent       | implement add and list degree behavior                         | Shared Kernel degree type, slice conventions | commands, queries, handlers, DTOs, endpoints | degree code rules are unclear or clash with seeded data          |
-| Testing/verification agent | verify uniqueness and list behavior                            | implemented slice                            | tests and evidence                           | persistence allows duplicates or queries return unstable values  |
+| slice-coordinator          | confirm degree storage, seed expectations, and route placement | execution plan, current repo tree            | approved targets and blocker notes           | current codebase already contains an incompatible degree catalog |
+| backend-domain       | implement add and list degree behavior                         | Shared Kernel degree type, slice conventions | commands, queries, handlers, DTOs, endpoints | degree code rules are unclear or clash with seeded data          |
+| testing-verification | verify uniqueness and list behavior                            | implemented slice                            | tests and evidence                           | persistence allows duplicates or queries return unstable values  |
 
 ## Ordered Implementation Steps
 
 1. Confirm the canonical degree-data location and route shape.
    Targets: src/features/ReferenceData/ManageDegrees/ or current equivalent, persistence configuration, and any seed scripts.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: one degree catalog source is identified and slice targets are approved.
 2. Implement add-degree behavior.
    Targets: AddDegree command, validator, handler, response, endpoint, and any mappings.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: duplicate degree codes are rejected and valid codes persist successfully.
 3. Implement list-degree behavior.
    Targets: ListDegrees query, handler, response contract, and endpoint.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: query returns stable degree records suitable for registration lookups.
 4. Verify the slice end to end.
    Targets: validator tests, handler tests, and integration tests for add/list flows.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: tests cover valid add, duplicate rejection, and list-query results.
 
 ## Verification and Acceptance Criteria

@@ -52,23 +52,23 @@ mode: agent
 
 | Role                       | Responsibilities                                             | Inputs                                  | Outputs                | Escalate when                                                         |
 | -------------------------- | ------------------------------------------------------------ | --------------------------------------- | ---------------------- | --------------------------------------------------------------------- |
-| Slice coordinator          | confirm command route and response contract                  | execution plan, current routes          | approved command scope | employment logic appears in multiple conflicting places               |
-| Backend/domain agent       | implement command, handler, endpoint, and any event emission | Shared Kernel guards and academic model | tenure code path       | tenure transition requires changing the Shared Kernel invariant model |
-| Testing/verification agent | verify XOR preservation and read-model visibility            | implemented slice                       | tests and evidence     | contract state is not cleared or profile output is inconsistent       |
+| slice-coordinator          | confirm command route and response contract                  | execution plan, current routes          | approved command scope | employment logic appears in multiple conflicting places               |
+| backend-domain       | implement command, handler, endpoint, and any event emission | Shared Kernel guards and academic model | tenure code path       | tenure transition requires changing the Shared Kernel invariant model |
+| testing-verification | verify XOR preservation and read-model visibility            | implemented slice                       | tests and evidence     | contract state is not cleared or profile output is inconsistent       |
 
 ## Ordered Implementation Steps
 
 1. Confirm the tenure transition contract.
    Targets: src/features/Employment/GrantTenure/ or equivalent and route placement.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: success and missing-record behaviors are explicit.
 2. Implement grant-tenure behavior.
    Targets: command, handler, endpoint, mappings, and any event contract.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: applying tenure clears contract end date and leaves a valid employment state.
 3. Verify employment invariants.
    Targets: unit or integration tests for tenured transition, missing academic, and prior contracted state.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: XOR rule is preserved through the command path.
 
 ## Verification and Acceptance Criteria

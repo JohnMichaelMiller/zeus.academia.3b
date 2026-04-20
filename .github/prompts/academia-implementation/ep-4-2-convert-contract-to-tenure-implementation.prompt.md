@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                 | Inputs                                          | Outputs                   | Escalate when                                                       |
 | -------------------------- | ------------------------------------------------ | ----------------------------------------------- | ------------------------- | ------------------------------------------------------------------- |
-| Slice coordinator          | confirm transition semantics and route           | execution plan and employment slices            | approved command contract | current model cannot distinguish conversion from direct tenure      |
-| Backend/domain agent       | implement conversion command, handler, endpoint  | Shared Kernel rules and prior employment slices | conversion code path      | conversion needs additional domain events not yet modeled           |
-| Testing/verification agent | verify contracted-only and post-conversion state | implemented slice                               | tests and evidence        | contract data survives the conversion or tenure state is incomplete |
+| slice-coordinator          | confirm transition semantics and route           | execution plan and employment slices            | approved command contract | current model cannot distinguish conversion from direct tenure      |
+| backend-domain       | implement conversion command, handler, endpoint  | Shared Kernel rules and prior employment slices | conversion code path      | conversion needs additional domain events not yet modeled           |
+| testing-verification | verify contracted-only and post-conversion state | implemented slice                               | tests and evidence        | contract data survives the conversion or tenure state is incomplete |
 
 ## Ordered Implementation Steps
 
 1. Confirm contracted-only conversion semantics.
    Targets: src/features/Employment/ConvertContractToTenure/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: handler behavior for non-contracted academics is explicit.
 2. Implement conversion behavior.
    Targets: command, handler, endpoint, mappings.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: success clears ContractEndDate and sets tenured state only.
 3. Verify transition behavior.
    Targets: tests for valid conversion, invalid starting state, and follow-up reads.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: XOR employment rule is preserved after the transition.
 
 ## Verification and Acceptance Criteria

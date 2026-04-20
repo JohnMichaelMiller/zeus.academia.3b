@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                               | Inputs                                          | Outputs                | Escalate when                                                |
 | -------------------------- | -------------------------------------------------------------- | ----------------------------------------------- | ---------------------- | ------------------------------------------------------------ |
-| Slice coordinator          | confirm identifier, route, and expected cleared-state response | execution plan and current routes               | approved command scope | existing routes imply a different employment lifecycle model |
-| Backend/domain agent       | implement clear-state command, handler, endpoint               | academic aggregate and current employment rules | removal code path      | clearing state would violate an unstated persistence rule    |
-| Testing/verification agent | verify tenure-clear and contract-clear scenarios               | implemented slice                               | tests and evidence     | either path leaves stale persisted employment data           |
+| slice-coordinator          | confirm identifier, route, and expected cleared-state response | execution plan and current routes               | approved command scope | existing routes imply a different employment lifecycle model |
+| backend-domain       | implement clear-state command, handler, endpoint               | academic aggregate and current employment rules | removal code path      | clearing state would violate an unstated persistence rule    |
+| testing-verification | verify tenure-clear and contract-clear scenarios               | implemented slice                               | tests and evidence     | either path leaves stale persisted employment data           |
 
 ## Ordered Implementation Steps
 
 1. Confirm the cleared-state contract.
    Targets: src/features/Employment/RemoveEmploymentStatus/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: handler behavior is defined for both tenured and contracted academics.
 2. Implement clear-employment behavior.
    Targets: command, handler, endpoint, and mappings.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: the command clears IsTenured and ContractEndDate safely.
 3. Verify both transition paths.
    Targets: tests for starting from tenured, starting from contracted, and reading back cleared state.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: read models show no residual employment state.
 
 ## Verification and Acceptance Criteria

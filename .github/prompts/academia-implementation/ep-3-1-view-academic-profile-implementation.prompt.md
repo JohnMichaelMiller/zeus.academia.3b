@@ -53,23 +53,23 @@ mode: agent
 
 | Role                       | Responsibilities                                 | Inputs                                       | Outputs                        | Escalate when                                                                                 |
 | -------------------------- | ------------------------------------------------ | -------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
-| Slice coordinator          | confirm route and projection shape               | execution plan, current repo tree            | approved query scope           | current academic data model cannot return all required fields without revisiting registration |
-| Backend/domain agent       | implement query, handler, response, and endpoint | registration data model, Shared Kernel types | profile query code path        | qualifications or extension data need a new shared projection strategy                        |
-| Testing/verification agent | verify happy path and not-found behavior         | implemented slice                            | integration tests and evidence | returned profile omits derived or joined data required by the plan                            |
+| slice-coordinator          | confirm route and projection shape               | execution plan, current repo tree            | approved query scope           | current academic data model cannot return all required fields without revisiting registration |
+| backend-domain       | implement query, handler, response, and endpoint | registration data model, Shared Kernel types | profile query code path        | qualifications or extension data need a new shared projection strategy                        |
+| testing-verification | verify happy path and not-found behavior         | implemented slice                            | integration tests and evidence | returned profile omits derived or joined data required by the plan                            |
 
 ## Ordered Implementation Steps
 
 1. Confirm the profile response contract and route.
    Targets: src/features/Academics/ViewAcademicProfile/ or equivalent, existing academic route grouping.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: response includes empNr, name, rank, access level, extension, qualifications, and employment state.
 2. Implement the query projection.
    Targets: query, handler, response DTO, endpoint, and mapping helpers.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: one academic record can be projected without command-side mutation logic.
 3. Verify query behavior.
    Targets: integration tests for found and not-found cases.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: tests prove the profile returns the required data and fails cleanly when absent.
 
 ## Verification and Acceptance Criteria

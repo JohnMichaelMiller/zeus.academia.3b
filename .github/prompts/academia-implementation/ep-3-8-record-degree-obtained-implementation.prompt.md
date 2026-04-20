@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                               | Inputs                                        | Outputs                     | Escalate when                                                                |
 | -------------------------- | -------------------------------------------------------------- | --------------------------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
-| Slice coordinator          | confirm qualification storage and identifier strategy          | execution plan and current persistence model  | approved slice targets      | registration stored qualifications in a way this slice cannot extend cleanly |
-| Backend/domain agent       | implement command, validator, handler, endpoint                | qualification rules and reference-data slices | qualification-add code path | duplicate-detection logic requires a broader data redesign                   |
-| Testing/verification agent | verify happy path, invalid references, and duplicate rejection | implemented slice                             | tests and evidence          | duplicate degree records slip through under realistic data                   |
+| slice-coordinator          | confirm qualification storage and identifier strategy          | execution plan and current persistence model  | approved slice targets      | registration stored qualifications in a way this slice cannot extend cleanly |
+| backend-domain       | implement command, validator, handler, endpoint                | qualification rules and reference-data slices | qualification-add code path | duplicate-detection logic requires a broader data redesign                   |
+| testing-verification | verify happy path, invalid references, and duplicate rejection | implemented slice                             | tests and evidence          | duplicate degree records slip through under realistic data                   |
 
 ## Ordered Implementation Steps
 
 1. Confirm qualification storage shape and route.
    Targets: src/features/Qualifications/RecordDegreeObtained/ or equivalent and current qualification model.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: academic-degree-university persistence strategy is explicit.
 2. Implement qualification-add behavior.
    Targets: command, validator, handler, endpoint, mappings.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: valid references persist a new qualification and duplicate Academic+Degree pairs are blocked.
 3. Verify qualification behavior.
    Targets: tests for happy path, invalid degree or university, duplicate degree pair, and follow-up read checks.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: the slice leaves the qualification set consistent and queryable.
 
 ## Verification and Acceptance Criteria

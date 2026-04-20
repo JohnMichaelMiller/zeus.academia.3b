@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                                     | Inputs                                               | Outputs                   | Escalate when                                                              |
 | -------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------- |
-| Slice coordinator          | confirm deregistration semantics, retention rules, and event shape   | execution plan and current lifecycle model           | approved command contract | retention rules are ambiguous or conflict with persistence behavior        |
-| Backend/domain agent       | implement command, handler, endpoint, cleanup, and event publication | academic model, extension lifecycle, event contracts | deregistration code path  | cleanup or retention requires a larger archival design                     |
-| Testing/verification agent | verify extension release, history retention, and event emission      | implemented slice                                    | tests and evidence        | deregistration leaves assigned extensions behind or loses required history |
+| slice-coordinator          | confirm deregistration semantics, retention rules, and event shape   | execution plan and current lifecycle model           | approved command contract | retention rules are ambiguous or conflict with persistence behavior        |
+| backend-domain       | implement command, handler, endpoint, cleanup, and event publication | academic model, extension lifecycle, event contracts | deregistration code path  | cleanup or retention requires a larger archival design                     |
+| testing-verification | verify extension release, history retention, and event emission      | implemented slice                                    | tests and evidence        | deregistration leaves assigned extensions behind or loses required history |
 
 ## Ordered Implementation Steps
 
 1. Confirm deregistration semantics and retention expectations.
    Targets: src/features/Academics/DeregisterAcademic/ or equivalent and domain-event wiring.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: expected post-deregistration state and required event payload are explicit.
 2. Implement deregistration behavior.
    Targets: command, handler, endpoint, cleanup logic, event publication.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: assigned extensions are released and qualification history is retained according to the plan.
 3. Verify lifecycle completion behavior.
    Targets: tests for success, missing academic, released extension state, and event emission.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: report-producing consumers have the data they need.
 
 ## Verification and Acceptance Criteria

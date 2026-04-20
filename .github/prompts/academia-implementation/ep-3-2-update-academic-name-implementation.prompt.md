@@ -52,23 +52,23 @@ mode: agent
 
 | Role                       | Responsibilities                                       | Inputs                                | Outputs                | Escalate when                                                            |
 | -------------------------- | ------------------------------------------------------ | ------------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
-| Slice coordinator          | confirm route, identifier, and update flow             | execution plan and current tree       | approved command scope | current repo uses a different canonical identifier than the plan assumes |
-| Backend/domain agent       | implement rename command, validator, handler, endpoint | registration model and existing rules | rename code path       | renaming requires cross-slice side effects not called for in the plan    |
-| Testing/verification agent | verify length rule, persistence, and query visibility  | implemented slice                     | tests and evidence     | updated name is not visible through read models after save               |
+| slice-coordinator          | confirm route, identifier, and update flow             | execution plan and current tree       | approved command scope | current repo uses a different canonical identifier than the plan assumes |
+| backend-domain       | implement rename command, validator, handler, endpoint | registration model and existing rules | rename code path       | renaming requires cross-slice side effects not called for in the plan    |
+| testing-verification | verify length rule, persistence, and query visibility  | implemented slice                     | tests and evidence     | updated name is not visible through read models after save               |
 
 ## Ordered Implementation Steps
 
 1. Confirm command route and identifier conventions.
    Targets: src/features/Academics/UpdateAcademicName/ or equivalent and current academic routing.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: command target and id strategy are explicit.
 2. Implement rename behavior.
    Targets: command, validator, handler, endpoint, and mappings.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: names longer than 15 characters are rejected and valid updates persist.
 3. Verify downstream visibility.
    Targets: integration tests for valid update, invalid name, and follow-up read-model assertions.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: profile or list queries reflect the updated name.
 
 ## Verification and Acceptance Criteria

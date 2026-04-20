@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                              | Inputs                                                  | Outputs                  | Escalate when                                                |
 | -------------------------- | ------------------------------------------------------------- | ------------------------------------------------------- | ------------------------ | ------------------------------------------------------------ |
-| Slice coordinator          | confirm grouping output and route shape                       | execution plan and report conventions                   | approved report contract | rank grouping requires a projection strategy not yet chosen  |
-| Backend/domain agent       | implement grouped query and response contracts                | current academic rank state and access-level derivation | by-rank report code path | grouped output would duplicate logic already owned elsewhere |
-| Testing/verification agent | verify counts, listing accuracy, and reaction to rank changes | implemented slice                                       | tests and evidence       | counts drift after rank changes                              |
+| slice-coordinator          | confirm grouping output and route shape                       | execution plan and report conventions                   | approved report contract | rank grouping requires a projection strategy not yet chosen  |
+| report-projection       | implement grouped query and response contracts                | current academic rank state and access-level derivation | by-rank report code path | grouped output would duplicate logic already owned elsewhere |
+| testing-verification | verify counts, listing accuracy, and reaction to rank changes | implemented slice                                       | tests and evidence       | counts drift after rank changes                              |
 
 ## Ordered Implementation Steps
 
 1. Confirm the grouped output contract.
    Targets: src/features/Reports/ByRankReport/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: report includes rank-based groupings and associated access-level context.
 2. Implement the report query.
    Targets: query, handler, DTOs, endpoint, and projection support if needed.
-   Owner: Backend/domain agent.
+   Owner: report-projection.
    Validation before next step: grouped counts and member listings reflect current rank state.
 3. Verify grouped behavior.
    Targets: tests for seeded counts, listing correctness, and post-rank-change updates.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: grouped output remains accurate as source data changes.
 
 ## Verification and Acceptance Criteria

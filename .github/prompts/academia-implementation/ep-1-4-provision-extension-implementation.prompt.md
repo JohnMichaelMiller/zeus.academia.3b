@@ -54,27 +54,27 @@ mode: agent
 
 | Role                       | Responsibilities                                        | Inputs                                           | Outputs                                        | Escalate when                                                     |
 | -------------------------- | ------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------- | ----------------------------------------------------------------- |
-| Slice coordinator          | confirm extension storage model and route placement     | execution plan, repo tree, persistence root      | approved artifact targets and dependency notes | extension state is already modeled elsewhere in a conflicting way |
-| Backend/domain agent       | implement provision and deprovision command behavior    | Shared Kernel Extension model, slice conventions | commands, validators, handlers, endpoints      | extNr formatting or identity semantics are unclear                |
-| Testing/verification agent | verify numeric format, uniqueness, and assignment guard | implemented slice and business rules             | tests and evidence                             | deprovision logic cannot reliably detect assigned extensions      |
+| slice-coordinator          | confirm extension storage model and route placement     | execution plan, repo tree, persistence root      | approved artifact targets and dependency notes | extension state is already modeled elsewhere in a conflicting way |
+| backend-domain       | implement provision and deprovision command behavior    | Shared Kernel Extension model, slice conventions | commands, validators, handlers, endpoints      | extNr formatting or identity semantics are unclear                |
+| testing-verification | verify numeric format, uniqueness, and assignment guard | implemented slice and business rules             | tests and evidence                             | deprovision logic cannot reliably detect assigned extensions      |
 
 ## Ordered Implementation Steps
 
 1. Confirm the extension-pool model and persistence root.
    Targets: src/features/Extensions/ProvisionExtension/ or current equivalent, entity configuration, and migration path.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: extNr representation and provisioned-state storage are explicit.
 2. Implement provision-extension behavior.
    Targets: provision command, validator, handler, response, endpoint, and mappings.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: only valid numeric extensions are accepted and duplicates are rejected.
 3. Implement deprovision-extension behavior.
    Targets: deprovision command, validator if needed, handler, response, and endpoint.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: assigned extensions cannot be deprovisioned and unassigned ones can.
 4. Verify command behavior end to end.
    Targets: validator tests, handler tests, integration tests for provision, duplicate rejection, and deprovision guards.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: extension pool behavior is reliable enough for registration to depend on it.
 
 ## Verification and Acceptance Criteria

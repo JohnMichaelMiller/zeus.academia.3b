@@ -54,27 +54,27 @@ mode: agent
 
 | Role                       | Responsibilities                           | Inputs                                           | Outputs                                      | Escalate when                                             |
 | -------------------------- | ------------------------------------------ | ------------------------------------------------ | -------------------------------------------- | --------------------------------------------------------- |
-| Slice coordinator          | confirm catalog ownership and placement    | execution plan, repo tree, existing fixtures     | approved artifact map                        | multiple university catalogs already exist                |
-| Backend/domain agent       | implement add and list university behavior | Shared Kernel university type, slice conventions | commands, queries, handlers, DTOs, endpoints | code or fixtures imply conflicting university identifiers |
-| Testing/verification agent | verify uniqueness and list behavior        | implemented slice                                | tests and evidence                           | duplicate handling or list output is unstable             |
+| slice-coordinator          | confirm catalog ownership and placement    | execution plan, repo tree, existing fixtures     | approved artifact map                        | multiple university catalogs already exist                |
+| backend-domain       | implement add and list university behavior | Shared Kernel university type, slice conventions | commands, queries, handlers, DTOs, endpoints | code or fixtures imply conflicting university identifiers |
+| testing-verification | verify uniqueness and list behavior        | implemented slice                                | tests and evidence                           | duplicate handling or list output is unstable             |
 
 ## Ordered Implementation Steps
 
 1. Confirm where university reference data belongs.
    Targets: src/features/ReferenceData/ManageUniversities/ or current equivalent, persistence setup, and seed data path.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: one canonical catalog location and route shape are agreed.
 2. Implement add-university behavior.
    Targets: AddUniversity command, validator, handler, response, endpoint, and mapping files.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: valid university codes persist and duplicates fail clearly.
 3. Implement list-universities behavior.
    Targets: ListUniversities query, handler, response contract, and endpoint.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: query returns stable reference data for registration and qualification flows.
 4. Verify the slice.
    Targets: validator tests, handler tests, integration tests.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: add and list flows pass with clear failure coverage.
 
 ## Verification and Acceptance Criteria

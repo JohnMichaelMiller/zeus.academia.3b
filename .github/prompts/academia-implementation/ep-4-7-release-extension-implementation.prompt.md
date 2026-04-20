@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                               | Inputs                              | Outputs                   | Escalate when                                               |
 | -------------------------- | ---------------------------------------------- | ----------------------------------- | ------------------------- | ----------------------------------------------------------- |
-| Slice coordinator          | confirm route and released-state semantics     | execution plan and extension slices | approved command contract | current model does not expose a clear released state        |
-| Backend/domain agent       | implement release command, handler, endpoint   | extension assignment model          | release code path         | release behavior would conflict with deregistration cleanup |
-| Testing/verification agent | verify state cleanup and returned availability | implemented slice                   | tests and evidence        | released extensions do not re-enter the available pool      |
+| slice-coordinator          | confirm route and released-state semantics     | execution plan and extension slices | approved command contract | current model does not expose a clear released state        |
+| backend-domain       | implement release command, handler, endpoint   | extension assignment model          | release code path         | release behavior would conflict with deregistration cleanup |
+| testing-verification | verify state cleanup and returned availability | implemented slice                   | tests and evidence        | released extensions do not re-enter the available pool      |
 
 ## Ordered Implementation Steps
 
 1. Confirm release semantics.
    Targets: src/features/Extensions/ReleaseExtension/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: expected academic state after release is explicit.
 2. Implement release behavior.
    Targets: command, handler, endpoint.
-   Owner: Backend/domain agent.
+   Owner: backend-domain.
    Validation before next step: academic no longer references the extension and the extension becomes available.
 3. Verify release behavior.
    Targets: tests for valid release, no-current-extension cases, and follow-up availability checks.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: availability reads reflect the released extension.
 
 ## Verification and Acceptance Criteria

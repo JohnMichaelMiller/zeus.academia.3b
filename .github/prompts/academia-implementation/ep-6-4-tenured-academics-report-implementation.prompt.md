@@ -51,23 +51,23 @@ mode: agent
 
 | Role                       | Responsibilities                                              | Inputs                                  | Outputs                  | Escalate when                                                       |
 | -------------------------- | ------------------------------------------------------------- | --------------------------------------- | ------------------------ | ------------------------------------------------------------------- |
-| Slice coordinator          | confirm tenured-state semantics and report columns            | execution plan and employment slices    | approved report contract | employment-state semantics are ambiguous after multiple transitions |
-| Backend/domain agent       | implement tenured report and qualification summary projection | employment state and qualification data | tenured report code path | qualification summaries need a separate read model not yet designed |
-| Testing/verification agent | verify filtered output and transition behavior                | implemented slice                       | tests and evidence       | converted academics do not appear correctly                         |
+| slice-coordinator          | confirm tenured-state semantics and report columns            | execution plan and employment slices    | approved report contract | employment-state semantics are ambiguous after multiple transitions |
+| report-projection       | implement tenured report and qualification summary projection | employment state and qualification data | tenured report code path | qualification summaries need a separate read model not yet designed |
+| testing-verification | verify filtered output and transition behavior                | implemented slice                       | tests and evidence       | converted academics do not appear correctly                         |
 
 ## Ordered Implementation Steps
 
 1. Confirm the tenured report contract.
    Targets: src/features/Reports/TenuredAcademicsReport/ or equivalent.
-   Owner: Slice coordinator.
+   Owner: slice-coordinator.
    Validation before next step: output includes rank and qualification summary for tenured academics only.
 2. Implement the report query.
    Targets: query, handler, DTOs, endpoint.
-   Owner: Backend/domain agent.
+   Owner: report-projection.
    Validation before next step: only tenured academics are returned.
 3. Verify filtered behavior.
    Targets: tests for direct-tenure, contract-conversion, and cleared-status cases.
-   Owner: Testing/verification agent.
+   Owner: testing-verification.
    Validation before next step: report output matches current employment state.
 
 ## Verification and Acceptance Criteria
