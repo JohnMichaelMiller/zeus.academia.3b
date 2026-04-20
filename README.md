@@ -10,3 +10,4 @@ The third iteration of the Zeus Academia experiment
 - [Custom Agents Standards](.github/instructions/custom-agents.instructions.md) ([Log](ai-logs/2026/02/25/2026-02-25-custom-agents-instructions-generation/conversation.md))
 - [Product Manager Agent Prompt](.github/prompts/create-product-manager-agent.prompt.md) ([Log](ai-logs/2026/02/25/2026-02-25-product-manager-agent-prompt/conversation.md))
 - [Product Manager Agent Profile](.github/agents/product-manager.agent.md) ([Log](ai-logs/2026/02/25/2026-02-25-product-manager-agent-prompt/conversation.md))
+- [Prompt Engineer Agent Profile](.github/agents/prompt-engineer.agent.md) ([Log](ai-logs/2026/04/20/2026-04-20-prompt-engineer-agent-conversion/conversation.md))
