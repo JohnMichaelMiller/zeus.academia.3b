@@ -57,7 +57,7 @@ applyTo: "**"
 - **Patterns**: CQRS (MediatR), Repository pattern, dependency injection
 - **Validation**: FluentValidation (backend), Vuelidate/custom (frontend)
 - **Testing**: xUnit (C#), Vitest (TypeScript), 80% coverage target
-- **AI Workflows**: [AI Development Process](.github/instructions/ai-dev-process.instructions.md), [Git Workflow](.github/instructions/git-workflow.instructions.md), [AI Output Policy](.github/instructions/ai-assisted-output.instructions.md), [Custom Agents](.github/instructions/custom-agents.instructions.md), [Vertical Slice Implementation](.github/instructions/vertical-slice-implementation.instructions.md)
+- **AI Workflows**: [AI Development Process](.github/instructions/ai-dev-process.instructions.md), [Git Workflow](.github/instructions/git-workflow.instructions.md), [AI Output Policy](.github/instructions/ai-assisted-output.instructions.md), [Custom Agents](.github/instructions/custom-agents.instructions.md), [Vertical Slice Implementation](.github/instructions/vertical-slice-implementation.instructions.md), [Implementation Prompt Standards](.github/instructions/implementation-prompt.instructions.md)
 
 ## Environment
 

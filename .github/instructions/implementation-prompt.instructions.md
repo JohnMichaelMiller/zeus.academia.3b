@@ -1,0 +1,277 @@
+---
+ai_generated: true
+model: "openai/gpt-5.4@unknown"
+operator: "johnmillerATcodemag-com"
+chat_id: "616990b5-0c5d-4735-a876-23fd1ebb4ff6"
+prompt: |
+  Follow instructions in #prompt:create-implementation-prompt-instructions.prompt.md
+started: "2026-04-20T20:20:00Z"
+ended: "2026-04-20T20:35:00Z"
+task_durations:
+  - task: "review repository standards and prompt requirements"
+    duration: "00:04:00"
+  - task: "draft implementation prompt instruction file"
+    duration: "00:08:00"
+  - task: "update project traceability and chat summary"
+    duration: "00:03:00"
+total_duration: "00:15:00"
+ai_log: "ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md"
+source: ".github/prompts/create-implementation-prompt-instructions.prompt.md"
+description: "Requirements for authoring slice implementation prompts with role-based agents, acceptance criteria, and showcase steps"
+applyTo: ".github/prompts/**/*implementation*.prompt.md"
+name: "Implementation Prompt Standards"
+author: "John Miller"
+tags:
+  [implementation, prompts, vertical-slice, custom-agents, acceptance-criteria]
+---
+
+# Implementation Prompt Standards
+
+## Purpose and Scope
+
+Use an implementation prompt to define the work plan for one slice or one explicitly bounded increment of a slice. The prompt must tell AI agents and humans what to inspect, what to build, in what order, how handoffs happen, how completion is verified, and how the slice's user value is demonstrated.
+
+In this repository, a slice is a cohesive unit of behavior implemented through the established vertical-slice structure. Do not use one implementation prompt to cover multiple unrelated slices. Create a new prompt when the next unit of work has its own business outcome, dependency boundary, or verification path.
+
+## Required Inputs
+
+Before writing an implementation prompt, gather the minimum evidence:
+
+- Slice name and one-sentence business outcome
+- Prerequisite slices, shared-kernel dependencies, and blocked work
+- Existing files, instructions, agents, and prompt patterns to reuse
+- Backend, frontend, data, API, test, and demo surfaces affected
+- Risks, constraints, assumptions, and explicit out-of-scope items
+
+Ground the prompt in repository evidence. Reference real files, existing instructions, and current patterns. Do not fill gaps with guesses; mark missing context and define the escalation path instead.
+
+## Required Context Review
+
+Review these sources before drafting when they exist:
+
+- `.github/instructions/project-overview.instructions.md`
+- `.github/instructions/vertical-slice-implementation.instructions.md`
+- `.github/instructions/custom-agents.instructions.md`
+- `.github/instructions/ai-assisted-output.instructions.md`
+- Existing files in `.github/agents/` for reusable implementation-role agents
+- Existing implementation or execution prompts in `.github/prompts/`
+
+If one of these sources is missing, say so in the implementation prompt and continue with the remaining repository evidence.
+
+## Agent-Oriented Roles
+
+Implementation prompts must use role-specialized custom agents when the slice spans multiple concerns. For a multi-surface slice, define at least three roles. Each role must state responsibilities, expected inputs, expected outputs, handoff targets, and escalation triggers.
+
+Recommended roles:
+
+| Role                                | Primary responsibility                                                   | Typical outputs                                |
+| ----------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------- |
+| Slice coordinator                   | Own scope, sequencing, and handoffs                                      | ordered plan, dependency decisions, blockers   |
+| Backend/domain agent                | Implement contracts, handlers, validation, persistence                   | backend code, API changes, domain rules        |
+| Frontend/workflow agent             | Implement UI, client flows, and interaction states                       | components, stores, composables, typed clients |
+| Testing/verification agent          | Define checks, run verification, capture evidence                        | test cases, verification notes, failure gaps   |
+| Optional data/integration/doc agent | Handle migrations, external integration, or user-facing docs when needed | scripts, integration notes, showcase support   |
+
+If a repository-specific agent does not exist, the prompt must say whether to:
+
+- reuse the closest existing custom agent and narrow its role for this slice
+- create a temporary role description inline for the current prompt
+- stop and ask for a new reusable agent profile when the role will recur
+
+Every prompt must define escalation triggers for missing prerequisites, contradictory repository patterns, failed verification, or ambiguity that changes the slice boundary.
+
+## Standard Implementation Prompt Structure
+
+Each implementation prompt must use this section order:
+
+1. Slice summary and business value
+2. Context files and repository evidence to inspect first
+3. Prerequisites and dependency checks
+4. Assigned agents and role boundaries
+5. Ordered implementation steps
+6. Verification workflow and acceptance criteria
+7. Human showcase steps
+8. Completion checklist
+
+Keep the section order stable so humans and agents can scan prompts quickly.
+
+## Step-by-Step Implementation Guidance
+
+Implementation steps must be numbered and explicit. Each step must include:
+
+- the objective of the step
+- the target files, folders, or artifacts to inspect or update
+- the responsible agent role
+- required handoff or dependency from prior steps
+- the validation expected before the next step begins
+
+Reject vague instructions such as "implement the UI" or "wire up the backend" without file-level or artifact-level direction. A valid step is actionable by a human without inferring hidden work.
+
+Use this step format:
+
+| Step | Goal                                    | Targets                                   | Owner                      | Validation before next step           |
+| ---- | --------------------------------------- | ----------------------------------------- | -------------------------- | ------------------------------------- |
+| 1    | Confirm slice boundary and dependencies | named files and prior slices              | slice coordinator          | boundary accepted and blockers listed |
+| 2    | Implement backend behavior              | specific command/query/endpoint files     | backend/domain agent       | API behavior matches rules            |
+| 3    | Implement frontend flow                 | specific component/store/composable files | frontend/workflow agent    | UI states align with API behavior     |
+| 4    | Verify and capture evidence             | tests, logs, screenshots, notes           | testing/verification agent | evidence recorded and gaps called out |
+
+## Acceptance Criteria Standards
+
+Acceptance criteria must be observable and testable by both agents and humans. Write them as outcomes, not intentions.
+
+Required coverage:
+
+- Functional behavior
+- Validation and error handling
+- Integration points or contracts affected
+- Tests, checks, or inspections to run
+- User-visible outcome or business rule satisfied
+
+Preferred phrasing:
+
+- "Submitting an invalid enrollment request returns validation errors and does not persist data."
+- "Saving a valid schedule update shows the updated state in the UI and persists the change through the slice endpoint."
+
+Avoid phrasing like "Validation should work" or "The UI should be intuitive." Those are not verifiable.
+
+## Verification Workflow
+
+Implementation prompts must separate implementation from verification. The verification section must define:
+
+- agent self-checks before handoff
+- human review checks after implementation
+- tests, commands, or manual inspection steps when available
+- evidence to capture, such as logs, screenshots, response samples, or test output
+- unresolved issues that block moving from implemented to verified
+
+A slice is not complete because code exists. It is complete when the prompt's verification path has been executed and evidence has been captured or explicitly waived by a human.
+
+## Showcase and Value Demonstration
+
+Every implementation prompt must end with a human-followable showcase sequence that proves the slice's value. The showcase is part of the definition of done.
+
+Each showcase step must include:
+
+- starting state and prerequisites
+- exact user actions or API calls
+- expected visible output or state change
+- the business value the step demonstrates
+
+Use showcase steps to prove user or stakeholder value, not internal implementation details. A good showcase connects actions to an outcome such as reduced manual work, correct policy enforcement, or clearer user feedback.
+
+## Example Role Split
+
+Example for a single slice:
+
+| Role                       | Scope for the slice                                                    | Handoff                                                        |
+| -------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Slice coordinator          | confirm scope, inspect dependencies, assign sequence                   | hands backend and frontend agents the approved work order      |
+| Backend/domain agent       | implement command, validator, handler, endpoint, and response contract | hands API contract and edge cases to frontend and verification |
+| Frontend/workflow agent    | implement component, composable, store, and request handling states    | hands user flow and failure states to verification             |
+| Testing/verification agent | define test cases, run checks, collect proof, raise failures           | returns pass/fail evidence to coordinator and human reviewer   |
+
+## Reusable Prompt Template
+
+```markdown
+# Implement {{slice_name}}
+
+## Slice Summary and Business Value
+
+- Slice: {{slice_name}}
+- Business outcome: {{business_outcome}}
+- Out of scope: {{out_of_scope}}
+
+## Context Files to Review First
+
+- {{file_or_instruction_1}}
+- {{file_or_instruction_2}}
+- {{file_or_instruction_3}}
+
+## Prerequisites and Dependency Checks
+
+- Required prior slices: {{dependencies}}
+- Blocking risks: {{risks}}
+- Existing patterns to reuse: {{patterns}}
+
+## Assigned Agents and Role Boundaries
+
+| Role                       | Responsibilities      | Inputs                 | Outputs                 | Escalate when              |
+| -------------------------- | --------------------- | ---------------------- | ----------------------- | -------------------------- |
+| Slice coordinator          | {{coordinator_scope}} | {{coordinator_inputs}} | {{coordinator_outputs}} | {{coordinator_escalation}} |
+| Backend/domain agent       | {{backend_scope}}     | {{backend_inputs}}     | {{backend_outputs}}     | {{backend_escalation}}     |
+| Frontend/workflow agent    | {{frontend_scope}}    | {{frontend_inputs}}    | {{frontend_outputs}}    | {{frontend_escalation}}    |
+| Testing/verification agent | {{test_scope}}        | {{test_inputs}}        | {{test_outputs}}        | {{test_escalation}}        |
+
+## Ordered Implementation Steps
+
+1. {{step_1_goal}}
+   Targets: {{step_1_targets}}
+   Owner: {{step_1_owner}}
+   Validation before next step: {{step_1_validation}}
+2. {{step_2_goal}}
+   Targets: {{step_2_targets}}
+   Owner: {{step_2_owner}}
+   Validation before next step: {{step_2_validation}}
+3. {{step_3_goal}}
+   Targets: {{step_3_targets}}
+   Owner: {{step_3_owner}}
+   Validation before next step: {{step_3_validation}}
+
+## Verification and Acceptance Criteria
+
+- {{acceptance_criterion_1}}
+- {{acceptance_criterion_2}}
+- {{acceptance_criterion_3}}
+
+## Human Showcase Steps
+
+1. Starting state: {{showcase_start}}
+   Action: {{showcase_action_1}}
+   Expected result: {{showcase_result_1}}
+   Value demonstrated: {{showcase_value_1}}
+2. Starting state: {{showcase_start_2}}
+   Action: {{showcase_action_2}}
+   Expected result: {{showcase_result_2}}
+   Value demonstrated: {{showcase_value_2}}
+
+## Completion Checklist
+
+- [ ] Scope is still limited to this slice or bounded increment
+- [ ] Agent roles and handoffs are explicit
+- [ ] Implementation steps are ordered and concrete
+- [ ] Acceptance criteria are observable
+- [ ] Verification evidence is captured
+- [ ] Showcase steps demonstrate business value
+```
+
+## Anti-Patterns
+
+Do not author implementation prompts that:
+
+- assign all work to one generic agent without role boundaries
+- skip repository context review and invent new patterns unnecessarily
+- use acceptance criteria that cannot be observed, tested, or inspected
+- describe showcase steps only in terms of code internals
+- span multiple unrelated slices in one prompt
+- stop at implementation instructions and omit verification or showcase paths
+
+## Validation Checklist
+
+Before using an implementation prompt, verify:
+
+- [ ] The scope is one slice or one clearly bounded increment
+- [ ] Repository context files are listed explicitly
+- [ ] Dependencies, risks, and out-of-scope items are stated
+- [ ] Custom agent roles, outputs, and handoffs are explicit
+- [ ] Each implementation step names targets, owner, and validation
+- [ ] Acceptance criteria are observable and testable
+- [ ] Verification steps include evidence capture
+- [ ] Showcase steps are human-followable and prove business value
+- [ ] The prompt states what to do when an agent is blocked or outputs conflict
+
+## Maintenance
+
+Keep implementation prompts aligned with current slice structure, agent inventory, and verification practices. Prefer updating shared agent profiles and this instruction file when a pattern repeats instead of re-explaining the same behavior in each prompt.
+
+After creating this instruction file, update `.github/instructions/project-overview.instructions.md` to reference the implementation-prompt instruction file in the Standards, Development Process, or Key Patterns section if that reference does not already exist.
