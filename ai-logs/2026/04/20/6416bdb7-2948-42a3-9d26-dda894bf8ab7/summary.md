@@ -4,11 +4,11 @@
 **Date**: 2026-04-20
 **Operator**: johnmillerATcodemag-com
 **Model**: openai/gpt-5.4@unknown
-**Duration**: 00:27:00
+**Duration**: 00:34:00
 
 ## Objective
 
-Create reusable repository-scoped custom agents for the implementation-role inventory referenced by the execution-plan workflow and implementation-prompt standards, then update the existing slice prompts to use those agent names explicitly.
+Create reusable repository-scoped custom agents for the implementation-role inventory referenced by the execution-plan workflow and implementation-prompt standards, update the existing slice prompts to use those agent names explicitly, and normalize the remaining inline persistence role into the reusable inventory.
 
 ## Work Completed
 
@@ -24,12 +24,18 @@ Create reusable repository-scoped custom agents for the implementation-role inve
    - Intended for Phase 6 report prompts where the work is query-heavy and projection-centric
    - Encodes explicit escalation for unsettled report semantics, missing projection infrastructure, and grouping drift
 
-3. **Slice Prompt Role Update** (`.github/prompts/academia-implementation/`)
+3. **Data Persistence Agent** (`.github/agents/data-persistence.agent.md`)
+   - Added a specialized reusable agent for EF Core mappings, indexes, migrations, and database-backed integrity constraints
+   - Intended for Shared Kernel or schema-heavy slices where persistence work is a primary concern instead of an inline supporting role
+   - Encodes explicit escalation for schema drift, migration uncertainty, and handler-only integrity gaps
+
+4. **Slice Prompt Role Update** (`.github/prompts/academia-implementation/`)
    - Updated the implementation prompt inventory to use explicit agent names instead of generic role labels
    - Assigned `report-projection` to the Phase 6 report prompts in place of the generic backend/domain role
    - Kept coordinator and verification ownership explicit across the prompt set
+   - Replaced the inline `Data/persistence agent` role in the Shared Kernel prompt with the reusable `data-persistence` agent
 
-4. **Repository Traceability Update** (`README.md`)
+5. **Repository Traceability Update** (`README.md`)
    - Added artifact entries for all new agent profiles
    - Linked each durable artifact back to this chat log for provenance
 
@@ -38,6 +44,7 @@ Create reusable repository-scoped custom agents for the implementation-role inve
 - Added a new `ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/` chat log folder
 - Grounded the new agents in the repo's custom-agent and implementation-prompt standards
 - Extended the implementation-prompt standard to include a report/projection role for recurring reporting work
+- Extended the implementation-prompt standard and prompt-generation template to include the reusable persistence role
 
 ## Key Decisions
 
@@ -56,6 +63,11 @@ Create reusable repository-scoped custom agents for the implementation-role inve
 **Decision**: Add a dedicated `report-projection` agent and route Phase 6 report prompts to it.
 **Rationale**: Report slices recur often enough, and their projection-heavy, grouped-query work differs enough from general backend mutation work, that a specialized reusable role reduces ambiguity and keeps report prompts aligned.
 
+### Persistence Normalization
+
+**Decision**: Add a dedicated `data-persistence` agent and replace the remaining inline Shared Kernel persistence role with it.
+**Rationale**: Foundational schema and migration work is distinct enough from general backend/domain implementation that it should be reusable, reviewable, and explicitly named in the same inventory as the other implementation roles.
+
 ## Artifacts Produced
 
 | Artifact                                              | Type     | Purpose                                                                   |
@@ -65,6 +77,7 @@ Create reusable repository-scoped custom agents for the implementation-role inve
 | `.github/agents/frontend-workflow.agent.md`           | Markdown | Reusable frontend workflow implementation agent                           |
 | `.github/agents/testing-verification.agent.md`        | Markdown | Reusable verification and evidence agent                                  |
 | `.github/agents/data-integration-doc.agent.md`        | Markdown | Reusable support agent for docs, integration, and migration-adjacent work |
+| `.github/agents/data-persistence.agent.md`            | Markdown | Reusable persistence and schema implementation agent                      |
 | `.github/agents/report-projection.agent.md`           | Markdown | Reusable report and projection implementation agent                       |
 | `.github/prompts/academia-implementation/*.prompt.md` | Markdown | Updated slice prompts with explicit reusable agent names                  |
 | `README.md`                                           | Markdown | Traceability entries for the new durable artifacts                        |
@@ -74,6 +87,7 @@ Create reusable repository-scoped custom agents for the implementation-role inve
 1. **The execution-plan file is indirect**: the reusable agent inventory is expressed through the implementation-prompt standard and prompt set, not the phase plan body itself.
 2. **Prompt inventory consistency matters**: once reusable agents exist, the slice prompts should reference them by name or the agent catalog remains underused.
 3. **Report work deserves its own role**: grouped queries and projection-backed reads recur enough to justify a dedicated reusable agent instead of treating them as generic backend work.
+4. **Schema-heavy work also benefits from explicit ownership**: foundational mappings, indexes, and migrations are clearer when they belong to a named persistence role rather than a one-off inline label.
 
 ## Next Steps
 
@@ -81,6 +95,7 @@ Create reusable repository-scoped custom agents for the implementation-role inve
 
 - Use the updated slice prompts as the canonical pattern for future implementation prompts
 - Apply `report-projection` to any new report-heavy slice instead of falling back to generic backend ownership
+- Apply `data-persistence` to schema-heavy slices instead of introducing new inline persistence-role wording
 
 ### Future Enhancements
 
@@ -99,10 +114,10 @@ Create reusable repository-scoped custom agents for the implementation-role inve
 ```yaml
 chat_id: 6416bdb7-2948-42a3-9d26-dda894bf8ab7
 started: 2026-04-20T18:02:00Z
-ended: 2026-04-20T18:28:43Z
-total_duration: 00:27:00
+ended: 2026-04-20T18:35:49Z
+total_duration: 00:34:00
 operator: johnmillerATcodemag-com
 model: openai/gpt-5.4@unknown
-artifacts_count: 9
-files_modified: 42
+artifacts_count: 10
+files_modified: 47
 ```

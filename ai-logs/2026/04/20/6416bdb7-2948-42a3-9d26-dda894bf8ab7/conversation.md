@@ -4,8 +4,8 @@
 - Operator: johnmillerATcodemag-com
 - Model: openai/gpt-5.4@unknown
 - Started: 2026-04-20T18:02:00Z
-- Ended: 2026-04-20T18:28:43Z
-- Total Duration: 00:27:00
+- Ended: 2026-04-20T18:35:49Z
+- Total Duration: 00:34:00
 
 ## Context
 
@@ -44,6 +44,20 @@ Add one more specialized agent for report/projection work
 Updated the slice implementation prompts to use explicit reusable agent names, added the report-projection agent for report-centric slices, and aligned the implementation-prompt standard plus README traceability with the expanded agent inventory.
 ```
 
+### Exchange 3
+
+[2026-04-20T18:31:00Z] johnmillerATcodemag-com
+
+```text
+Normalize the remaining inline Data/persistence agent role into the reusable agent inventory.
+```
+
+[2026-04-20T18:35:49Z] openai/gpt-5.4@unknown
+
+```text
+Added a reusable data-persistence agent, rewired the Shared Kernel implementation prompt to use it, and aligned the implementation-prompt standards and prompt-generation template with the expanded agent inventory.
+```
+
 ## Work Burst Closure
 
 **Artifacts Produced**:
@@ -53,9 +67,12 @@ Updated the slice implementation prompts to use explicit reusable agent names, a
 - `.github/agents/frontend-workflow.agent.md` - Implements Vue workflow, client interactions, and user-visible states.
 - `.github/agents/testing-verification.agent.md` - Verifies slice outcomes, evidence, and failure gaps.
 - `.github/agents/data-integration-doc.agent.md` - Handles supporting migrations, integration notes, docs, and showcase support.
+- `.github/agents/data-persistence.agent.md` - Implements EF Core mappings, indexes, migrations, and database constraints that back domain rules.
 - `.github/agents/report-projection.agent.md` - Implements report queries, grouped outputs, and projection-backed read models.
 - `.github/prompts/academia-implementation/*.prompt.md` - Replaces generic role labels with explicit reusable agent names and assigns report-projection to report slices.
+- `.github/prompts/academia-implementation/ep-0-1-shared-kernel-implementation.prompt.md` - Replaces the inline Data/persistence role with the reusable data-persistence agent.
 - `.github/instructions/implementation-prompt.instructions.md` - Documents the report/projection role in the implementation-prompt standard.
+- `.github/prompts/create-implementation-prompt-instructions.prompt.md` - Keeps generated prompt standards aligned with the new persistence role.
 - `README.md` - Adds artifact traceability entries for the new custom agent profiles.
 
 **Next Steps**:
@@ -68,5 +85,6 @@ Updated the slice implementation prompts to use explicit reusable agent names, a
 - inventory prompt role usage: 00:05:00
 - author reusable implementation-role agents: 00:09:00
 - specialize report prompt ownership: 00:09:00
+- normalize persistence role: 00:07:00
 - update standards and traceability: 00:04:00
-- Total: 00:27:00
+- Total: 00:34:00
