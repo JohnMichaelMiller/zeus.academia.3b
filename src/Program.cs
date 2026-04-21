@@ -1,5 +1,7 @@
 using System.Reflection;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using Zeus.Academia.Shared.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,10 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+builder.Services.AddDbContext<AcademiaDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("Academia")
+        ?? throw new InvalidOperationException("Missing connection string 'Academia'.")));
 
 var app = builder.Build();
 
