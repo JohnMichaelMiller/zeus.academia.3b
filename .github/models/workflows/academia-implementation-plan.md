@@ -221,7 +221,7 @@ flowchart LR
 
 ## Shared Kernel Boundary
 
-Promote to `src/backend/SharedKernel/` upfront:
+Promote to `src/shared/` (or `src/features/Shared/`) upfront:
 
 | Type                                         | Rationale                                            |
 | -------------------------------------------- | ---------------------------------------------------- |

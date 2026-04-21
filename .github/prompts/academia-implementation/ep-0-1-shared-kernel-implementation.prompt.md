@@ -62,7 +62,7 @@ mode: agent
 ## Ordered Implementation Steps
 
 1. Confirm the Shared Kernel boundary and file roots.
-   Targets: src/backend/SharedKernel/, persistence project root, and tests/ root or current equivalents.
+   Targets: src/shared/ (Shared Kernel per vertical-slice standard), src/features/Shared/ if co-located, and tests/ root or current equivalents.
    Owner: slice-coordinator.
    Validation before next step: artifact list is approved for Academic, Rank, AccessLevel, Degree, University, Extension, AcademicQualification, Result<T>, Error, domain events, and common exceptions.
 2. Implement the domain model and invariant methods.
