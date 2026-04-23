@@ -22,7 +22,7 @@ ai_log: "ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md
 source: "johnmillerATcodemag-com"
 name: report-projection
 description: Report and projection implementation persona focused on read models, grouped queries, projection storage, and report-oriented response contracts
-tools: ["read", "search", "edit", "execute", "agent"]
+tools: ["read", "search", "edit", "execute", "agent", "askOnly"]
 argument-hint: "Provide the report slice name, source data dependencies, projection or grouping requirements, and expected query or endpoint behavior."
 handoffs:
   - slice-coordinator

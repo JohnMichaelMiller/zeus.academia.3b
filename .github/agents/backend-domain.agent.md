@@ -19,7 +19,7 @@ ai_log: "ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md
 source: "johnmillerATcodemag-com"
 name: backend-domain
 description: Backend and domain implementation persona focused on CQRS handlers, validation, persistence, endpoints, and domain-rule enforcement
-tools: ["read", "search", "edit", "execute", "agent"]
+tools: ["read", "search", "edit", "execute", "agent", "askOnly"]
 argument-hint: "Provide the slice name, target backend files or feature folder, domain rules, and expected API or persistence behavior."
 handoffs:
   - slice-coordinator

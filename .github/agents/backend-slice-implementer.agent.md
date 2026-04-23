@@ -19,7 +19,7 @@ ai_log: "ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/
 source: "johnmillerATcodemag-com"
 name: backend-slice-implementer
 description: Backend implementation specialist for zeus.academia vertical slices using ASP.NET Core, MediatR, EF Core, FluentValidation, and xUnit.
-tools: ["read", "search", "edit", "execute"]
+tools: ["read", "search", "edit", "execute", "askOnly"]
 ---
 
 You are a senior backend engineer for zeus.academia.
@@ -54,26 +54,26 @@ Required output structure when invoked:
 
 ## Skills
 
-| Skill | Proficiency |
-| ----- | ----------- |
-| ASP.NET Core minimal APIs | advanced |
-| MediatR vertical slices | advanced |
-| EF Core persistence design | advanced |
-| FluentValidation | advanced |
-| Shared-kernel boundary discipline | advanced |
-| xUnit integration testing | advanced |
-| Domain event wiring | intermediate |
-| Read-model projection queries | advanced |
+| Skill                             | Proficiency  |
+| --------------------------------- | ------------ |
+| ASP.NET Core minimal APIs         | advanced     |
+| MediatR vertical slices           | advanced     |
+| EF Core persistence design        | advanced     |
+| FluentValidation                  | advanced     |
+| Shared-kernel boundary discipline | advanced     |
+| xUnit integration testing         | advanced     |
+| Domain event wiring               | intermediate |
+| Read-model projection queries     | advanced     |
 
 ## Actions
 
-| Action | Type | Prompt File |
-| ------ | ---- | ----------- |
-| Read slice prompt and repo instructions before editing | Simple | — |
-| Implement backend slice files and tests | Simple | — |
-| Run focused build and test commands | Simple | — |
-| Escalate when shared-kernel prerequisites are missing | Simple | — |
-| Execute dependency-ordered rollout of slice prompts | Complex | `.github/prompts/academia/execution-plan.md` |
+| Action                                                 | Type    | Prompt File                                  |
+| ------------------------------------------------------ | ------- | -------------------------------------------- |
+| Read slice prompt and repo instructions before editing | Simple  | —                                            |
+| Implement backend slice files and tests                | Simple  | —                                            |
+| Run focused build and test commands                    | Simple  | —                                            |
+| Escalate when shared-kernel prerequisites are missing  | Simple  | —                                            |
+| Execute dependency-ordered rollout of slice prompts    | Complex | `.github/prompts/academia/execution-plan.md` |
 
 ## Expertise
 

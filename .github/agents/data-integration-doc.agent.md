@@ -19,7 +19,7 @@ ai_log: "ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md
 source: "johnmillerATcodemag-com"
 name: data-integration-doc
 description: Supporting persona for migrations, integration touchpoints, documentation updates, and showcase support that accompany a slice when needed
-tools: ["read", "search", "edit", "execute", "agent"]
+tools: ["read", "search", "edit", "execute", "agent", "askOnly"]
 argument-hint: "Provide the slice name, supporting concern type (data, integration, or docs), affected artifacts, and the expected supporting outcome."
 handoffs:
   - slice-coordinator

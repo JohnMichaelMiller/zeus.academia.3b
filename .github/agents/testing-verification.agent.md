@@ -19,7 +19,53 @@ ai_log: "ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md
 source: "johnmillerATcodemag-com"
 name: testing-verification
 description: Testing and verification persona focused on defining checks, executing validation, capturing evidence, and surfacing failure gaps before completion
-tools: ["read", "search", "edit", "execute", "agent"]
+tools:
+  [
+    vscode/getProjectSetupInfo,
+    vscode/installExtension,
+    vscode/memory,
+    vscode/newWorkspace,
+    vscode/resolveMemoryFileUri,
+    vscode/runCommand,
+    vscode/vscodeAPI,
+    vscode/extensions,
+    vscode/askQuestions,
+    execute/runNotebookCell,
+    execute/testFailure,
+    execute/executionSubagent,
+    execute/getTerminalOutput,
+    execute/killTerminal,
+    execute/sendToTerminal,
+    execute/createAndRunTask,
+    execute/runInTerminal,
+    execute/runTests,
+    read/getNotebookSummary,
+    read/problems,
+    read/readFile,
+    read/viewImage,
+    read/readNotebookCellOutput,
+    read/terminalSelection,
+    read/terminalLastCommand,
+    agent/runSubagent,
+    edit/createDirectory,
+    edit/createFile,
+    edit/createJupyterNotebook,
+    edit/editFiles,
+    edit/editNotebook,
+    edit/rename,
+    search/changes,
+    search/codebase,
+    search/fileSearch,
+    search/listDirectory,
+    search/textSearch,
+    search/usages,
+    web/fetch,
+    web/githubRepo,
+    azure-mcp/search,
+    browser/openBrowserPage,
+    todo,
+    askOnly,
+  ]
 argument-hint: "Provide the slice name, changed surfaces, expected rules, and any required tests, commands, or manual verification steps."
 handoffs:
   - slice-coordinator

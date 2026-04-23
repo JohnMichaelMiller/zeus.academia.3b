@@ -19,7 +19,7 @@ ai_log: "ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md
 source: "johnmillerATcodemag-com"
 name: slice-coordinator
 description: Slice coordinator persona focused on scope control, sequencing, handoffs, and blocker management for vertical-slice delivery
-tools: ["read", "search", "edit", "agent"]
+tools: ["read", "search", "edit", "agent", "askOnly"]
 argument-hint: "Provide the slice name, business outcome, prerequisites, and any known blockers or conflicting patterns."
 handoffs:
   - product-manager

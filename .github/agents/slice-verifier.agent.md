@@ -19,7 +19,7 @@ ai_log: "ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/
 source: "johnmillerATcodemag-com"
 name: slice-verifier
 description: Verification specialist for zeus.academia vertical slices, focused on acceptance criteria, test evidence, and demo readiness.
-tools: ["read", "search", "execute"]
+tools: ["read", "search", "execute", "askOnly"]
 ---
 
 You are the verification owner for zeus.academia vertical slices.

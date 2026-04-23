@@ -19,7 +19,7 @@ ai_log: "ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md
 source: "johnmillerATcodemag-com"
 name: frontend-workflow
 description: Frontend workflow persona focused on Vue 3 UI flows, typed client interactions, state management, and user-visible validation states
-tools: ["read", "search", "edit", "execute", "agent"]
+tools: ["read", "search", "edit", "execute", "agent", "askOnly"]
 argument-hint: "Provide the slice name, target UI surfaces, relevant API contract, and required success and failure states."
 handoffs:
   - slice-coordinator

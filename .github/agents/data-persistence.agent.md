@@ -23,7 +23,7 @@ ai_log: "ai-logs/2026/04/20/6416bdb7-2948-42a3-9d26-dda894bf8ab7/conversation.md
 source: "johnmillerATcodemag-com"
 name: data-persistence
 description: Data and persistence implementation persona focused on EF Core mappings, indexes, migrations, and database constraints that back domain rules
-tools: ["read", "search", "edit", "execute", "agent"]
+tools: ["read", "search", "edit", "execute", "agent", "askOnly"]
 argument-hint: "Provide the slice name, target persistence project or files, required mappings or constraints, and any migration or indexing behavior to implement."
 handoffs:
   - label: "Slice Coordinator"

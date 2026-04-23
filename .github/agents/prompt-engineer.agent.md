@@ -1,7 +1,7 @@
 ---
 name: prompt-engineer
 description: Prompt engineering specialist for creating and optimizing prompts and instruction files
-tools: ["read", "search", "edit", "agent"]
+tools: ["read", "search", "edit", "agent", "askOnly"]
 argument-hint: "Provide goal, target artifact type (.prompt.md or .instructions.md), constraints, and desired output format."
 handoffs:
   - blog-author
