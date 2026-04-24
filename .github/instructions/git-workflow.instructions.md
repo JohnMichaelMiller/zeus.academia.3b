@@ -119,6 +119,7 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 **Repository-Level Checks:**
 
 - [ ] README updated for durable artifacts (new files intended for long-term use)
+- [ ] Durable README entries include the corresponding `ai_log` link when traceability applies
 - [ ] Conversation logs committed under `ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/`
 - [ ] Summary references all artifacts generated
 
@@ -128,6 +129,8 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 
 - [ ] No obvious bugs or logic errors
 - [ ] Follows project conventions (naming, structure, patterns)
+- [ ] Domain factories, validators, and EF Core mappings do not drift on shared length, precision, normalization, or uniqueness rules
+- [ ] Target-provider EF Core mappings are explicit for provider-sensitive shapes such as decimals, shadow FKs, filtered indexes, and computed values
 - [ ] Security best practices applied (no hardcoded secrets, SQL injection risks)
 - [ ] Error handling appropriate for context
 - [ ] Performance acceptable (no N+1 queries, excessive allocations)
@@ -136,6 +139,7 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 
 - [ ] Tests added for new functionality
 - [ ] Tests updated for modified behavior
+- [ ] Test names describe the actual scenario and expected outcome
 - [ ] Test coverage ≥80% for new code
 - [ ] Edge cases covered
 - [ ] Tests pass locally and in CI

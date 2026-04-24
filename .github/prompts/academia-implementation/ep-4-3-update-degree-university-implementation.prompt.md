@@ -64,7 +64,7 @@ mode: agent
 2. Implement update behavior.
    Targets: command, validator, handler, endpoint.
    Owner: backend-domain.
-   Validation before next step: only existing qualification records are updated and new university references are valid.
+   Validation before next step: only existing qualification records are updated, new university references are valid, and any persisted qualification identifier or code-length rules are enforced before persistence through shared canonical definitions.
 3. Verify update behavior.
    Targets: tests for successful update, missing qualification, invalid university, read-model visibility, and proof that the existing committed migration artifact still backs qualification uniqueness or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
@@ -77,6 +77,7 @@ mode: agent
 - Invalid university references are rejected.
 - Qualification reads reflect the updated university after success.
 - Updating a qualification does not create or permit duplicate Academic+Degree state in persistence.
+- Qualification identity, code length, and normalization rules are defined once for reuse across domain validation and EF Core mapping.
 
 ## Human Showcase Steps
 
@@ -94,8 +95,10 @@ mode: agent
 - [ ] Existing-record targeting is explicit.
 - [ ] University references are validated.
 - [ ] Shared qualification type mutability is intentional and documented in review notes (immutable-by-default unless lifecycle mutation is required).
+- [ ] Qualification identifier, length, and normalization rules are enforced before persistence using shared constants or a single canonical definition reused by EF Core mappings.
 - [ ] Updated data is visible after success.
 - [ ] Missing-record and invalid-reference paths are tested.
 - [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
+- [ ] Target-provider mappings for qualification keys and related foreign keys are explicit enough to keep generated migrations valid.
 - [ ] Verification ties qualification uniqueness to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice stays focused on updates only.

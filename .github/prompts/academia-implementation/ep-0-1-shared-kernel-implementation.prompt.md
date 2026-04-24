@@ -68,11 +68,11 @@ mode: agent
 2. Implement the domain model and invariant methods.
    Targets: Shared Kernel aggregate and value-object files, especially Academic employment guards and Rank to AccessLevel derivation.
    Owner: backend-domain.
-   Validation before next step: the aggregate enforces tenured XOR contracted state and AccessLevel is derived only from Rank.
+   Validation before next step: the aggregate enforces tenured XOR contracted state, AccessLevel is derived only from Rank, and any persisted identifier or code length rules are enforced before persistence through shared constants reused by domain factories and mappings.
 3. Implement persistence mappings and hard database constraints.
-   Targets: EF Core entity configurations, indexes, CHECK constraints, and base migration updates for empNr uniqueness, extension uniqueness, and the employment XOR invariant.
+   Targets: EF Core entity configurations, indexes, CHECK constraints, provider-specific type mappings for shadow properties and foreign keys, and base migration updates for empNr uniqueness, extension uniqueness, and the employment XOR invariant.
    Owner: data-persistence.
-   Validation before next step: mappings align with domain rules, no persistence rule contradicts the aggregate, the schema rejects impossible employment state, and the required migration artifact exists in the diff.
+   Validation before next step: mappings align with domain rules, no persistence rule contradicts the aggregate, provider-specific precision and type mappings match the target store, the schema rejects impossible employment state, redundant PK-backed indexes are avoided unless justified, and the required migration artifact exists in the diff.
 4. Add reusable error/result plumbing and domain event contracts.
    Targets: Shared Kernel result types, error primitives, event interfaces, and common exceptions.
    Owner: backend-domain.
@@ -87,6 +87,8 @@ mode: agent
 - Creating or mutating an Academic cannot leave both IsTenured and ContractEndDate set at the same time.
 - The persisted Academic schema rejects rows where both IsTenured and ContractEndDate are set at the same time.
 - Rank values map only as P -> INT, SL -> NAT, and L -> LOC, and AccessLevel is never assigned directly.
+- AcademicQualification rejects empNr, degree code, and university code values that exceed the persisted limits before hitting the database, and those limits are defined once for reuse across domain and EF Core mapping.
+- Any shadow foreign key or decimal-backed identifier used by the Shared Kernel is mapped with target-provider-compatible precision and scale so migrations do not fail on SQL Server.
 - Shared Kernel types compile with nullable reference types enabled and are reusable by later slices.
 - Database constraints back up the code-level uniqueness rules and the employment XOR invariant.
 - A committed migration artifact exists for the Shared Kernel schema changes and is treated as part of the slice deliverable.
@@ -99,8 +101,8 @@ mode: agent
    Expected result: the domain foundation exists in one reusable location with explicit invariant methods and no feature-specific leakage.
    Value demonstrated: later slice work no longer needs to rediscover or duplicate core academic rules.
 2. Starting state: test runner available.
-   Action: run the Shared Kernel unit and mapping tests, inspect the migration artifact in the persistence root, and verify the employment-state constraint is represented there.
-   Expected result: passing tests and the committed migration together prove the core rules are enforced before endpoint work begins.
+   Action: run the Shared Kernel unit and mapping tests, inspect the migration artifact in the persistence root, and verify the employment-state constraint plus provider-specific precision mappings are represented there.
+   Expected result: passing tests and the committed migration together prove the core rules are enforced before endpoint work begins and that the target provider will not fail on precision or constraint drift.
    Value demonstrated: the highest-risk domain invariants are locked in with durable persistence support before the backlog expands.
 
 ## Completion Checklist
@@ -108,7 +110,9 @@ mode: agent
 - [ ] Shared Kernel scope is still limited to reusable domain and persistence foundations.
 - [ ] Aggregate invariants and derived properties are enforced in code.
 - [ ] Aggregate state-transition methods validate XOR preconditions before committing field mutation so invalid transient state is not created before throwing.
+- [ ] Domain factories reject values that violate persisted max lengths, precision expectations, or normalization rules before persistence, using shared constants where the same rule appears in EF Core mappings.
 - [ ] Database constraints back up the critical uniqueness rules and persistence-level invariants.
+- [ ] Target-provider mappings for shadow properties, foreign keys, and decimal identifiers are explicit enough to keep generated migrations valid on the intended database engine.
 - [ ] Constraint tests assert on stable signals (exception type, constraint name, or SQL state) rather than provider-specific full error-message text.
 - [ ] Required migration files are present for schema-changing persistence work.
 - [ ] Public XML documentation reflects the actual layer or project where the type lives (for example, persistence types describe persistence responsibilities).

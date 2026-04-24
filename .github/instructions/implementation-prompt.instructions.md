@@ -136,6 +136,8 @@ Required coverage:
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
 
+For any persistence-backed field constraint such as max length, precision, scale, uniqueness, or required normalization, the prompt must say where the canonical rule lives and how drift is prevented. Prefer shared domain constants or a single canonical definition reused by factories, validators, and EF Core mappings rather than repeating raw values across layers.
+
 Use a short enforcement matrix when the slice includes durable invariants, schema changes, or persistence-backed rules:
 
 | Rule           | Canonical layer      | Persistence backing required | Verification evidence                 |
@@ -143,6 +145,8 @@ Use a short enforcement matrix when the slice includes durable invariants, schem
 | Employment XOR | Aggregate + database | Yes, CHECK constraint        | Unit test + schema or migration proof |
 
 When a slice changes schema, constraints, indexes, or EF Core model shape, the prompt must explicitly say whether a committed migration artifact is required. If it is required, name the expected persistence root, the migration artifact to create or update, and the evidence that proves the migration is part of the slice deliverable.
+
+When the slice depends on provider-specific EF Core behavior, such as SQL Server decimal precision, filtered indexes, collations, computed columns, or constraint translation, the prompt must require verification against the target provider or generated migration output. SQLite-only checks are not sufficient unless the prompt explicitly states that provider parity is out of scope.
 
 Do not let a schema-changing prompt stop at "migration support" or "schema evidence." The prompt must distinguish mapping-only persistence work from schema-changing persistence work.
 
@@ -166,6 +170,8 @@ Implementation prompts must separate implementation from verification. The verif
 If the prompt claims persistence foundations, database constraints, or migration support, verification must include schema evidence. Passing unit tests or mapping tests alone is insufficient when the rule is supposed to be durable at the database level.
 
 If the slice changes schema, verification must also confirm that a committed migration artifact exists in the diff unless the prompt explicitly waives migrations and explains why.
+
+Verification should also call out reviewer-facing hygiene when the slice produces durable artifacts or tests. At minimum, require durable README entries to link back to the artifact log when traceability applies, and require test names to describe the actual scenario and expectation rather than a nearby but different failure mode.
 
 A slice is not complete because code exists. It is complete when the prompt's verification path has been executed and evidence has been captured or explicitly waived by a human.
 

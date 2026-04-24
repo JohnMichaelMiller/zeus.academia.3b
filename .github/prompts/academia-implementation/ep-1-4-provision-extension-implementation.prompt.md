@@ -67,7 +67,7 @@ mode: agent
 2. Implement provision-extension behavior.
    Targets: provision command, validator, handler, response, endpoint, and mappings.
    Owner: backend-domain.
-   Validation before next step: only valid numeric extensions are accepted and duplicates are rejected in both code and persistence.
+   Validation before next step: only valid numeric extensions are accepted, any persisted formatting or normalization rule is enforced before persistence through shared canonical definitions, and duplicates are rejected in both code and persistence.
 3. Implement deprovision-extension behavior.
    Targets: deprovision command, validator if needed, handler, response, and endpoint.
    Owner: backend-domain.
@@ -82,6 +82,7 @@ mode: agent
 - Provisioning accepts only valid numeric extension values and persists a unique extension record.
 - Provisioning the same extension twice fails without creating duplicates.
 - Extension uniqueness is protected in both application behavior and persistence.
+- Any provider-sensitive mapping used for extension identifiers or assignment state is explicit enough to keep target-provider migrations valid.
 - If this slice introduces or changes extension uniqueness schema, a committed migration artifact exists in the confirmed persistence root.
 - Deprovisioning an unassigned extension succeeds and removes it from the available pool.
 - Deprovisioning an assigned extension fails and preserves the existing assignment state.
@@ -103,7 +104,9 @@ mode: agent
 - [ ] ProvisionExtension remains limited to extension-pool lifecycle behavior.
 - [ ] Numeric extension validation is enforced.
 - [ ] Extension uniqueness is preserved.
+- [ ] Domain validation, normalization, and EF Core mappings reuse the same canonical extension rules instead of repeating raw values across layers.
 - [ ] Required migration files are present when this slice introduces or changes extension uniqueness schema.
+- [ ] Target-provider mappings for extension identifiers, shadow properties, or filtered uniqueness rules are explicit enough to keep generated migrations valid.
 - [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Assigned extensions are protected from deprovisioning.
 - [ ] Tests cover success and failure paths.
