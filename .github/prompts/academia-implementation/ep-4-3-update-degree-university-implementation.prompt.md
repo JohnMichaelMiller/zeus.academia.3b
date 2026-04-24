@@ -45,13 +45,13 @@ mode: agent
 
 - Required prior slices: RecordDegreeObtained
 - Blocking risks: updates must target an existing qualification record and preserve the one-university-per-academic-degree rule.
-- Existing patterns to reuse: qualification reference lookups and deterministic missing-record handling.
+- Existing patterns to reuse: qualification reference lookups, deterministic missing-record handling, and duplicate protection aligned between code and persistence.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                         | Inputs                                            | Outputs                     | Escalate when                                                           |
-| -------------------------- | -------------------------------------------------------- | ------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------- |
-| slice-coordinator          | confirm qualification identifier strategy and route      | execution plan and current qualification model    | approved command contract   | qualification records are not uniquely addressable in the current model |
+| Role                 | Responsibilities                                         | Inputs                                            | Outputs                     | Escalate when                                                           |
+| -------------------- | -------------------------------------------------------- | ------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------- |
+| slice-coordinator    | confirm qualification identifier strategy and route      | execution plan and current qualification model    | approved command contract   | qualification records are not uniquely addressable in the current model |
 | backend-domain       | implement update command, validator, handler, endpoint   | qualification model and university reference data | university-update code path | update semantics would break the academic-degree uniqueness rule        |
 | testing-verification | verify existing-record update and missing-record failure | implemented slice                                 | tests and evidence          | updates create new rows instead of modifying the intended record        |
 
@@ -66,7 +66,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: only existing qualification records are updated and new university references are valid.
 3. Verify update behavior.
-   Targets: tests for successful update, missing qualification, invalid university, and read-model visibility.
+   Targets: tests for successful update, missing qualification, invalid university, read-model visibility, and proof that the existing committed migration artifact still backs qualification uniqueness or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: the updated university is visible and no duplicate qualification is created.
 
@@ -76,6 +76,7 @@ mode: agent
 - Missing qualification targets fail cleanly.
 - Invalid university references are rejected.
 - Qualification reads reflect the updated university after success.
+- Updating a qualification does not create or permit duplicate Academic+Degree state in persistence.
 
 ## Human Showcase Steps
 
@@ -94,4 +95,5 @@ mode: agent
 - [ ] University references are validated.
 - [ ] Updated data is visible after success.
 - [ ] Missing-record and invalid-reference paths are tested.
+- [ ] Verification ties qualification uniqueness to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice stays focused on updates only.

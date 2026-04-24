@@ -49,9 +49,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                                                  | Inputs                                      | Outputs                       | Escalate when                                                |
-| -------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------- | ------------------------------------------------------------ |
-| slice-coordinator          | confirm whether one endpoint or multiple endpoints best match current conventions | execution plan and current API style        | approved query surface        | current API conventions make the planned query modes unclear |
+| Role                 | Responsibilities                                                                  | Inputs                                      | Outputs                       | Escalate when                                                |
+| -------------------- | --------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------- | ------------------------------------------------------------ |
+| slice-coordinator    | confirm whether one endpoint or multiple endpoints best match current conventions | execution plan and current API style        | approved query surface        | current API conventions make the planned query modes unclear |
 | backend-domain       | implement qualification queries and response DTOs                                 | qualification model and shared paging rules | list-qualifications code path | one query mode needs a different storage/projection strategy |
 | testing-verification | verify all query modes and empty-result handling                                  | implemented slice                           | tests and evidence            | query modes return inconsistent shapes                       |
 
@@ -94,4 +94,5 @@ mode: agent
 - [ ] Query contracts are stable.
 - [ ] Empty-result behavior is verified.
 - [ ] Tests cover each query mode.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice stays operational, not analytical.

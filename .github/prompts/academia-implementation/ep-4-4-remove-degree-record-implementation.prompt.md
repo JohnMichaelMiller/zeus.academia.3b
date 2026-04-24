@@ -49,9 +49,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                        | Inputs                                        | Outputs                   | Escalate when                                                                          |
-| -------------------------- | ------------------------------------------------------- | --------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| slice-coordinator          | confirm removal route and qualification target strategy | execution plan and qualification model        | approved command contract | qualification identity is ambiguous                                                    |
+| Role                 | Responsibilities                                        | Inputs                                        | Outputs                   | Escalate when                                                                          |
+| -------------------- | ------------------------------------------------------- | --------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm removal route and qualification target strategy | execution plan and qualification model        | approved command contract | qualification identity is ambiguous                                                    |
 | backend-domain       | implement remove command, handler, endpoint             | qualification rules and current storage model | removal code path         | the minimum-one-qualification rule cannot be enforced cleanly in the current aggregate |
 | testing-verification | verify safe removal and last-record rejection           | implemented slice                             | tests and evidence        | the command can remove the final qualification                                         |
 
@@ -94,4 +94,5 @@ mode: agent
 - [ ] Valid removals keep the remaining set consistent.
 - [ ] Missing-record behavior is tested.
 - [ ] Qualification reads are verified after success.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice does not overlap with deregistration behavior.

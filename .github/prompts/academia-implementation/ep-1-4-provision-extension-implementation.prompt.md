@@ -48,13 +48,13 @@ mode: agent
 
 - Required prior slices: Shared Kernel
 - Blocking risks: extension uniqueness must be preserved for later assignment slices, so do not treat this as disposable seed data.
-- Existing patterns to reuse: command-first slice structure, validator beside command, persistence uniqueness, and guard methods preventing invalid deprovisioning.
+- Existing patterns to reuse: command-first slice structure, validator beside command, persistence uniqueness backed by durable constraints, and guard methods preventing invalid deprovisioning.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                        | Inputs                                           | Outputs                                        | Escalate when                                                     |
-| -------------------------- | ------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------- | ----------------------------------------------------------------- |
-| slice-coordinator          | confirm extension storage model and route placement     | execution plan, repo tree, persistence root      | approved artifact targets and dependency notes | extension state is already modeled elsewhere in a conflicting way |
+| Role                 | Responsibilities                                        | Inputs                                           | Outputs                                        | Escalate when                                                     |
+| -------------------- | ------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------- | ----------------------------------------------------------------- |
+| slice-coordinator    | confirm extension storage model and route placement     | execution plan, repo tree, persistence root      | approved artifact targets and dependency notes | extension state is already modeled elsewhere in a conflicting way |
 | backend-domain       | implement provision and deprovision command behavior    | Shared Kernel Extension model, slice conventions | commands, validators, handlers, endpoints      | extNr formatting or identity semantics are unclear                |
 | testing-verification | verify numeric format, uniqueness, and assignment guard | implemented slice and business rules             | tests and evidence                             | deprovision logic cannot reliably detect assigned extensions      |
 
@@ -67,13 +67,13 @@ mode: agent
 2. Implement provision-extension behavior.
    Targets: provision command, validator, handler, response, endpoint, and mappings.
    Owner: backend-domain.
-   Validation before next step: only valid numeric extensions are accepted and duplicates are rejected.
+   Validation before next step: only valid numeric extensions are accepted and duplicates are rejected in both code and persistence.
 3. Implement deprovision-extension behavior.
    Targets: deprovision command, validator if needed, handler, response, and endpoint.
    Owner: backend-domain.
    Validation before next step: assigned extensions cannot be deprovisioned and unassigned ones can.
 4. Verify command behavior end to end.
-   Targets: validator tests, handler tests, integration tests for provision, duplicate rejection, and deprovision guards.
+   Targets: validator tests, handler tests, integration tests for provision, duplicate rejection, and deprovision guards, plus the committed migration artifact in the confirmed persistence root when this slice introduces or changes extension uniqueness.
    Owner: testing-verification.
    Validation before next step: extension pool behavior is reliable enough for registration to depend on it.
 
@@ -81,6 +81,8 @@ mode: agent
 
 - Provisioning accepts only valid numeric extension values and persists a unique extension record.
 - Provisioning the same extension twice fails without creating duplicates.
+- Extension uniqueness is protected in both application behavior and persistence.
+- If this slice introduces or changes extension uniqueness schema, a committed migration artifact exists in the confirmed persistence root.
 - Deprovisioning an unassigned extension succeeds and removes it from the available pool.
 - Deprovisioning an assigned extension fails and preserves the existing assignment state.
 - Automated tests cover valid provision, duplicate provision, valid deprovision, and assigned-extension rejection.
@@ -101,6 +103,7 @@ mode: agent
 - [ ] ProvisionExtension remains limited to extension-pool lifecycle behavior.
 - [ ] Numeric extension validation is enforced.
 - [ ] Extension uniqueness is preserved.
+- [ ] Required migration files are present when this slice introduces or changes extension uniqueness schema.
 - [ ] Assigned extensions are protected from deprovisioning.
 - [ ] Tests cover success and failure paths.
 - [ ] The slice is safe for RegisterAcademic to consume next.

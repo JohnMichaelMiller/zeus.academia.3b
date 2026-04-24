@@ -48,20 +48,20 @@ mode: agent
 
 - Required prior slices: Shared Kernel
 - Blocking risks: degree codes may already appear in fixtures or examples; normalize them instead of creating duplicate catalogs.
-- Existing patterns to reuse: reference-data command/query shape, unique code validation, and deterministic list contracts.
+- Existing patterns to reuse: reference-data command/query shape, unique code validation backed by database constraints, and deterministic list contracts.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                               | Inputs                                       | Outputs                                      | Escalate when                                                    |
-| -------------------------- | -------------------------------------------------------------- | -------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
-| slice-coordinator          | confirm degree storage, seed expectations, and route placement | execution plan, current repo tree            | approved targets and blocker notes           | current codebase already contains an incompatible degree catalog |
+| Role                 | Responsibilities                                               | Inputs                                       | Outputs                                      | Escalate when                                                    |
+| -------------------- | -------------------------------------------------------------- | -------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
+| slice-coordinator    | confirm degree storage, seed expectations, and route placement | execution plan, current repo tree            | approved targets and blocker notes           | current codebase already contains an incompatible degree catalog |
 | backend-domain       | implement add and list degree behavior                         | Shared Kernel degree type, slice conventions | commands, queries, handlers, DTOs, endpoints | degree code rules are unclear or clash with seeded data          |
 | testing-verification | verify uniqueness and list behavior                            | implemented slice                            | tests and evidence                           | persistence allows duplicates or queries return unstable values  |
 
 ## Ordered Implementation Steps
 
 1. Confirm the canonical degree-data location and route shape.
-   Targets: src/features/ReferenceData/ManageDegrees/ or current equivalent, persistence configuration, and any seed scripts.
+   Targets: src/features/ReferenceData/ManageDegrees/ or current equivalent, persistence root, migration path, and any seed scripts.
    Owner: slice-coordinator.
    Validation before next step: one degree catalog source is identified and slice targets are approved.
 2. Implement add-degree behavior.
@@ -73,7 +73,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: query returns stable degree records suitable for registration lookups.
 4. Verify the slice end to end.
-   Targets: validator tests, handler tests, and integration tests for add/list flows.
+   Targets: validator tests, handler tests, integration tests for add/list flows, and the committed migration artifact in the confirmed persistence root when this slice introduces or changes duplicate-code protection.
    Owner: testing-verification.
    Validation before next step: tests cover valid add, duplicate rejection, and list-query results.
 
@@ -81,6 +81,8 @@ mode: agent
 
 - Adding a new degree code persists one canonical reference-data record.
 - Adding a duplicate degree code fails without creating a second record.
+- Degree-code uniqueness is protected in both application behavior and persistence.
+- If this slice introduces or changes the uniqueness schema, a committed migration artifact exists in the confirmed persistence root.
 - Listing degrees returns stable records that downstream registration and qualification slices can resolve.
 - Validation and persistence rules agree on what constitutes a valid degree payload.
 - Automated tests cover the success path, duplicate path, and list-query behavior.
@@ -100,6 +102,7 @@ mode: agent
 
 - [ ] ManageDegrees stays limited to degree reference-data behavior.
 - [ ] Degree code uniqueness is enforced.
+- [ ] Required migration files are present when this slice introduces or changes reference-data uniqueness schema.
 - [ ] List behavior is stable and reusable by dependent slices.
 - [ ] Tests cover add and list success and failure cases.
 - [ ] Any seed or bootstrap path is documented.

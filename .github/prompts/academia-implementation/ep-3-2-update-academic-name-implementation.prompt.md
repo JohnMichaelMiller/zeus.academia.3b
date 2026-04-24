@@ -50,9 +50,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                       | Inputs                                | Outputs                | Escalate when                                                            |
-| -------------------------- | ------------------------------------------------------ | ------------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
-| slice-coordinator          | confirm route, identifier, and update flow             | execution plan and current tree       | approved command scope | current repo uses a different canonical identifier than the plan assumes |
+| Role                 | Responsibilities                                       | Inputs                                | Outputs                | Escalate when                                                            |
+| -------------------- | ------------------------------------------------------ | ------------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
+| slice-coordinator    | confirm route, identifier, and update flow             | execution plan and current tree       | approved command scope | current repo uses a different canonical identifier than the plan assumes |
 | backend-domain       | implement rename command, validator, handler, endpoint | registration model and existing rules | rename code path       | renaming requires cross-slice side effects not called for in the plan    |
 | testing-verification | verify length rule, persistence, and query visibility  | implemented slice                     | tests and evidence     | updated name is not visible through read models after save               |
 
@@ -95,4 +95,5 @@ mode: agent
 - [ ] Rename behavior does not alter unrelated academic fields.
 - [ ] Read models reflect the persisted update.
 - [ ] Success and failure paths are tested.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] Missing-record handling is verified.

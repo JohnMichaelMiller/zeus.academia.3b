@@ -49,10 +49,10 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                              | Inputs                                                  | Outputs                  | Escalate when                                                |
-| -------------------------- | ------------------------------------------------------------- | ------------------------------------------------------- | ------------------------ | ------------------------------------------------------------ |
-| slice-coordinator          | confirm grouping output and route shape                       | execution plan and report conventions                   | approved report contract | rank grouping requires a projection strategy not yet chosen  |
-| report-projection       | implement grouped query and response contracts                | current academic rank state and access-level derivation | by-rank report code path | grouped output would duplicate logic already owned elsewhere |
+| Role                 | Responsibilities                                              | Inputs                                                  | Outputs                  | Escalate when                                                |
+| -------------------- | ------------------------------------------------------------- | ------------------------------------------------------- | ------------------------ | ------------------------------------------------------------ |
+| slice-coordinator    | confirm grouping output and route shape                       | execution plan and report conventions                   | approved report contract | rank grouping requires a projection strategy not yet chosen  |
+| report-projection    | implement grouped query and response contracts                | current academic rank state and access-level derivation | by-rank report code path | grouped output would duplicate logic already owned elsewhere |
 | testing-verification | verify counts, listing accuracy, and reaction to rank changes | implemented slice                                       | tests and evidence       | counts drift after rank changes                              |
 
 ## Ordered Implementation Steps
@@ -94,4 +94,5 @@ mode: agent
 - [ ] Derived access-level context is consistent.
 - [ ] Rank changes are reflected.
 - [ ] Tests cover counts and listings.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The report remains distinct from pure access-level analytics.

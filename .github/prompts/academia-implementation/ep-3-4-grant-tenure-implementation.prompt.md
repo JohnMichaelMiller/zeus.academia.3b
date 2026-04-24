@@ -46,13 +46,13 @@ mode: agent
 
 - Required prior slices: RegisterAcademic
 - Blocking risks: the command must reuse the aggregate guard rather than re-encode XOR logic in the handler only.
-- Existing patterns to reuse: aggregate mutation methods, command validation, and follow-up profile assertions.
+- Existing patterns to reuse: aggregate mutation methods, command validation, persistence-backed employment invariants, and follow-up profile assertions.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                             | Inputs                                  | Outputs                | Escalate when                                                         |
-| -------------------------- | ------------------------------------------------------------ | --------------------------------------- | ---------------------- | --------------------------------------------------------------------- |
-| slice-coordinator          | confirm command route and response contract                  | execution plan, current routes          | approved command scope | employment logic appears in multiple conflicting places               |
+| Role                 | Responsibilities                                             | Inputs                                  | Outputs                | Escalate when                                                         |
+| -------------------- | ------------------------------------------------------------ | --------------------------------------- | ---------------------- | --------------------------------------------------------------------- |
+| slice-coordinator    | confirm command route and response contract                  | execution plan, current routes          | approved command scope | employment logic appears in multiple conflicting places               |
 | backend-domain       | implement command, handler, endpoint, and any event emission | Shared Kernel guards and academic model | tenure code path       | tenure transition requires changing the Shared Kernel invariant model |
 | testing-verification | verify XOR preservation and read-model visibility            | implemented slice                       | tests and evidence     | contract state is not cleared or profile output is inconsistent       |
 
@@ -67,7 +67,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: applying tenure clears contract end date and leaves a valid employment state.
 3. Verify employment invariants.
-   Targets: unit or integration tests for tenured transition, missing academic, and prior contracted state.
+   Targets: unit or integration tests for tenured transition, missing academic, and prior contracted state, plus proof that the existing committed migration artifact still backs the XOR invariant or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: XOR rule is preserved through the command path.
 
@@ -76,6 +76,7 @@ mode: agent
 - Granting tenure sets the academic to tenured state.
 - Granting tenure clears any existing contract end date.
 - Missing academics fail cleanly.
+- The persisted employment state remains valid under the Shared Kernel XOR invariant after the transition.
 - Automated tests prove the employment XOR rule still holds after the transition.
 
 ## Human Showcase Steps
@@ -95,4 +96,5 @@ mode: agent
 - [ ] Contract state is cleared on tenure.
 - [ ] Missing-record handling is verified.
 - [ ] Profile visibility is tested.
+- [ ] Verification ties the employment XOR invariant to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] XOR employment rule remains enforced.

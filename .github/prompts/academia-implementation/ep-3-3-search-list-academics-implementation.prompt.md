@@ -50,9 +50,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                      | Inputs                                       | Outputs                        | Escalate when                                                     |
-| -------------------------- | ----------------------------------------------------- | -------------------------------------------- | ------------------------------ | ----------------------------------------------------------------- |
-| slice-coordinator          | confirm filter contract and default sort              | execution plan and current query conventions | approved query surface         | existing API pagination rules conflict with the needed filter set |
+| Role                 | Responsibilities                                      | Inputs                                       | Outputs                        | Escalate when                                                     |
+| -------------------- | ----------------------------------------------------- | -------------------------------------------- | ------------------------------ | ----------------------------------------------------------------- |
+| slice-coordinator    | confirm filter contract and default sort              | execution plan and current query conventions | approved query surface         | existing API pagination rules conflict with the needed filter set |
 | backend-domain       | implement filtered query, DTOs, endpoint, and mapping | academic persistence model and filter rules  | search/list code path          | one or more filters need data not yet exposed by registration     |
 | testing-verification | verify filters, pagination, and sorting               | implemented slice                            | integration tests and evidence | query output is nondeterministic across repeated runs             |
 
@@ -95,4 +95,5 @@ mode: agent
 - [ ] Pagination and sorting are deterministic.
 - [ ] Empty-result behavior is clean.
 - [ ] Tests cover filter, sort, and pagination behavior.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice remains operational search, not reporting.

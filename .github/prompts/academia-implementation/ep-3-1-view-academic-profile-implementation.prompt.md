@@ -51,9 +51,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                 | Inputs                                       | Outputs                        | Escalate when                                                                                 |
-| -------------------------- | ------------------------------------------------ | -------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
-| slice-coordinator          | confirm route and projection shape               | execution plan, current repo tree            | approved query scope           | current academic data model cannot return all required fields without revisiting registration |
+| Role                 | Responsibilities                                 | Inputs                                       | Outputs                        | Escalate when                                                                                 |
+| -------------------- | ------------------------------------------------ | -------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm route and projection shape               | execution plan, current repo tree            | approved query scope           | current academic data model cannot return all required fields without revisiting registration |
 | backend-domain       | implement query, handler, response, and endpoint | registration data model, Shared Kernel types | profile query code path        | qualifications or extension data need a new shared projection strategy                        |
 | testing-verification | verify happy path and not-found behavior         | implemented slice                            | integration tests and evidence | returned profile omits derived or joined data required by the plan                            |
 
@@ -96,4 +96,4 @@ mode: agent
 - [ ] Response shape includes all required fields.
 - [ ] Derived access level is consistent with rank.
 - [ ] Not-found behavior is verified.
-- [ ] Tests provide evidence for happy and failure paths.
+- [ ] Verification evidence exists for happy and failure paths.

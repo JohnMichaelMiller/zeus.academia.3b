@@ -46,13 +46,13 @@ mode: agent
 
 - Required prior slices: RegisterAcademic
 - Blocking risks: the future-date rule must be enforced before persistence and stay aligned with RenewContract.
-- Existing patterns to reuse: aggregate mutation, command validation, and profile/read-model verification.
+- Existing patterns to reuse: aggregate mutation, command validation, persistence-backed employment invariants, and profile/read-model verification.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                | Inputs                                     | Outputs                       | Escalate when                                                   |
-| -------------------------- | ----------------------------------------------- | ------------------------------------------ | ----------------------------- | --------------------------------------------------------------- |
-| slice-coordinator          | confirm route and date semantics                | execution plan and current API conventions | approved command contract     | local time handling is ambiguous for future-date validation     |
+| Role                 | Responsibilities                                | Inputs                                     | Outputs                       | Escalate when                                                   |
+| -------------------- | ----------------------------------------------- | ------------------------------------------ | ----------------------------- | --------------------------------------------------------------- |
+| slice-coordinator    | confirm route and date semantics                | execution plan and current API conventions | approved command contract     | local time handling is ambiguous for future-date validation     |
 | backend-domain       | implement command, validator, handler, endpoint | Shared Kernel rules and academic model     | contract-assignment code path | contract date semantics conflict with current domain primitives |
 | testing-verification | verify future-date enforcement and XOR behavior | implemented slice                          | tests and evidence            | contracted state is persisted with invalid or current dates     |
 
@@ -67,7 +67,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: valid future dates persist and tenured state is cleared.
 3. Verify command behavior.
-   Targets: tests for valid assignment, current/past date rejection, and profile assertions.
+   Targets: tests for valid assignment, current/past date rejection, and profile assertions, plus proof that the existing committed migration artifact still backs the XOR invariant or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: the command path preserves XOR employment rules.
 
@@ -77,6 +77,7 @@ mode: agent
 - Current or past end dates are rejected.
 - Contract assignment clears tenured state when necessary.
 - Profile or list reads reflect the contracted state after success.
+- The persisted employment state remains valid under the Shared Kernel XOR invariant after the transition.
 
 ## Human Showcase Steps
 
@@ -95,4 +96,5 @@ mode: agent
 - [ ] Tenured state is cleared when contract state is applied.
 - [ ] Read models reflect the new employment state.
 - [ ] Success and failure paths are covered.
+- [ ] Verification ties the employment XOR invariant to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] XOR employment rule remains intact.

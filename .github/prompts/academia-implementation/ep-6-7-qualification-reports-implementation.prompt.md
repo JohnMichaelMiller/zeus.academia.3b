@@ -48,10 +48,10 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                                 | Inputs                                             | Outputs                        | Escalate when                                                                  |
-| -------------------------- | ---------------------------------------------------------------- | -------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------ |
-| slice-coordinator          | confirm grouped report shapes and route strategy                 | execution plan and qualification query conventions | approved report contract       | degree-grouped and university-grouped outputs need different projection models |
-| report-projection       | implement grouped qualification reports                          | qualification state and grouping rules             | qualification report code path | grouped reporting exposes unresolved duplication in qualification storage      |
+| Role                 | Responsibilities                                                 | Inputs                                             | Outputs                        | Escalate when                                                                  |
+| -------------------- | ---------------------------------------------------------------- | -------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------ |
+| slice-coordinator    | confirm grouped report shapes and route strategy                 | execution plan and qualification query conventions | approved report contract       | degree-grouped and university-grouped outputs need different projection models |
+| report-projection    | implement grouped qualification reports                          | qualification state and grouping rules             | qualification report code path | grouped reporting exposes unresolved duplication in qualification storage      |
 | testing-verification | verify counts and grouped listings after qualification mutations | implemented slice                                  | tests and evidence             | counts drift after add, update, or remove operations                           |
 
 ## Ordered Implementation Steps
@@ -93,4 +93,5 @@ mode: agent
 - [ ] Grouped counts are accurate.
 - [ ] Mutation effects are reflected.
 - [ ] Tests cover grouped counts and listings.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice remains analytical rather than operational listing.

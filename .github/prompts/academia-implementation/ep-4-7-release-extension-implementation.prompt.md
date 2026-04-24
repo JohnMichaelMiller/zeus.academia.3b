@@ -45,13 +45,13 @@ mode: agent
 
 - Required prior slices: AssignExtension
 - Blocking risks: release must update both academic state and extension availability consistently.
-- Existing patterns to reuse: extension uniqueness checks, transactional updates, and follow-up availability verification.
+- Existing patterns to reuse: extension uniqueness checks, transactional updates, persistence-backed 1:1 assignment rules, and follow-up availability verification.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                               | Inputs                              | Outputs                   | Escalate when                                               |
-| -------------------------- | ---------------------------------------------- | ----------------------------------- | ------------------------- | ----------------------------------------------------------- |
-| slice-coordinator          | confirm route and released-state semantics     | execution plan and extension slices | approved command contract | current model does not expose a clear released state        |
+| Role                 | Responsibilities                               | Inputs                              | Outputs                   | Escalate when                                               |
+| -------------------- | ---------------------------------------------- | ----------------------------------- | ------------------------- | ----------------------------------------------------------- |
+| slice-coordinator    | confirm route and released-state semantics     | execution plan and extension slices | approved command contract | current model does not expose a clear released state        |
 | backend-domain       | implement release command, handler, endpoint   | extension assignment model          | release code path         | release behavior would conflict with deregistration cleanup |
 | testing-verification | verify state cleanup and returned availability | implemented slice                   | tests and evidence        | released extensions do not re-enter the available pool      |
 
@@ -66,7 +66,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: academic no longer references the extension and the extension becomes available.
 3. Verify release behavior.
-   Targets: tests for valid release, no-current-extension cases, and follow-up availability checks.
+   Targets: tests for valid release, no-current-extension cases, follow-up availability checks, and proof that the existing committed migration artifact still backs 1:1 uniqueness after release or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: availability reads reflect the released extension.
 
@@ -76,6 +76,7 @@ mode: agent
 - Released extensions become available for later assignment.
 - Invalid release requests fail cleanly.
 - Automated tests verify both academic and extension-pool state after success.
+- The 1:1 uniqueness rule remains protected in persistence after release.
 
 ## Human Showcase Steps
 
@@ -94,4 +95,5 @@ mode: agent
 - [ ] Released extensions return to the available pool.
 - [ ] Invalid release behavior is tested.
 - [ ] Follow-up availability checks are verified.
+- [ ] Verification ties post-release 1:1 uniqueness to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice remains distinct from reassignment and deregistration.

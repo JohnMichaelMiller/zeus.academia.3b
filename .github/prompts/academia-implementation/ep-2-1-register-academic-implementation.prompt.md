@@ -48,13 +48,13 @@ mode: agent
 
 - Required prior slices: ManageRanks, ManageDegrees, ManageUniversities, ProvisionExtension
 - Blocking risks: this slice is the first hard dependency gate; do not parallelize dependent slices until registration passes integration tests.
-- Existing patterns to reuse: command validator beside handler, atomic persistence, rank-derived access-level logic from Shared Kernel, and extension uniqueness backed by database constraints.
+- Existing patterns to reuse: command validator beside handler, atomic persistence, rank-derived access-level logic from Shared Kernel, empNr uniqueness backed by database constraints, and extension uniqueness backed by database constraints.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                                                        | Inputs                                                     | Outputs                                           | Escalate when                                                            |
-| -------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
-| slice-coordinator          | confirm endpoint route, transaction boundary, and prerequisite readiness                | execution plan, current repo tree, reference-data slices   | approved implementation sequence and blocker list | any prerequisite slice is incomplete or lacks integration proof          |
+| Role                 | Responsibilities                                                                        | Inputs                                                     | Outputs                                           | Escalate when                                                            |
+| -------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
+| slice-coordinator    | confirm endpoint route, transaction boundary, and prerequisite readiness                | execution plan, current repo tree, reference-data slices   | approved implementation sequence and blocker list | any prerequisite slice is incomplete or lacks integration proof          |
 | backend-domain       | implement command, validator, handler, endpoint, mappings, and persistence workflow     | Shared Kernel, reference-data contracts, slice conventions | registration code path and response contract      | qualification or extension rules require changing Shared Kernel behavior |
 | testing-verification | verify valid registration, duplicate empNr, invalid references, and extension conflicts | implemented slice and prerequisite data                    | integration-first tests and evidence              | registration is not atomic or leaves partial data behind                 |
 
@@ -73,7 +73,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: successful registration persists one academic with derived access level, at least one qualification, and one assigned extension.
 4. Add integration-first verification.
-   Targets: integration tests, validator tests, and any required fixtures.
+   Targets: integration tests, validator tests, any required fixtures, and proof that the existing committed migration artifact still backs the empNr and extension constraints or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: duplicate empNr, invalid rank, missing qualification, and unavailable extension cases all fail cleanly without partial writes.
 
@@ -83,6 +83,7 @@ mode: agent
 - Registration rejects payloads that do not include at least one degree and university pair.
 - Registration rejects invalid rank, degree, university, or extension references.
 - Registration uses an unassigned extension only and persists the rank-derived access level automatically.
+- Duplicate empNr and conflicting extension usage are blocked without partial writes and remain aligned with persistence constraints.
 - Automated tests cover the happy path plus duplicate empNr, invalid reference data, missing qualification, and extension-conflict failures.
 
 ## Human Showcase Steps
@@ -102,5 +103,6 @@ mode: agent
 - [ ] Validation covers empNr length, name length, qualification minimum, and reference-data existence.
 - [ ] Persistence is atomic across academic, qualifications, and extension linkage.
 - [ ] Derived access level is persisted or exposed consistently from Rank.
+- [ ] Persistence-backed identity and extension constraints are verified against the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] Integration tests prove clean failure behavior for invalid and conflicting requests.
 - [ ] Dependent slices are blocked until registration verification passes.

@@ -48,20 +48,20 @@ mode: agent
 
 - Required prior slices: Shared Kernel
 - Blocking risks: university code format may already appear in existing fixtures; reconcile those values before locking the validator.
-- Existing patterns to reuse: reference-data CRUD-lite behavior, code uniqueness, and deterministic listing.
+- Existing patterns to reuse: reference-data CRUD-lite behavior, code uniqueness backed by database constraints, and deterministic listing.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                           | Inputs                                           | Outputs                                      | Escalate when                                             |
-| -------------------------- | ------------------------------------------ | ------------------------------------------------ | -------------------------------------------- | --------------------------------------------------------- |
-| slice-coordinator          | confirm catalog ownership and placement    | execution plan, repo tree, existing fixtures     | approved artifact map                        | multiple university catalogs already exist                |
+| Role                 | Responsibilities                           | Inputs                                           | Outputs                                      | Escalate when                                             |
+| -------------------- | ------------------------------------------ | ------------------------------------------------ | -------------------------------------------- | --------------------------------------------------------- |
+| slice-coordinator    | confirm catalog ownership and placement    | execution plan, repo tree, existing fixtures     | approved artifact map                        | multiple university catalogs already exist                |
 | backend-domain       | implement add and list university behavior | Shared Kernel university type, slice conventions | commands, queries, handlers, DTOs, endpoints | code or fixtures imply conflicting university identifiers |
 | testing-verification | verify uniqueness and list behavior        | implemented slice                                | tests and evidence                           | duplicate handling or list output is unstable             |
 
 ## Ordered Implementation Steps
 
 1. Confirm where university reference data belongs.
-   Targets: src/features/ReferenceData/ManageUniversities/ or current equivalent, persistence setup, and seed data path.
+   Targets: src/features/ReferenceData/ManageUniversities/ or current equivalent, persistence root, migration path, and seed data path.
    Owner: slice-coordinator.
    Validation before next step: one canonical catalog location and route shape are agreed.
 2. Implement add-university behavior.
@@ -73,7 +73,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: query returns stable reference data for registration and qualification flows.
 4. Verify the slice.
-   Targets: validator tests, handler tests, integration tests.
+   Targets: validator tests, handler tests, integration tests, and the committed migration artifact in the confirmed persistence root when this slice introduces or changes duplicate-code protection.
    Owner: testing-verification.
    Validation before next step: add and list flows pass with clear failure coverage.
 
@@ -81,6 +81,8 @@ mode: agent
 
 - Adding a university code creates one canonical reference-data record.
 - Duplicate university codes are rejected without partial persistence.
+- University-code uniqueness is protected in both application behavior and persistence.
+- If this slice introduces or changes the uniqueness schema, a committed migration artifact exists in the confirmed persistence root.
 - Listing universities returns stable data that downstream slices can resolve reliably.
 - Validation, handler logic, and persistence behavior agree on duplicate handling.
 - Automated tests cover add success, duplicate rejection, and list-query behavior.
@@ -100,6 +102,7 @@ mode: agent
 
 - [ ] ManageUniversities remains reference-data only.
 - [ ] University code uniqueness is enforced.
+- [ ] Required migration files are present when this slice introduces or changes reference-data uniqueness schema.
 - [ ] Query behavior is stable for downstream lookups.
 - [ ] Tests cover successful adds, duplicate rejection, and listing.
 - [ ] Any bootstrap or seed mechanism is documented.

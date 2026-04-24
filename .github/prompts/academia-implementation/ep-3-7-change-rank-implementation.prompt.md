@@ -50,9 +50,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                                                 | Inputs                                              | Outputs                   | Escalate when                                                              |
-| -------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------- |
-| slice-coordinator          | confirm event needs and route placement                                          | execution plan, report dependencies, current routes | approved command contract | report dependencies require a broader event model than currently available |
+| Role                 | Responsibilities                                                                 | Inputs                                              | Outputs                   | Escalate when                                                              |
+| -------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------- |
+| slice-coordinator    | confirm event needs and route placement                                          | execution plan, report dependencies, current routes | approved command contract | report dependencies require a broader event model than currently available |
 | backend-domain       | implement command, validator, handler, endpoint, and any rank-change event       | Shared Kernel rules, ManageRanks data               | rank-change code path     | handler would need to assign access level directly rather than deriving it |
 | testing-verification | verify valid rank change, invalid rank rejection, and access-level recalculation | implemented slice                                   | tests and evidence        | profile or report seed data still shows stale access levels                |
 
@@ -95,4 +95,5 @@ mode: agent
 - [ ] AccessLevel remains derived, not manually assigned.
 - [ ] Missing-record and invalid-rank cases are tested.
 - [ ] Read models reflect the updated rank and access level.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] Any required event publication is documented or implemented.

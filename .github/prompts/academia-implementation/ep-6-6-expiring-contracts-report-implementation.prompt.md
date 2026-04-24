@@ -49,10 +49,10 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                      | Inputs                                               | Outputs                             | Escalate when                                                     |
-| -------------------------- | ----------------------------------------------------- | ---------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------- |
-| slice-coordinator          | confirm default threshold and date-boundary semantics | execution plan and current date-handling conventions | approved report contract            | current date handling is inconsistent across employment slices    |
-| report-projection       | implement threshold-based report query                | contract end-date data and filter rules              | expiring-contracts report code path | date logic requires timezone semantics beyond current conventions |
+| Role                 | Responsibilities                                      | Inputs                                               | Outputs                             | Escalate when                                                     |
+| -------------------- | ----------------------------------------------------- | ---------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------- |
+| slice-coordinator    | confirm default threshold and date-boundary semantics | execution plan and current date-handling conventions | approved report contract            | current date handling is inconsistent across employment slices    |
+| report-projection    | implement threshold-based report query                | contract end-date data and filter rules              | expiring-contracts report code path | date logic requires timezone semantics beyond current conventions |
 | testing-verification | verify default and custom windows plus boundary dates | implemented slice                                    | tests and evidence                  | near-boundary contracts appear inconsistently                     |
 
 ## Ordered Implementation Steps
@@ -94,4 +94,5 @@ mode: agent
 - [ ] Custom thresholds are supported.
 - [ ] Boundary-date handling is tested.
 - [ ] Results match current contract data.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The report stays focused on expiring-window analysis.

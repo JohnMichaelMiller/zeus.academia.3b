@@ -49,10 +49,10 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                  | Inputs                               | Outputs                     | Escalate when                                                  |
-| -------------------------- | ------------------------------------------------- | ------------------------------------ | --------------------------- | -------------------------------------------------------------- |
-| slice-coordinator          | confirm contracted-state semantics and sort order | execution plan and employment slices | approved report contract    | employment data does not expose current contract state cleanly |
-| report-projection       | implement report query and DTOs                   | contract state and end-date data     | contracted report code path | the report needs separate projection storage for performance   |
+| Role                 | Responsibilities                                  | Inputs                               | Outputs                     | Escalate when                                                  |
+| -------------------- | ------------------------------------------------- | ------------------------------------ | --------------------------- | -------------------------------------------------------------- |
+| slice-coordinator    | confirm contracted-state semantics and sort order | execution plan and employment slices | approved report contract    | employment data does not expose current contract state cleanly |
+| report-projection    | implement report query and DTOs                   | contract state and end-date data     | contracted report code path | the report needs separate projection storage for performance   |
 | testing-verification | verify filtering and ascending sort order         | implemented slice                    | tests and evidence          | results are unsorted or include non-contracted academics       |
 
 ## Ordered Implementation Steps
@@ -94,4 +94,5 @@ mode: agent
 - [ ] Sort order is deterministic and ascending.
 - [ ] Renewal effects are reflected.
 - [ ] Tests cover filtering and ordering.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The report stays distinct from expiring-window logic.

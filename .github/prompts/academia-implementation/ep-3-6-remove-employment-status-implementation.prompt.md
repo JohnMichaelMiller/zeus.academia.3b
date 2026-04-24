@@ -45,13 +45,13 @@ mode: agent
 
 - Required prior slices: RegisterAcademic
 - Blocking risks: clearing state must not leave stale contract dates or contradictory read-model values.
-- Existing patterns to reuse: aggregate mutation methods and follow-up read-model verification.
+- Existing patterns to reuse: aggregate mutation methods, persistence-backed employment invariants, and follow-up read-model verification.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                               | Inputs                                          | Outputs                | Escalate when                                                |
-| -------------------------- | -------------------------------------------------------------- | ----------------------------------------------- | ---------------------- | ------------------------------------------------------------ |
-| slice-coordinator          | confirm identifier, route, and expected cleared-state response | execution plan and current routes               | approved command scope | existing routes imply a different employment lifecycle model |
+| Role                 | Responsibilities                                               | Inputs                                          | Outputs                | Escalate when                                                |
+| -------------------- | -------------------------------------------------------------- | ----------------------------------------------- | ---------------------- | ------------------------------------------------------------ |
+| slice-coordinator    | confirm identifier, route, and expected cleared-state response | execution plan and current routes               | approved command scope | existing routes imply a different employment lifecycle model |
 | backend-domain       | implement clear-state command, handler, endpoint               | academic aggregate and current employment rules | removal code path      | clearing state would violate an unstated persistence rule    |
 | testing-verification | verify tenure-clear and contract-clear scenarios               | implemented slice                               | tests and evidence     | either path leaves stale persisted employment data           |
 
@@ -66,7 +66,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: the command clears IsTenured and ContractEndDate safely.
 3. Verify both transition paths.
-   Targets: tests for starting from tenured, starting from contracted, and reading back cleared state.
+   Targets: tests for starting from tenured, starting from contracted, and reading back cleared state, plus proof that the existing committed migration artifact still backs the XOR invariant or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: read models show no residual employment state.
 
@@ -76,6 +76,7 @@ mode: agent
 - The command leaves both IsTenured and ContractEndDate cleared.
 - Missing academics fail cleanly.
 - Read models reflect the cleared employment state after success.
+- The persisted employment state remains valid under the Shared Kernel XOR invariant after the transition.
 
 ## Human Showcase Steps
 
@@ -94,4 +95,5 @@ mode: agent
 - [ ] Stale contract data is removed.
 - [ ] Read models reflect cleared state.
 - [ ] Missing-record handling is tested.
+- [ ] Verification ties the employment XOR invariant to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice does not assign any new employment state.
