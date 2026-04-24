@@ -4,6 +4,7 @@ The third iteration of the Zeus Academia experiment
 
 ## AI-Assisted Artifacts
 
+- [Shared Kernel (EP 0.1)](src/backend/SharedKernel/) ([Log](ai-logs/2026/04/24/ep-0-1-shared-kernel-implementation/conversation.md), [Summary](ai-logs/2026/04/24/ep-0-1-shared-kernel-implementation/summary.md))
 - [Academia Slice Implementation Prompts](.github/prompts/academia/README.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-implementation-prompts/conversation.md))
 - [Academia Slice Execution Plan](.github/prompts/academia/execution-plan.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
 - [Backend Slice Implementer Agent Profile](.github/agents/backend-slice-implementer.agent.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))

@@ -1,1 +1,8 @@
 .clockwork.json
+
+# .NET build output
+**/bin/
+**/obj/
+*.user
+.vs/
+
