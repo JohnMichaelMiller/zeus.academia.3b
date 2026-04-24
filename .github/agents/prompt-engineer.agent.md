@@ -1,7 +1,7 @@
 ---
 name: prompt-engineer
 description: Prompt engineering specialist for creating and optimizing prompts and instruction files
-tools: ["read", "search", "edit", "agent", "askOnly"]
+tools: [vscode/getProjectSetupInfo, vscode/installExtension, vscode/memory, vscode/newWorkspace, vscode/resolveMemoryFileUri, vscode/runCommand, vscode/vscodeAPI, vscode/extensions, vscode/askQuestions, execute/runNotebookCell, execute/executionSubagent, execute/getTerminalOutput, execute/killTerminal, execute/sendToTerminal, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/getNotebookSummary, read/problems, read/readFile, read/viewImage, read/readNotebookCellOutput, read/terminalSelection, read/terminalLastCommand, agent/runSubagent, edit/createDirectory, edit/createFile, edit/createJupyterNotebook, edit/editFiles, edit/editNotebook, edit/rename, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/usages, web/fetch, web/githubRepo, browser/openBrowserPage, azure-mcp/search, todo]
 argument-hint: "Provide goal, target artifact type (.prompt.md or .instructions.md), constraints, and desired output format."
 handoffs:
   - label: "Blog Author"
