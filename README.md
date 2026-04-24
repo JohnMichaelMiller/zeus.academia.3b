@@ -28,3 +28,7 @@ The third iteration of the Zeus Academia experiment
 - [Product Manager Agent Profile](.github/agents/product-manager.agent.md) ([Log](ai-logs/2026/02/25/2026-02-25-product-manager-agent-prompt/conversation.md))
 - [Prompt Engineer Agent Profile](.github/agents/prompt-engineer.agent.md) ([Log](ai-logs/2026/04/20/2026-04-20-prompt-engineer-agent-conversion/conversation.md))
 - [Slice Verifier Agent Profile](.github/agents/slice-verifier.agent.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
+
+## Backend Implementation Artifacts
+
+- [Shared Kernel (EP-0-1)](src/backend/SharedKernel/) — reusable domain primitives (Academic aggregate, Rank/AccessLevel/Degree/University/Extension value objects, AcademicQualification, Result/Error, domain events, base exceptions) enforcing employment XOR and Rank→AccessLevel derivation. Persisted via [Zeus.Academia.Persistence](src/backend/Persistence/) with EF Core 8 mappings, check constraints, and unique indexes. Slice prompt: [ep-0-1-shared-kernel-implementation.prompt.md](.github/prompts/academia-implementation/ep-0-1-shared-kernel-implementation.prompt.md).
