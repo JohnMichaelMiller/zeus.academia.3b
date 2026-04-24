@@ -28,3 +28,4 @@ The third iteration of the Zeus Academia experiment
 - [Product Manager Agent Profile](.github/agents/product-manager.agent.md) ([Log](ai-logs/2026/02/25/2026-02-25-product-manager-agent-prompt/conversation.md))
 - [Prompt Engineer Agent Profile](.github/agents/prompt-engineer.agent.md) ([Log](ai-logs/2026/04/20/2026-04-20-prompt-engineer-agent-conversion/conversation.md))
 - [Slice Verifier Agent Profile](.github/agents/slice-verifier.agent.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
+- [Zeus Academia Shared Kernel (EP-0-1)](src/backend/README.md) ([Log](ai-logs/2026/04/24/2026-04-24-ep-0-1-shared-kernel-implementation/conversation.md))

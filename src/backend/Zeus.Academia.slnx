@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="../../tests/SharedKernel/SharedKernel.Tests.csproj" />
+  <Project Path="Persistence/Persistence.csproj" />
+  <Project Path="SharedKernel/SharedKernel.csproj" />
+</Solution>
