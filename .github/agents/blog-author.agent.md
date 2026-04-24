@@ -4,7 +4,9 @@ description: Technical blog author focused on AI-assisted software development p
 tools: ["read", "search", "edit", "askOnly"]
 argument-hint: "Provide topic, audience, target length, and desired output format (outline, section, or full draft)."
 handoffs:
-  - product-manager
+  - label: "Product Manager"
+    agent: "product-manager"
+    prompt: "Clarify audience, product intent, and messaging goals for the draft"
 ---
 
 You are an expert technical blog post author specializing in AI-assisted software development.

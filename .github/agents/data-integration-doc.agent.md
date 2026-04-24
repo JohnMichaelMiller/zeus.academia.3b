@@ -22,11 +22,21 @@ description: Supporting persona for migrations, integration touchpoints, documen
 tools: ["read", "search", "edit", "execute", "agent", "askOnly"]
 argument-hint: "Provide the slice name, supporting concern type (data, integration, or docs), affected artifacts, and the expected supporting outcome."
 handoffs:
-  - slice-coordinator
-  - backend-domain
-  - testing-verification
-  - blog-author
-  - prompt-engineer
+  - label: "Slice Coordinator"
+    agent: "slice-coordinator"
+    prompt: "Coordinate supporting documentation, migration, and integration scope"
+  - label: "Backend Domain"
+    agent: "backend-domain"
+    prompt: "Clarify backend impacts, contracts, and domain rules for documentation"
+  - label: "Testing Verification"
+    agent: "testing-verification"
+    prompt: "Capture verification evidence, known gaps, and residual risks"
+  - label: "Blog Author"
+    agent: "blog-author"
+    prompt: "Turn technical integration work into polished explanatory content"
+  - label: "Prompt Engineer"
+    agent: "prompt-engineer"
+    prompt: "Refine supporting prompts and instruction artifacts for documentation work"
 ---
 
 You are the optional data/integration/doc support agent for Zeus Academia.

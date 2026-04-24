@@ -22,12 +22,24 @@ description: Slice coordinator persona focused on scope control, sequencing, han
 tools: ["read", "search", "edit", "agent", "askOnly"]
 argument-hint: "Provide the slice name, business outcome, prerequisites, and any known blockers or conflicting patterns."
 handoffs:
-  - product-manager
-  - prompt-engineer
-  - backend-domain
-  - frontend-workflow
-  - testing-verification
-  - data-integration-doc
+  - label: "Product Manager"
+    agent: "product-manager"
+    prompt: "Clarify scope, priorities, acceptance criteria, and business outcomes"
+  - label: "Prompt Engineer"
+    agent: "prompt-engineer"
+    prompt: "Refine implementation prompts, structure, and execution guidance"
+  - label: "Backend Domain"
+    agent: "backend-domain"
+    prompt: "Implement and clarify backend rules, contracts, and domain behavior"
+  - label: "Frontend Workflow"
+    agent: "frontend-workflow"
+    prompt: "Implement and clarify UI workflows, client behavior, and user-visible states"
+  - label: "Testing Verification"
+    agent: "testing-verification"
+    prompt: "Define and execute focused checks that prove the slice outcome"
+  - label: "Data Integration Documentation"
+    agent: "data-integration-doc"
+    prompt: "Document integration impacts, supporting artifacts, and rollout notes"
 ---
 
 You are the slice coordinator for Zeus Academia implementation work.
