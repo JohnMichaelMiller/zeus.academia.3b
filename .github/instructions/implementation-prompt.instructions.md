@@ -134,6 +134,18 @@ Required coverage:
 - Tests, checks, or inspections to run
 - User-visible outcome or business rule satisfied
 
+For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
+
+Use a short enforcement matrix when the slice includes durable invariants, schema changes, or persistence-backed rules:
+
+| Rule           | Canonical layer      | Persistence backing required | Verification evidence                 |
+| -------------- | -------------------- | ---------------------------- | ------------------------------------- |
+| Employment XOR | Aggregate + database | Yes, CHECK constraint        | Unit test + schema or migration proof |
+
+When a slice changes schema, constraints, indexes, or EF Core model shape, the prompt must explicitly say whether a committed migration artifact is required. If it is required, name the expected persistence root, the migration artifact to create or update, and the evidence that proves the migration is part of the slice deliverable.
+
+Do not let a schema-changing prompt stop at "migration support" or "schema evidence." The prompt must distinguish mapping-only persistence work from schema-changing persistence work.
+
 Preferred phrasing:
 
 - "Submitting an invalid enrollment request returns validation errors and does not persist data."
@@ -150,6 +162,10 @@ Implementation prompts must separate implementation from verification. The verif
 - tests, commands, or manual inspection steps when available
 - evidence to capture, such as logs, screenshots, response samples, or test output
 - unresolved issues that block moving from implemented to verified
+
+If the prompt claims persistence foundations, database constraints, or migration support, verification must include schema evidence. Passing unit tests or mapping tests alone is insufficient when the rule is supposed to be durable at the database level.
+
+If the slice changes schema, verification must also confirm that a committed migration artifact exists in the diff unless the prompt explicitly waives migrations and explains why.
 
 A slice is not complete because code exists. It is complete when the prompt's verification path has been executed and evidence has been captured or explicitly waived by a human.
 
@@ -252,6 +268,7 @@ Example for a single slice:
 - [ ] Implementation steps are ordered and concrete
 - [ ] Acceptance criteria are observable
 - [ ] Verification evidence is captured
+- [ ] Schema-changing work names the required migration artifact and how it will be verified
 - [ ] Showcase steps demonstrate business value
 ```
 

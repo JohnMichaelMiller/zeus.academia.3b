@@ -106,6 +106,8 @@ The generated plan must explicitly validate:
 - Academic must retain at least one qualification
 - Extension 1:1 uniqueness with Academic
 - Contract dates are future-dated where required
+- For each listed business rule, the required enforcement layers: aggregate, validator, handler, database constraint, and verification evidence
+- A database-backed constraint and migration validation whenever a rule can be violated through direct persistence, concurrency, imports, or non-handler writes
 
 ## Constraints
 
