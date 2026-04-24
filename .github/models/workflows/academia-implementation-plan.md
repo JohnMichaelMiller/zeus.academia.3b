@@ -174,10 +174,10 @@ flowchart LR
 **Acceptance Criteria:**
 
 - [ ] All entity/value object types compile with nullability enabled
-- [ ] ExclusiveOr constraint (`IsTenured` and `ContractEndDate` cannot both be set) enforced in `Academic` aggregate
+- [ ] ExclusiveOr constraint (`IsTenured` and `ContractEndDate` cannot both be set) enforced in `Academic` aggregate and backed by a database CHECK constraint
 - [ ] `AccessLevel` is read-only, computed from `Rank`
 - [ ] `Result<T>` covers Success and Failure paths
-- [ ] Unit tests confirm ExclusiveOr rule and AccessLevel derivation
+- [ ] Unit and persistence tests confirm ExclusiveOr rule and AccessLevel derivation
 
 ---
 
@@ -239,18 +239,18 @@ Do **not** promote: response DTOs, validators, endpoint-specific types.
 
 ## Business Rule Enforcement Summary
 
-| Rule                                                                       | Enforced In                                                                  | Slice                                |
-| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------ |
-| `empNr` is 6-char fixed                                                    | `RegisterAcademicCommandValidator`                                           | RegisterAcademic                     |
-| `EmpName` ≤15 chars                                                        | `RegisterAcademicCommandValidator`, `UpdateAcademicNameCommandValidator`     | RegisterAcademic, UpdateAcademicName |
-| Rank ∈ {P, SL, L}                                                          | `RegisterAcademicCommandValidator`, `ChangeRankCommandValidator`             | RegisterAcademic, ChangeRank         |
-| AccessLevel derived from Rank; never set directly                          | `Academic` aggregate property                                                | Shared Kernel                        |
-| IsTenured XOR ContractEndDate (never both)                                 | `Academic.SetTenured()`, `Academic.SetContract()` guard methods              | Shared Kernel                        |
-| Academic must have ≥1 Degree+University                                    | `RegisterAcademicCommandValidator`, `RemoveDegreeRecordHandler` domain guard | RegisterAcademic, RemoveDegreeRecord |
-| Academic+Degree pair maps to at most one University                        | `RecordDegreeObtainedHandler` duplicate check                                | RecordDegreeObtained                 |
-| Extension is 1:1 with Academic (unique per Academic, unique per Extension) | `AssignExtensionHandler` uniqueness check                                    | AssignExtension                      |
-| ContractEndDate must be future                                             | `AssignContractCommandValidator`, `RenewContractCommandValidator`            | AssignContract, RenewContract        |
-| Cannot deprovision assigned Extension                                      | `DeprovisionExtensionHandler` guard                                          | ProvisionExtension                   |
+| Rule                                                                       | Enforced In                                                                   | Slice                                |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------ |
+| `empNr` is 6-char fixed                                                    | `RegisterAcademicCommandValidator`                                            | RegisterAcademic                     |
+| `EmpName` ≤15 chars                                                        | `RegisterAcademicCommandValidator`, `UpdateAcademicNameCommandValidator`      | RegisterAcademic, UpdateAcademicName |
+| Rank ∈ {P, SL, L}                                                          | `RegisterAcademicCommandValidator`, `ChangeRankCommandValidator`              | RegisterAcademic, ChangeRank         |
+| AccessLevel derived from Rank; never set directly                          | `Academic` aggregate property                                                 | Shared Kernel                        |
+| IsTenured XOR ContractEndDate (never both)                                 | `Academic` employment guard methods + database CHECK constraint on `Academic` | Shared Kernel                        |
+| Academic must have ≥1 Degree+University                                    | `RegisterAcademicCommandValidator`, `RemoveDegreeRecordHandler` domain guard  | RegisterAcademic, RemoveDegreeRecord |
+| Academic+Degree pair maps to at most one University                        | `RecordDegreeObtainedHandler` duplicate check                                 | RecordDegreeObtained                 |
+| Extension is 1:1 with Academic (unique per Academic, unique per Extension) | `AssignExtensionHandler` uniqueness check                                     | AssignExtension                      |
+| ContractEndDate must be future                                             | `AssignContractCommandValidator`, `RenewContractCommandValidator`             | AssignContract, RenewContract        |
+| Cannot deprovision assigned Extension                                      | `DeprovisionExtensionHandler` guard                                           | ProvisionExtension                   |
 
 ---
 
@@ -260,5 +260,5 @@ Do **not** promote: response DTOs, validators, endpoint-specific types.
 - **ManageRanks**, **ManageDegrees**, **ManageUniversities**, **ProvisionExtension** carry no UI requirement; seed via migration or admin API.
 - **RegisterAcademic** is the minimum viable slice for any UI work to begin — unblock it first.
 - **Reporting** slices should use dedicated read-optimised projection queries; do not reuse command-side aggregate loading.
-- **ExclusiveOr constraint** must be verified by integration tests before **GrantTenure**, **AssignContract**, or **RemoveEmploymentStatus** ship to production.
+- **ExclusiveOr constraint** must be enforced at both the aggregate level and the database level before **GrantTenure**, **AssignContract**, or **RemoveEmploymentStatus** ship to production. The schema must reject rows where `IsTenured = true` and `ContractEndDate IS NOT NULL`.
 - **Extension uniqueness** must be enforced at the database level (unique index on `ExtensionId` FK) in addition to handler guards.
