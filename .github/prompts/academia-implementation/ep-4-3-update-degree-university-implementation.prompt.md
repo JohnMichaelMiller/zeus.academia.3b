@@ -93,7 +93,9 @@ mode: agent
 
 - [ ] Existing-record targeting is explicit.
 - [ ] University references are validated.
+- [ ] Shared qualification type mutability is intentional and documented in review notes (immutable-by-default unless lifecycle mutation is required).
 - [ ] Updated data is visible after success.
 - [ ] Missing-record and invalid-reference paths are tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Verification ties qualification uniqueness to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice stays focused on updates only.

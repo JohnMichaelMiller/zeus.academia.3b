@@ -95,5 +95,6 @@ mode: agent
 - [ ] Released extensions return to the available pool.
 - [ ] Invalid release behavior is tested.
 - [ ] Follow-up availability checks are verified.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Verification ties post-release 1:1 uniqueness to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice remains distinct from reassignment and deregistration.

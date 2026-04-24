@@ -93,8 +93,10 @@ mode: agent
 ## Completion Checklist
 
 - [ ] Future-date validation is explicit and tested.
+- [ ] Employment state-transition logic checks XOR preconditions before committing field mutation.
 - [ ] Tenured state is cleared when contract state is applied.
 - [ ] Read models reflect the new employment state.
 - [ ] Success and failure paths are covered.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Verification ties the employment XOR invariant to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] XOR employment rule remains intact.

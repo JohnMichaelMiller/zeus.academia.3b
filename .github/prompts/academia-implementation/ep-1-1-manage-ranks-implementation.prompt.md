@@ -104,6 +104,7 @@ mode: agent
 - [ ] Rank validation is restricted to P, SL, and L.
 - [ ] Duplicate codes are blocked at the application and persistence levels as appropriate.
 - [ ] Required migration files are present when this slice introduces or changes reference-data uniqueness schema.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] List behavior returns stable rank data for downstream slices.
 - [ ] Verification covers add and list success and failure paths.
 - [ ] Any chosen seed strategy is documented for later environments.

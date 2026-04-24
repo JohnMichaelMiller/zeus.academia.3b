@@ -107,8 +107,12 @@ mode: agent
 
 - [ ] Shared Kernel scope is still limited to reusable domain and persistence foundations.
 - [ ] Aggregate invariants and derived properties are enforced in code.
+- [ ] Aggregate state-transition methods validate XOR preconditions before committing field mutation so invalid transient state is not created before throwing.
 - [ ] Database constraints back up the critical uniqueness rules and persistence-level invariants.
+- [ ] Constraint tests assert on stable signals (exception type, constraint name, or SQL state) rather than provider-specific full error-message text.
 - [ ] Required migration files are present for schema-changing persistence work.
+- [ ] Public XML documentation reflects the actual layer or project where the type lives (for example, persistence types describe persistence responsibilities).
 - [ ] Result, error, event, and exception primitives are reusable by later slices.
+- [ ] Mutability for shared types is intentional and documented in code review notes: use immutable members (`init`/record) unless lifecycle mutation is explicitly required.
 - [ ] Verification evidence exists for invariant and mapping behavior.
 - [ ] Any repo-layout deviation from the plan is documented before dependent slice work begins.

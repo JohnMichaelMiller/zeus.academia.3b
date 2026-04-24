@@ -95,5 +95,6 @@ mode: agent
 - [ ] Duplicate Academic+Degree pairs are blocked.
 - [ ] Qualification visibility is verified after success.
 - [ ] Failure paths are tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Verification ties duplicate Academic+Degree protection to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice stays focused on adding, not editing or removing, qualifications.

@@ -95,5 +95,6 @@ mode: agent
 - [ ] Original assignments survive failed attempts.
 - [ ] Uniqueness remains intact.
 - [ ] Rollback behavior is tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Verification ties preserved 1:1 uniqueness to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice stays distinct from initial assignment and pure release.

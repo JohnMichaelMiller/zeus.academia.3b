@@ -98,5 +98,6 @@ mode: agent
 - [ ] 1:1 uniqueness is protected in code and persistence.
 - [ ] Current-assignment visibility is available after success.
 - [ ] Conflict and concurrency-sensitive cases are tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Verification ties the 1:1 uniqueness rule to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice does not absorb reassignment or release behavior.

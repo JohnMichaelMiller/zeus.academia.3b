@@ -93,8 +93,10 @@ mode: agent
 ## Completion Checklist
 
 - [ ] Aggregate guard methods are reused.
+- [ ] Employment state-transition logic checks XOR preconditions before committing field mutation.
 - [ ] Contract state is cleared on tenure.
 - [ ] Missing-record handling is verified.
 - [ ] Profile visibility is tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Verification ties the employment XOR invariant to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] XOR employment rule remains enforced.

@@ -92,8 +92,10 @@ mode: agent
 ## Completion Checklist
 
 - [ ] Both starting states are covered.
+- [ ] Employment state-transition logic checks XOR preconditions before committing field mutation.
 - [ ] Stale contract data is removed.
 - [ ] Read models reflect cleared state.
 - [ ] Missing-record handling is tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Verification ties the employment XOR invariant to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice does not assign any new employment state.

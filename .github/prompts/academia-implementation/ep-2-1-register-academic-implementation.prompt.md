@@ -103,6 +103,8 @@ mode: agent
 - [ ] Validation covers empNr length, name length, qualification minimum, and reference-data existence.
 - [ ] Persistence is atomic across academic, qualifications, and extension linkage.
 - [ ] Derived access level is persisted or exposed consistently from Rank.
+- [ ] Public XML documentation in touched persistence types reflects actual layer responsibilities.
 - [ ] Persistence-backed identity and extension constraints are verified against the existing committed migration artifact or a new one when this slice changes schema.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Integration tests prove clean failure behavior for invalid and conflicting requests.
 - [ ] Dependent slices are blocked until registration verification passes.

@@ -104,6 +104,7 @@ mode: agent
 - [ ] Numeric extension validation is enforced.
 - [ ] Extension uniqueness is preserved.
 - [ ] Required migration files are present when this slice introduces or changes extension uniqueness schema.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Assigned extensions are protected from deprovisioning.
 - [ ] Tests cover success and failure paths.
 - [ ] The slice is safe for RegisterAcademic to consume next.

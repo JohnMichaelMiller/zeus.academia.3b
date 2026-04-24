@@ -103,6 +103,7 @@ mode: agent
 - [ ] ManageDegrees stays limited to degree reference-data behavior.
 - [ ] Degree code uniqueness is enforced.
 - [ ] Required migration files are present when this slice introduces or changes reference-data uniqueness schema.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] List behavior is stable and reusable by dependent slices.
 - [ ] Tests cover add and list success and failure cases.
 - [ ] Any seed or bootstrap path is documented.

@@ -103,6 +103,7 @@ mode: agent
 - [ ] ManageUniversities remains reference-data only.
 - [ ] University code uniqueness is enforced.
 - [ ] Required migration files are present when this slice introduces or changes reference-data uniqueness schema.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] Query behavior is stable for downstream lookups.
 - [ ] Tests cover successful adds, duplicate rejection, and listing.
 - [ ] Any bootstrap or seed mechanism is documented.
