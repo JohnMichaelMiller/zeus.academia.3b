@@ -1,1 +1,10 @@
 .clockwork.json
+
+# .NET build artifacts
+bin/
+obj/
+*.user
+*.suo
+.vs/
+artifacts/
+TestResults/

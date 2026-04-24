@@ -2,6 +2,13 @@
 
 The third iteration of the Zeus Academia experiment
 
+## Backend Artifacts
+
+- [Zeus.Academia Solution](src/backend/Zeus.Academia.sln) — .NET 8 backend solution root
+- [Zeus.Academia.SharedKernel](src/backend/SharedKernel/Zeus.Academia.SharedKernel.csproj) — Shared Kernel (EP-0-1): domain primitives, `Academic` aggregate, value objects (`Rank`, `AccessLevel`, `Degree`, `University`, `Extension`), `Result<T>`/`Error`, domain events, and common exceptions
+- [Zeus.Academia.Persistence](src/backend/Persistence/Zeus.Academia.Persistence.csproj) — EF Core 8 mappings for the Shared Kernel (`AcademiaDbContext`, `AcademicConfiguration`)
+- [Zeus.Academia.SharedKernel.Tests](tests/SharedKernel/Zeus.Academia.SharedKernel.Tests.csproj) — xUnit invariant and mapping tests
+
 ## AI-Assisted Artifacts
 
 - [Academia Slice Implementation Prompts](.github/prompts/academia/README.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-implementation-prompts/conversation.md))

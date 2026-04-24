@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Zeus.Academia.SharedKernel</RootNamespace>
+    <AssemblyName>Zeus.Academia.SharedKernel</AssemblyName>
+  </PropertyGroup>
+
+</Project>
