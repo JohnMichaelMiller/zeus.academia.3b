@@ -47,7 +47,7 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: none
-- Blocking risks: feature-root or persistence-root naming may differ from the plan; confirm the actual backend root before creating files.
+- Blocking risks: feature-root or persistence-root naming may differ from the plan; confirm the actual backend root before creating files. If raw rank codes will still be persisted before later rank-reference FK wiring lands, this slice must either establish a temporary persistence safeguard or record the accepted gap and read-path failure policy explicitly.
 - Existing patterns to reuse: nullable-enabled C#, Result/Error wrapper, domain event abstraction, EF Core uniqueness constraints, aggregate guard methods, and durable database constraints for persistence-level invariants.
 
 ## Assigned Agents and Role Boundaries
@@ -72,7 +72,7 @@ mode: agent
 3. Implement persistence mappings and hard database constraints.
    Targets: EF Core entity configurations, indexes, CHECK constraints, provider-specific type mappings for shadow properties and foreign keys, and base migration updates for empNr uniqueness, extension uniqueness, and the employment XOR invariant.
    Owner: data-persistence.
-   Validation before next step: mappings align with domain rules, no persistence rule contradicts the aggregate, provider-specific precision and type mappings match the target store, the schema rejects impossible employment state, redundant PK-backed indexes are avoided unless justified, and the required migration artifact exists in the diff.
+   Validation before next step: mappings align with domain rules, no persistence rule contradicts the aggregate, provider-specific precision and type mappings match the target store, the schema rejects impossible employment state, redundant PK-backed indexes are avoided unless justified, the required migration artifact exists in the diff, and any intentionally deferred persistence backing is called out with the owning later slice.
 4. Add reusable error/result plumbing and domain event contracts.
    Targets: Shared Kernel result types, error primitives, event interfaces, and common exceptions.
    Owner: backend-domain.
@@ -87,6 +87,7 @@ mode: agent
 - Creating or mutating an Academic cannot leave both IsTenured and ContractEndDate set at the same time.
 - The persisted Academic schema rejects rows where both IsTenured and ContractEndDate are set at the same time.
 - Rank values map only as P -> INT, SL -> NAT, and L -> LOC, and AccessLevel is never assigned directly.
+- If persisted rank values can drift before later FK wiring exists, the current slice either introduces a temporary safeguard for the stored rank representation or records the accepted gap and read-path failure contract explicitly.
 - AcademicQualification rejects empNr, degree code, and university code values that exceed the persisted limits before hitting the database, and those limits are defined once for reuse across domain and EF Core mapping.
 - Any shadow foreign key or decimal-backed identifier used by the Shared Kernel is mapped with target-provider-compatible precision and scale so migrations do not fail on SQL Server.
 - Shared Kernel types compile with nullable reference types enabled and are reusable by later slices.
@@ -112,6 +113,7 @@ mode: agent
 - [ ] Aggregate state-transition methods validate XOR preconditions before committing field mutation so invalid transient state is not created before throwing.
 - [ ] Domain factories reject values that violate persisted max lengths, precision expectations, or normalization rules before persistence, using shared constants where the same rule appears in EF Core mappings.
 - [ ] Database constraints back up the critical uniqueness rules and persistence-level invariants.
+- [ ] Any intentionally deferred persistence backing is tracked with the owning later slice and a named read-path failure contract.
 - [ ] Target-provider mappings for shadow properties, foreign keys, and decimal identifiers are explicit enough to keep generated migrations valid on the intended database engine.
 - [ ] Constraint tests assert on stable signals (exception type, constraint name, or SQL state) rather than provider-specific full error-message text.
 - [ ] Required migration files are present for schema-changing persistence work.

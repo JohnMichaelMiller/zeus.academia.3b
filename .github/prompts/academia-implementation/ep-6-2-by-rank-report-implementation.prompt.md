@@ -44,7 +44,7 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RegisterAcademic, ChangeRank
-- Blocking risks: grouped totals must stay aligned with current rank state after updates.
+- Blocking risks: grouped totals must stay aligned with current rank state after updates. The report must observe canonical rank and access-level state rather than becoming a second owner of derivation logic.
 - Existing patterns to reuse: read-optimized reporting and stable grouped DTOs.
 
 ## Assigned Agents and Role Boundaries
@@ -74,7 +74,7 @@ mode: agent
 
 - The report groups academics by rank accurately.
 - Returned listings reflect current rank values after changes.
-- Derived access-level context aligns with the current rank mapping.
+- Derived access-level context aligns with the current rank mapping owned by Shared Kernel and command-side slices; the report does not redefine that mapping.
 - Automated tests verify counts and listing accuracy.
 
 ## Human Showcase Steps
@@ -91,7 +91,7 @@ mode: agent
 ## Completion Checklist
 
 - [ ] Grouping logic is accurate.
-- [ ] Derived access-level context is consistent.
+- [ ] Derived access-level context is consistent and sourced from canonical domain behavior rather than report-local logic.
 - [ ] Rank changes are reflected.
 - [ ] Tests cover counts and listings.
 - [ ] Verification evidence exists for the slice's acceptance criteria.

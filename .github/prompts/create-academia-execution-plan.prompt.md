@@ -95,6 +95,7 @@ For each backlog item, use this template:
 - **Type**: `Command | Query | Command+Query | Shared`
 - **Why now**: one sentence tied to dependency logic
 - **Implementation tasks**: 3-7 concise bullets
+- **Durability status**: for each non-trivial invariant, state whether it is durable now, temporarily safeguarded now, or deferred to a named later slice
 - **Definition of done**: explicit, testable checks
 
 ## Validation Requirements
@@ -108,12 +109,15 @@ The generated plan must explicitly validate:
 - Contract dates are future-dated where required
 - For each listed business rule, the required enforcement layers: aggregate, validator, handler, database constraint, and verification evidence
 - A database-backed constraint and migration validation whenever a rule can be violated through direct persistence, concurrency, imports, or non-handler writes
+- A transitional safeguard or an explicit deferred-risk entry whenever final durable enforcement is intentionally postponed to a later slice
+- A named read-path policy for invalid persisted values when raw persisted data can drift outside domain expectations before later slices add stronger persistence backing
 
 ## Constraints
 
 - Do not invent slices not present in the input plan.
 - Do not reorder required sequential dependencies.
 - Do not omit report slices; place them after their data-producing predecessors.
+- Do not imply that a rule is durably enforced if the plan is intentionally deferring that durability to a later slice.
 - Keep language concise and implementation-focused.
 - Use checklists for acceptance and quality gates.
 
@@ -124,6 +128,7 @@ The generated plan must explicitly validate:
 - [ ] Shared Kernel appears before all slice phases
 - [ ] RegisterAcademic is treated as a hard prerequisite for dependent slices
 - [ ] Validation gates cover business rules and testing expectations
+- [ ] Deferred durable invariants are tracked with a named owning slice or a temporary safeguard in the current slice
 - [ ] Risks and mitigations reference real dependency or domain constraints
 - [ ] Output written to `output_file`
 

@@ -44,7 +44,7 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RecordDegreeObtained
-- Blocking risks: three query modes must share a stable contract without drifting into report logic.
+- Blocking risks: three query modes must share a stable contract without drifting into report logic. This query slice reads qualification state but does not own duplicate protection or last-qualification retention invariants.
 - Existing patterns to reuse: read-only projections, filter contracts, and deterministic pagination when needed.
 
 ## Assigned Agents and Role Boundaries
@@ -75,6 +75,7 @@ mode: agent
 - Qualifications can be listed by academic, by degree code, and by university code.
 - Empty-result requests return a clean empty result.
 - Query contracts are stable across the supported list modes.
+- Returned qualification state reflects the command-side slices that add, update, and remove qualifications; this query does not redefine qualification invariants.
 - Automated tests cover all three query modes.
 
 ## Human Showcase Steps
@@ -93,6 +94,7 @@ mode: agent
 - [ ] All planned query modes are implemented.
 - [ ] Query contracts are stable.
 - [ ] Empty-result behavior is verified.
+- [ ] Qualification reads remain observational and do not imply ownership of add/update/remove invariants.
 - [ ] Tests cover each query mode.
 - [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice stays operational, not analytical.

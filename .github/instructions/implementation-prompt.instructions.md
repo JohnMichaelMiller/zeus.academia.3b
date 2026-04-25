@@ -144,7 +144,18 @@ Use a short enforcement matrix when the slice includes durable invariants, schem
 | -------------- | -------------------- | ---------------------------- | ------------------------------------- |
 | Employment XOR | Aggregate + database | Yes, CHECK constraint        | Unit test + schema or migration proof |
 
+When a rule's final durable enforcement belongs to a later slice, the prompt must say so explicitly. Do not imply that a rule is fully durable now if the current slice only enforces it at the validator, handler, or aggregate level.
+
+For each deferred durable invariant, the prompt must include a short deferral ledger with these fields: rule, enforced now by, not yet enforced in, owning follow-up slice, reviewer-visible risk, and verification evidence for the current temporary state.
+
+If the current slice leaves a persistence gap open until a later slice, the prompt must explicitly choose one of these paths:
+
+- add a temporary persistence safeguard now, such as a CHECK constraint or transitional uniqueness/index protection
+- waive the safeguard for now and record the accepted gap, why it is acceptable, the owning follow-up slice, and the condition that removes the waiver
+
 When a slice changes schema, constraints, indexes, or EF Core model shape, the prompt must explicitly say whether a committed migration artifact is required. If it is required, name the expected persistence root, the migration artifact to create or update, and the evidence that proves the migration is part of the slice deliverable.
+
+When persisted data can drift outside domain expectations, read-path failure handling must be named explicitly. Treat invalid stored values as a persistence or data-corruption concern, not as an ordinary business-rule validation path, unless the prompt explicitly justifies a different contract.
 
 When the slice depends on provider-specific EF Core behavior, such as SQL Server decimal precision, filtered indexes, collations, computed columns, or constraint translation, the prompt must require verification against the target provider or generated migration output. SQLite-only checks are not sufficient unless the prompt explicitly states that provider parity is out of scope.
 
@@ -275,6 +286,7 @@ Example for a single slice:
 - [ ] Acceptance criteria are observable
 - [ ] Verification evidence is captured
 - [ ] Schema-changing work names the required migration artifact and how it will be verified
+- [ ] Deferred durable invariants are either temporarily safeguarded now or tracked with an explicit owning follow-up slice and risk note
 - [ ] Showcase steps demonstrate business value
 ```
 
@@ -285,6 +297,7 @@ Do not author implementation prompts that:
 - assign all work to one generic agent without role boundaries
 - skip repository context review and invent new patterns unnecessarily
 - use acceptance criteria that cannot be observed, tested, or inspected
+- imply a rule is durably enforced without stating whether it is enforced now, temporarily safeguarded, or deferred to a later slice
 - describe showcase steps only in terms of code internals
 - span multiple unrelated slices in one prompt
 - stop at implementation instructions and omit verification or showcase paths

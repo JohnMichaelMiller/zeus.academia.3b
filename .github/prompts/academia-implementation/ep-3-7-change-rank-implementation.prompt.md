@@ -45,7 +45,7 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RegisterAcademic, ManageRanks
-- Blocking risks: access-level derivation must remain centralized in the aggregate or shared domain code.
+- Blocking risks: access-level derivation must remain centralized in the aggregate or shared domain code. If academics still persist raw rank codes before full rank-reference FK wiring exists, this slice must preserve the explicit read-path failure contract rather than treating corrupt stored values as ordinary business validation.
 - Existing patterns to reuse: valid-rank lookup, aggregate mutation, and event publication when needed for downstream reports.
 
 ## Assigned Agents and Role Boundaries
@@ -61,7 +61,7 @@ mode: agent
 1. Confirm route, identifier, and event expectations.
    Targets: src/features/Academics/ChangeRank/ or equivalent and any domain-event registration.
    Owner: slice-coordinator.
-   Validation before next step: accepted rank source and downstream notification behavior are explicit.
+   Validation before next step: accepted rank source, downstream notification behavior, and the current read-path policy for invalid persisted rank values are explicit.
 2. Implement change-rank behavior.
    Targets: command, validator, handler, endpoint, mappings, and optional RankChanged event.
    Owner: backend-domain.
@@ -76,6 +76,7 @@ mode: agent
 - Only valid rank codes from ManageRanks can be applied.
 - Successful rank changes update the academic's effective access level automatically.
 - Missing academics or invalid rank codes fail cleanly.
+- If corrupted persisted rank values are encountered on read after a change, the failure is treated as a persistence or data-corruption signal rather than normal command validation.
 - Automated tests prove the P, SL, and L mapping still yields INT, NAT, and LOC after changes.
 
 ## Human Showcase Steps
@@ -94,6 +95,7 @@ mode: agent
 - [ ] Valid-rank lookup is enforced.
 - [ ] AccessLevel remains derived, not manually assigned.
 - [ ] Missing-record and invalid-rank cases are tested.
+- [ ] Any existing read-path contract for invalid persisted rank values remains explicit and verified.
 - [ ] Read models reflect the updated rank and access level.
 - [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] Any required event publication is documented or implemented.

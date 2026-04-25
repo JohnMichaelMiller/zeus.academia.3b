@@ -253,6 +253,7 @@ Constraint summary:
   - [ ] Invalid rank codes are rejected.
   - [ ] Rank records are queryable and unique.
   - [ ] Access-level mapping is verified against rank values.
+  - [ ] If academics still persist raw rank codes before rank-reference FK wiring exists, the plan either adds a temporary persistence safeguard for `P`, `SL`, and `L` or records the accepted gap with the owning follow-up slice.
 
 - **ID**: `EP-1-2`
 - **Slice**: `ManageDegrees`
@@ -305,6 +306,7 @@ Constraint summary:
   - [ ] Registration succeeds only with valid reference data and an unassigned extension.
   - [ ] Duplicate `empNr` and invalid payloads fail deterministically.
   - [ ] Created academic can be retrieved immediately by dependent queries.
+  - [ ] Qualification minimum is enforced at creation time here, and the ongoing last-qualification protection remains tracked for the later qualification-maintenance slice.
 
 - **ID**: `EP-3-1`
 - **Slice**: `ViewAcademicProfile`
@@ -474,6 +476,7 @@ Constraint summary:
   - [ ] Removing the last qualification is rejected.
   - [ ] Remaining qualifications stay queryable.
   - [ ] Rule coverage exists at integration level.
+  - [ ] This slice closes the earlier deferred durability note for minimum-one-qualification retention from `RegisterAcademic`.
 
 - **ID**: `EP-4-5`
 - **Slice**: `ListQualifications`

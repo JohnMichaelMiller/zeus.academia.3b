@@ -45,7 +45,7 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RegisterAcademic
-- Blocking risks: filters can become inconsistent with profile and report fields if contracts diverge.
+- Blocking risks: filters can become inconsistent with profile and report fields if contracts diverge. This query should consume rank, access level, and qualification state from the canonical source data, not redefine those rules.
 - Existing patterns to reuse: read-only query projections, paginated endpoints, and deterministic sort behavior.
 
 ## Assigned Agents and Role Boundaries
@@ -76,6 +76,7 @@ mode: agent
 - The list query supports filters for name, rank, access level, employment status, degree, and university.
 - Pagination and sorting are deterministic across repeated calls.
 - Empty-result cases return a valid empty page rather than an error.
+- Rank, access-level, and qualification filters reflect upstream canonical state and do not introduce query-local business-rule reinterpretation.
 - Automated tests cover multiple filter combinations plus paging and sorting behavior.
 
 ## Human Showcase Steps
@@ -94,6 +95,7 @@ mode: agent
 - [ ] Filter contract matches the execution plan.
 - [ ] Pagination and sorting are deterministic.
 - [ ] Empty-result behavior is clean.
+- [ ] Rank, access-level, and qualification filters read from canonical source state rather than owning those invariants.
 - [ ] Tests cover filter, sort, and pagination behavior.
 - [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice remains operational search, not reporting.

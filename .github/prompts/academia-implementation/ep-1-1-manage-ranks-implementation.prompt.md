@@ -47,7 +47,7 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: Shared Kernel
-- Blocking risks: rank code representation may already exist in Shared Kernel; do not create a second source of truth.
+- Blocking risks: rank code representation may already exist in Shared Kernel; do not create a second source of truth. If later slices still persist raw rank codes before full rank-reference FK wiring lands, this slice must either add a temporary database safeguard for `P`, `SL`, and `L` or record the accepted persistence gap explicitly.
 - Existing patterns to reuse: command plus query slice structure, validator beside command, unique reference-data persistence backed by database constraints, and rank-to-access mapping rules.
 
 ## Assigned Agents and Role Boundaries
@@ -63,7 +63,7 @@ mode: agent
 1. Confirm how rank data is stored and exposed.
    Targets: src/features/ReferenceData/ManageRanks/ or current equivalent, persistence root, migration path, and seed data path.
    Owner: slice-coordinator.
-   Validation before next step: one canonical approach is selected for add/list behavior and existing seed data conflicts are resolved.
+   Validation before next step: one canonical approach is selected for add/list behavior, existing seed data conflicts are resolved, and any temporary persistence safeguard needed before later FK wiring is called out explicitly.
 2. Implement add-rank command behavior.
    Targets: AddRank command, validator, handler, response, endpoint, and mapping helpers within the ManageRanks slice folder.
    Owner: backend-domain.
@@ -83,8 +83,10 @@ mode: agent
 - Attempting to add a duplicate rank code fails without creating a second record.
 - Rank-code uniqueness is protected in both application behavior and persistence.
 - If this slice introduces or changes the uniqueness schema, a committed migration artifact exists in the confirmed persistence root.
+- If downstream slices still persist raw rank codes before rank-reference FK wiring exists, the current plan either adds a temporary CHECK constraint for `P`, `SL`, and `L` or records the accepted gap with the owning follow-up slice and reviewer-visible risk.
 - Listing ranks returns the canonical codes in a stable form that downstream slices can resolve.
 - The slice exposes or documents the mapping from rank to access level so registration and reports do not redefine it.
+- Invalid persisted rank codes discovered on read are treated as a persistence or data-corruption signal, not as ordinary user-input validation.
 - Automated tests cover valid add, invalid code, duplicate code, and list-query behavior.
 
 ## Human Showcase Steps
@@ -104,6 +106,7 @@ mode: agent
 - [ ] Rank validation is restricted to P, SL, and L.
 - [ ] Duplicate codes are blocked at the application and persistence levels as appropriate.
 - [ ] Required migration files are present when this slice introduces or changes reference-data uniqueness schema.
+- [ ] Any pre-FK persistence gap for raw rank codes is either temporarily guarded now or tracked explicitly with the owning follow-up slice.
 - [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] List behavior returns stable rank data for downstream slices.
 - [ ] Verification covers add and list success and failure paths.

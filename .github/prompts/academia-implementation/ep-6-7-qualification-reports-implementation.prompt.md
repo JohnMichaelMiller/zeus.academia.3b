@@ -43,7 +43,7 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RecordDegreeObtained
-- Blocking risks: grouped counts must stay in sync after add, update, and remove qualification flows.
+- Blocking risks: grouped counts must stay in sync after add, update, and remove qualification flows. The report must reflect qualification lifecycle state without implying ownership of qualification invariants itself.
 - Existing patterns to reuse: grouped report contracts and read-optimized projections.
 
 ## Assigned Agents and Role Boundaries
@@ -74,6 +74,7 @@ mode: agent
 - Degree-grouped qualification output is accurate.
 - University-grouped qualification output is accurate.
 - Counts remain correct after qualification add, update, and remove flows.
+- Grouped outputs reflect the state produced by qualification command slices and do not redefine duplicate or minimum-retention rules.
 - Automated tests verify grouped counts and listings.
 
 ## Human Showcase Steps
@@ -92,6 +93,7 @@ mode: agent
 - [ ] Degree and university groupings are both implemented.
 - [ ] Grouped counts are accurate.
 - [ ] Mutation effects are reflected.
+- [ ] Report wording and behavior stay observational rather than taking ownership of qualification invariants.
 - [ ] Tests cover grouped counts and listings.
 - [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice remains analytical rather than operational listing.
