@@ -46,14 +46,14 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RegisterAcademic
-- Blocking risks: response shape can drift if derived access level or qualification loading is recomputed inconsistently. This query must reflect invariants owned by upstream command slices and Shared Kernel rules rather than redefining them.
+- Blocking risks: response shape can drift if derived access level or qualification loading is recomputed inconsistently.
 - Existing patterns to reuse: query slice folder, read-only projection, not-found handling, and stable response DTOs.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                 | Responsibilities                                 | Inputs                                       | Outputs                        | Escalate when                                                                                 |
-| -------------------- | ------------------------------------------------ | -------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
-| slice-coordinator    | confirm route and projection shape               | execution plan, current repo tree            | approved query scope           | current academic data model cannot return all required fields without revisiting registration |
+| Role                       | Responsibilities                                 | Inputs                                       | Outputs                        | Escalate when                                                                                 |
+| -------------------------- | ------------------------------------------------ | -------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
+| slice-coordinator          | confirm route and projection shape               | execution plan, current repo tree            | approved query scope           | current academic data model cannot return all required fields without revisiting registration |
 | backend-domain       | implement query, handler, response, and endpoint | registration data model, Shared Kernel types | profile query code path        | qualifications or extension data need a new shared projection strategy                        |
 | testing-verification | verify happy path and not-found behavior         | implemented slice                            | integration tests and evidence | returned profile omits derived or joined data required by the plan                            |
 
@@ -76,8 +76,7 @@ mode: agent
 
 - The profile query returns empNr, name, rank, derived access level, qualifications, extension, and current employment state.
 - Not-found requests return the repo-standard missing-resource behavior.
-- AccessLevel in the response matches the current rank-derived rule owned by Shared Kernel and command-side slices; the query does not recalculate business meaning independently.
-- If corrupted persisted rank values are encountered while materializing the profile, the failure is treated as a persistence or data-corruption signal rather than normal user-input validation.
+- AccessLevel in the response matches the current rank-derived rule.
 - Automated tests cover the happy path and not-found path.
 
 ## Human Showcase Steps
@@ -95,6 +94,6 @@ mode: agent
 
 - [ ] Query scope is read-only.
 - [ ] Response shape includes all required fields.
-- [ ] Derived access level is consistent with rank and is sourced from existing canonical behavior rather than query-local reinterpretation.
+- [ ] Derived access level is consistent with rank.
 - [ ] Not-found behavior is verified.
 - [ ] Verification evidence exists for happy and failure paths.

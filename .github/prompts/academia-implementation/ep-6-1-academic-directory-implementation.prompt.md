@@ -49,10 +49,10 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                 | Responsibilities                                                       | Inputs                                           | Outputs                    | Escalate when                                              |
-| -------------------- | ---------------------------------------------------------------------- | ------------------------------------------------ | -------------------------- | ---------------------------------------------------------- |
-| slice-coordinator    | confirm report route, active-record semantics, and projection strategy | execution plan and current read patterns         | approved report contract   | reporting requires a projection store not yet present      |
-| report-projection    | implement directory query, projection, DTOs, endpoint                  | stable lifecycle data and shared paging patterns | directory report code path | active/inactive semantics are unclear after deregistration |
+| Role                       | Responsibilities                                                       | Inputs                                           | Outputs                    | Escalate when                                              |
+| -------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------ | -------------------------- | ---------------------------------------------------------- |
+| slice-coordinator          | confirm report route, active-record semantics, and projection strategy | execution plan and current read patterns         | approved report contract   | reporting requires a projection store not yet present      |
+| report-projection       | implement directory query, projection, DTOs, endpoint                  | stable lifecycle data and shared paging patterns | directory report code path | active/inactive semantics are unclear after deregistration |
 | testing-verification | verify report completeness and performance on seeded data              | implemented slice                                | tests and evidence         | report output diverges from source-of-truth slice data     |
 
 ## Ordered Implementation Steps

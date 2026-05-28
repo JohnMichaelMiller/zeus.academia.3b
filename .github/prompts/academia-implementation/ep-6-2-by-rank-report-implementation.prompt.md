@@ -44,15 +44,15 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RegisterAcademic, ChangeRank
-- Blocking risks: grouped totals must stay aligned with current rank state after updates. The report must observe canonical rank and access-level state rather than becoming a second owner of derivation logic.
+- Blocking risks: grouped totals must stay aligned with current rank state after updates.
 - Existing patterns to reuse: read-optimized reporting and stable grouped DTOs.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                 | Responsibilities                                              | Inputs                                                  | Outputs                  | Escalate when                                                |
-| -------------------- | ------------------------------------------------------------- | ------------------------------------------------------- | ------------------------ | ------------------------------------------------------------ |
-| slice-coordinator    | confirm grouping output and route shape                       | execution plan and report conventions                   | approved report contract | rank grouping requires a projection strategy not yet chosen  |
-| report-projection    | implement grouped query and response contracts                | current academic rank state and access-level derivation | by-rank report code path | grouped output would duplicate logic already owned elsewhere |
+| Role                       | Responsibilities                                              | Inputs                                                  | Outputs                  | Escalate when                                                |
+| -------------------------- | ------------------------------------------------------------- | ------------------------------------------------------- | ------------------------ | ------------------------------------------------------------ |
+| slice-coordinator          | confirm grouping output and route shape                       | execution plan and report conventions                   | approved report contract | rank grouping requires a projection strategy not yet chosen  |
+| report-projection       | implement grouped query and response contracts                | current academic rank state and access-level derivation | by-rank report code path | grouped output would duplicate logic already owned elsewhere |
 | testing-verification | verify counts, listing accuracy, and reaction to rank changes | implemented slice                                       | tests and evidence       | counts drift after rank changes                              |
 
 ## Ordered Implementation Steps
@@ -74,7 +74,7 @@ mode: agent
 
 - The report groups academics by rank accurately.
 - Returned listings reflect current rank values after changes.
-- Derived access-level context aligns with the current rank mapping owned by Shared Kernel and command-side slices; the report does not redefine that mapping.
+- Derived access-level context aligns with the current rank mapping.
 - Automated tests verify counts and listing accuracy.
 
 ## Human Showcase Steps
@@ -91,7 +91,7 @@ mode: agent
 ## Completion Checklist
 
 - [ ] Grouping logic is accurate.
-- [ ] Derived access-level context is consistent and sourced from canonical domain behavior rather than report-local logic.
+- [ ] Derived access-level context is consistent.
 - [ ] Rank changes are reflected.
 - [ ] Tests cover counts and listings.
 - [ ] Verification evidence exists for the slice's acceptance criteria.

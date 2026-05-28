@@ -48,9 +48,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                 | Responsibilities                                       | Inputs                                        | Outputs                      | Escalate when                                                      |
-| -------------------- | ------------------------------------------------------ | --------------------------------------------- | ---------------------------- | ------------------------------------------------------------------ |
-| slice-coordinator    | confirm route and response shape                       | execution plan and existing extension queries | approved query contract      | current model cannot distinguish provisioned from assigned clearly |
+| Role                       | Responsibilities                                       | Inputs                                        | Outputs                      | Escalate when                                                      |
+| -------------------------- | ------------------------------------------------------ | --------------------------------------------- | ---------------------------- | ------------------------------------------------------------------ |
+| slice-coordinator          | confirm route and response shape                       | execution plan and existing extension queries | approved query contract      | current model cannot distinguish provisioned from assigned clearly |
 | backend-domain       | implement available-extension query, handler, endpoint | extension pool and assignment model           | availability query code path | availability requires a separate projection store                  |
 | testing-verification | verify pool accuracy after assign and release flows    | implemented slice                             | tests and evidence           | query results lag behind current assignment state                  |
 

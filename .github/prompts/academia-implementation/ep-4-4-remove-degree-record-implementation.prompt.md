@@ -44,14 +44,14 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RecordDegreeObtained
-- Blocking risks: removing the last qualification would violate a core academic rule. This slice is the point where the earlier registration-time minimum qualification rule becomes a durable lifecycle guard and should close that explicit deferral.
+- Blocking risks: removing the last qualification would violate a core academic rule.
 - Existing patterns to reuse: qualification identity lookup and invariant-preserving aggregate methods.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                 | Responsibilities                                        | Inputs                                        | Outputs                   | Escalate when                                                                          |
-| -------------------- | ------------------------------------------------------- | --------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| slice-coordinator    | confirm removal route and qualification target strategy | execution plan and qualification model        | approved command contract | qualification identity is ambiguous                                                    |
+| Role                       | Responsibilities                                        | Inputs                                        | Outputs                   | Escalate when                                                                          |
+| -------------------------- | ------------------------------------------------------- | --------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
+| slice-coordinator          | confirm removal route and qualification target strategy | execution plan and qualification model        | approved command contract | qualification identity is ambiguous                                                    |
 | backend-domain       | implement remove command, handler, endpoint             | qualification rules and current storage model | removal code path         | the minimum-one-qualification rule cannot be enforced cleanly in the current aggregate |
 | testing-verification | verify safe removal and last-record rejection           | implemented slice                             | tests and evidence        | the command can remove the final qualification                                         |
 
@@ -68,14 +68,13 @@ mode: agent
 3. Verify invariant preservation.
    Targets: tests for valid removal, missing qualification, and last-qualification rejection.
    Owner: testing-verification.
-   Validation before next step: qualification reads remain consistent after valid removal, and the earlier deferred note from RegisterAcademic is now closed by executable verification.
+   Validation before next step: qualification reads remain consistent after valid removal.
 
 ## Verification and Acceptance Criteria
 
 - Removing a non-final qualification succeeds.
 - Attempting to remove the last remaining qualification fails.
 - Missing qualification targets fail cleanly.
-- This slice closes the earlier deferral by making minimum-one-qualification retention an enforced lifecycle rule, not only a registration-time rule.
 - Qualification queries remain consistent after successful removal.
 
 ## Human Showcase Steps
@@ -94,7 +93,6 @@ mode: agent
 - [ ] Last-qualification protection is enforced.
 - [ ] Valid removals keep the remaining set consistent.
 - [ ] Missing-record behavior is tested.
-- [ ] The earlier RegisterAcademic deferral for ongoing qualification retention is explicitly closed here.
 - [ ] Qualification reads are verified after success.
 - [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice does not overlap with deregistration behavior.

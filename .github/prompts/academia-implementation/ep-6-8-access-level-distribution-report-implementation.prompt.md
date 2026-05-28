@@ -49,10 +49,10 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                 | Responsibilities                                                 | Inputs                                      | Outputs                       | Escalate when                                                   |
-| -------------------- | ---------------------------------------------------------------- | ------------------------------------------- | ----------------------------- | --------------------------------------------------------------- |
-| slice-coordinator    | confirm whether the report is counts-only or counts-plus-details | execution plan and reporting conventions    | approved report contract      | active-academic semantics remain ambiguous after deregistration |
-| report-projection    | implement grouped distribution query and DTOs                    | current academic state and derivation rules | distribution report code path | active-state filtering requires a broader lifecycle redesign    |
+| Role                       | Responsibilities                                                 | Inputs                                      | Outputs                       | Escalate when                                                   |
+| -------------------------- | ---------------------------------------------------------------- | ------------------------------------------- | ----------------------------- | --------------------------------------------------------------- |
+| slice-coordinator          | confirm whether the report is counts-only or counts-plus-details | execution plan and reporting conventions    | approved report contract      | active-academic semantics remain ambiguous after deregistration |
+| report-projection       | implement grouped distribution query and DTOs                    | current academic state and derivation rules | distribution report code path | active-state filtering requires a broader lifecycle redesign    |
 | testing-verification | verify totals, grouping, and post-change updates                 | implemented slice                           | tests and evidence            | totals do not match current active academics                    |
 
 ## Ordered Implementation Steps
