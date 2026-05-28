@@ -1,14 +1,56 @@
 .clockwork.json
 
-# .NET build artifacts
+# ── .NET build artifacts ─────────────────────────────────────────────────────
 **/bin/
 **/obj/
+*.nupkg
+*.snupkg
 
-# VS / IDE
+# publish output
+**/publish/
+**/out/
+
+# Secret overrides – never commit
+**/appsettings.*.json
+!**/appsettings.Development.json
+
+# ── ASP.NET Core ─────────────────────────────────────────────────────────────
+*.pfx
+*.p12
+
+# ── Entity Framework Core migrations snapshot scratch ────────────────────────
+# (keep actual migration files; ignore scaffolding temp output)
+ScaffoldingReadMe.txt
+
+# ── Node / npm / Vite ────────────────────────────────────────────────────────
+node_modules/
+dist/
+.vite/
+*.local
+
+# env files – keep the example, ignore real secrets
+.env
+.env.*
+!.env.example
+
+# ── TypeScript build output ───────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ── Test / coverage output ────────────────────────────────────────────────────
+TestResults/
+coverage/
+*.coveragexml
+*.trx
+
+# ── VS / IDE ──────────────────────────────────────────────────────────────────
 .vs/
 *.user
 *.suo
 .vscode/*.log
+*.DS_Store
+Thumbs.db
 
-# Test results
-TestResults/
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+ehthumbs.db
+Desktop.ini
