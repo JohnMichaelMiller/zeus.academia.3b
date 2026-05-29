@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Zeus.Academia.SharedKernel.Domain.Aggregates;
 using Zeus.Academia.SharedKernel.Domain.Entities;
@@ -10,34 +9,33 @@ namespace Zeus.Academia.SharedKernel.Tests.Persistence;
 
 /// <summary>
 /// Integration tests for EF Core entity configurations.
-/// 
-/// Uses a real SQLite in-memory database (connection kept open per test)
-/// to validate schema shape, unique constraints, and that AccessLevel is
-/// NOT materialised as a column.
+///
+/// Uses SQL Server LocalDB via real migrations so that CHECK constraints,
+/// unique indexes, and column-type precision are enforced by the actual
+/// target database engine. Each test runs against an isolated database that
+/// is deleted on disposal.
 /// </summary>
 public sealed class AcademicConfigurationTests : IDisposable
 {
-    private readonly SqliteConnection _connection;
     private readonly AppDbContext _context;
+    private readonly string _dbName = $"Zeus_Test_{Guid.NewGuid():N}";
 
     public AcademicConfigurationTests()
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _connection.Open();
-
         DbContextOptions<AppDbContext> options =
             new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlite(_connection)
+                .UseSqlServer(
+                    $"Server=(localdb)\\mssqllocaldb;Database={_dbName};Trusted_Connection=True;")
                 .Options;
 
         _context = new AppDbContext(options);
-        _context.Database.EnsureCreated();
+        _context.Database.Migrate(); // runs actual migrations — fails fast if none exist
     }
 
     public void Dispose()
     {
+        _context.Database.EnsureDeleted();
         _context.Dispose();
-        _connection.Dispose();
     }
 
     // ─── Basic insert / schema ────────────────────────────────────────────────
@@ -95,6 +93,21 @@ public sealed class AcademicConfigurationTests : IDisposable
             because: "AccessLevel is derived from Rank and must never be stored");
     }
 
+    // ─── XOR CHECK constraint ──────────────────────────────────────────────────
+
+    [Fact]
+    public async Task Academic_XOR_CheckConstraint_RejectsRowWithBothTenuredAndContractEndDate()
+    {
+        // The DB-level CK_Academics_XOR_IsTenured_ContractEndDate must fire.
+        // Bypass the domain guard by using raw SQL to attempt the invalid insert.
+        Func<Task> act = () => _context.Database.ExecuteSqlRawAsync(
+            "INSERT INTO Academics (EmpNr, EmpName, Rank, IsTenured, ContractEndDate) " +
+            "VALUES ('XOR001', 'XOR Test', 'P', 1, '2030-01-01')");
+
+        await act.Should().ThrowAsync<Exception>(
+            because: "the CHECK constraint CK_Academics_XOR_IsTenured_ContractEndDate must reject a row where both IsTenured and ContractEndDate are non-null");
+    }
+
     // ─── Unique extension constraint ──────────────────────────────────────────
 
     [Fact]
@@ -111,14 +124,15 @@ public sealed class AcademicConfigurationTests : IDisposable
         _context.Academics.Add(first);
         await _context.SaveChangesAsync();
 
-        // Use a SEPARATE context instance on the same connection to defeat EF
-        // relationship fixup: fixup only operates within a single change tracker.
-        DbContextOptions<AppDbContext> sameConnOptions =
+        // Use a SEPARATE context instance (same DB) to defeat EF relationship fixup:
+        // fixup only operates within a single change tracker.
+        DbContextOptions<AppDbContext> sameDbOptions =
             new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlite(_connection)
+                .UseSqlServer(
+                    $"Server=(localdb)\\mssqllocaldb;Database={_dbName};Trusted_Connection=True;")
                 .Options;
 
-        await using AppDbContext ctx2 = new(sameConnOptions);
+        await using AppDbContext ctx2 = new(sameDbOptions);
 
         // Load the same extension in the new context
         Extension sameExt = (await ctx2.Extensions.FindAsync(1001m))!;

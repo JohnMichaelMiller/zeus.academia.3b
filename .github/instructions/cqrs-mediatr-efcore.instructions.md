@@ -31,12 +31,12 @@ Implementation rules for Command Query Responsibility Segregation pattern using 
 
 ### Structure
 
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| Command | Immutable DTO with intent | `Commands/<Aggregate>/<Name>Command.cs` |
-| Handler | Validates → executes → persists | `Commands/<Aggregate>/<Name>CommandHandler.cs` |
-| Validator | FluentValidation rules | `Commands/<Aggregate>/<Name>CommandValidator.cs` |
-| Result | Success/failure outcome | Return `Unit`, `Result<T>`, or custom type |
+| Component | Purpose                         | Location                                         |
+| --------- | ------------------------------- | ------------------------------------------------ |
+| Command   | Immutable DTO with intent       | `Commands/<Aggregate>/<Name>Command.cs`          |
+| Handler   | Validates → executes → persists | `Commands/<Aggregate>/<Name>CommandHandler.cs`   |
+| Validator | FluentValidation rules          | `Commands/<Aggregate>/<Name>CommandValidator.cs` |
+| Result    | Success/failure outcome         | Return `Unit`, `Result<T>`, or custom type       |
 
 ### Rules
 
@@ -58,24 +58,24 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
 {
     private readonly AppDbContext _context;
     private readonly IValidator<CreateOrderCommand> _validator;
-    
+
     public async Task<Result<Guid>> Handle(CreateOrderCommand cmd, CancellationToken ct)
     {
         // 1. Validate
         var validationResult = await _validator.ValidateAsync(cmd, ct);
-        if (!validationResult.IsValid) 
+        if (!validationResult.IsValid)
             return Result<Guid>.Failure(validationResult.Errors);
-        
+
         // 2. Execute domain logic
         var order = Order.Create(cmd.CustomerId, cmd.Items);
-        
+
         // 3. Persist
         _context.Orders.Add(order);
         await _context.SaveChangesAsync(ct);
-        
+
         // 4. Publish events (if using domain events)
         // await _mediator.DispatchDomainEventsAsync(order, ct);
-        
+
         return Result<Guid>.Success(order.Id);
     }
 }
@@ -95,11 +95,11 @@ public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
 
 ### Structure
 
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| Query | Criteria for retrieval | `Queries/<Context>/<Name>Query.cs` |
-| Handler | Reads from DB/read model | `Queries/<Context>/<Name>QueryHandler.cs` |
-| DTO | Response data shape | `Models/Queries/<Name>Dto.cs` |
+| Component | Purpose                  | Location                                  |
+| --------- | ------------------------ | ----------------------------------------- |
+| Query     | Criteria for retrieval   | `Queries/<Context>/<Name>Query.cs`        |
+| Handler   | Reads from DB/read model | `Queries/<Context>/<Name>QueryHandler.cs` |
+| DTO       | Response data shape      | `Models/Queries/<Name>Dto.cs`             |
 
 ### Rules
 
@@ -120,7 +120,7 @@ public record GetOrderByIdQuery(Guid OrderId) : IRequest<OrderDto?>;
 public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, OrderDto?>
 {
     private readonly AppDbContext _context;
-    
+
     public async Task<OrderDto?> Handle(GetOrderByIdQuery query, CancellationToken ct)
     {
         return await _context.Orders
@@ -204,21 +204,21 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
     where TRequest : IRequest<TResponse>
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
-    
+
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
     {
         if (!_validators.Any()) return await next();
-        
+
         var context = new ValidationContext<TRequest>(request);
         var failures = _validators
             .Select(v => v.Validate(context))
             .SelectMany(r => r.Errors)
             .Where(f => f != null)
             .ToList();
-            
+
         if (failures.Any())
             throw new ValidationException(failures);
-            
+
         return await next();
     }
 }
@@ -251,7 +251,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Guid>
 {
     private readonly AppDbContext _context;
-    
+
     public async Task<Guid> Handle(CreateOrderCommand cmd, CancellationToken ct)
     {
         var order = Order.Create(cmd.CustomerId);
@@ -267,6 +267,26 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
 - Commands: Default tracking enabled
 - Queries: Use `.AsNoTracking()`
 - Updates: Load entity, modify properties, `SaveChangesAsync()`
+
+### Migrations
+
+- Every slice that introduces or modifies a schema **MUST** produce a migration artifact (`dotnet ef migrations add <Name> --project <PersistenceProject>`).
+- Migration files are committed as part of the slice diff — a PR with EF Core model changes and no migration is incomplete.
+- Use `Database.Migrate()` (not `EnsureCreated()`) in persistence tests so that missing or broken migrations cause an immediate test failure.
+
+### Length and Precision Constants
+
+- Domain value object constants (`MaxCodeLength`, `RequiredLength`, `Precision`, etc.) are the **single source of truth** for size constraints.
+- EF Core `IEntityTypeConfiguration` MUST reference these constants in `HasMaxLength`, `HasPrecision`, and similar fluent calls — never hard-code raw literals.
+- Shadow foreign key columns that mirror a typed value object (e.g., a decimal FK derived from `Extension.ExtNr`) require an explicit `HasPrecision` / `HasColumnType` annotation matching the target provider; EF Core inference is not reliable for provider-sensitive types.
+
+```csharp
+// WRONG — duplicates the constraint as a magic literal
+builder.Property(x => x.DegreeCode).HasMaxLength(10);
+
+// CORRECT — single source of truth
+builder.Property(x => x.DegreeCode).HasMaxLength(Degree.MaxCodeLength);
+```
 
 ## Cross-Cutting Concerns
 
@@ -302,7 +322,7 @@ public class Result<T>
     public bool IsSuccess { get; }
     public T Value { get; }
     public string Error { get; }
-    
+
     public static Result<T> Success(T value) => new(true, value, string.Empty);
     public static Result<T> Failure(string error) => new(false, default!, error);
 }
@@ -316,7 +336,7 @@ Use `LoggingBehavior<TRequest, TResponse>` in pipeline:
 public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
 {
     private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
-    
+
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
     {
         _logger.LogInformation("Handling {RequestName}", typeof(TRequest).Name);
@@ -342,14 +362,14 @@ services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 ## Anti-Patterns
 
-| ❌ DON'T | ✅ DO |
-|----------|-------|
-| Return domain entities from queries | Return DTOs mapped from entities |
-| Modify state in query handlers | Use `.AsNoTracking()` and read-only logic |
-| Return business data from commands | Return only operation result (ID, success) |
-| Share models between commands/queries | Separate write models and read DTOs |
-| Cross-aggregate transactions in single command | Use domain events + eventual consistency |
-| Inject `IMediator` into domain entities | Keep domain pure, use from handlers |
+| ❌ DON'T                                       | ✅ DO                                      |
+| ---------------------------------------------- | ------------------------------------------ |
+| Return domain entities from queries            | Return DTOs mapped from entities           |
+| Modify state in query handlers                 | Use `.AsNoTracking()` and read-only logic  |
+| Return business data from commands             | Return only operation result (ID, success) |
+| Share models between commands/queries          | Separate write models and read DTOs        |
+| Cross-aggregate transactions in single command | Use domain events + eventual consistency   |
+| Inject `IMediator` into domain entities        | Keep domain pure, use from handlers        |
 
 ## Testing
 
@@ -363,10 +383,10 @@ public async Task Handle_ValidCommand_CreatesOrder()
     var context = CreateInMemoryContext();
     var handler = new CreateOrderCommandHandler(context);
     var command = new CreateOrderCommand(Guid.NewGuid(), new List<OrderItemDto>());
-    
+
     // Act
     var result = await handler.Handle(command, CancellationToken.None);
-    
+
     // Assert
     Assert.True(result.IsSuccess);
     Assert.Single(context.Orders);
@@ -384,13 +404,13 @@ public async Task Handle_ExistingOrder_ReturnsDto()
     var order = Order.Create(Guid.NewGuid());
     context.Orders.Add(order);
     await context.SaveChangesAsync();
-    
+
     var handler = new GetOrderByIdQueryHandler(context);
     var query = new GetOrderByIdQuery(order.Id);
-    
+
     // Act
     var result = await handler.Handle(query, CancellationToken.None);
-    
+
     // Assert
     Assert.NotNull(result);
     Assert.Equal(order.Id, result.Id);
@@ -406,11 +426,11 @@ public async Task CommandToQuery_FullFlow_WorksEndToEnd()
     // Arrange: Create via command
     var createCmd = new CreateOrderCommand(customerId, items);
     var orderId = await _mediator.Send(createCmd);
-    
+
     // Act: Retrieve via query
     var query = new GetOrderByIdQuery(orderId);
     var dto = await _mediator.Send(query);
-    
+
     // Assert
     Assert.NotNull(dto);
     Assert.Equal(customerId, dto.CustomerId);

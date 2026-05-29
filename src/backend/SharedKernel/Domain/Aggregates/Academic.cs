@@ -2,12 +2,13 @@ using Zeus.Academia.SharedKernel.Domain.Entities;
 using Zeus.Academia.SharedKernel.Domain.Exceptions;
 using Zeus.Academia.SharedKernel.Domain.Primitives;
 using Zeus.Academia.SharedKernel.Domain.ValueObjects;
+using EmpNrVO = Zeus.Academia.SharedKernel.Domain.ValueObjects.EmpNr;
 
 namespace Zeus.Academia.SharedKernel.Domain.Aggregates;
 
 /// <summary>
 /// Academic aggregate root.
-/// 
+///
 /// Invariants enforced in code (and backed by database constraints):
 /// 1. EmpNr is exactly 6 characters.
 /// 2. EmpName is at most 15 characters.
@@ -41,10 +42,10 @@ public sealed class Academic : AggregateRoot
     /// </summary>
     public AccessLevel AccessLevel => Rank switch
     {
-        Rank.P  => AccessLevel.INT,
+        Rank.P => AccessLevel.INT,
         Rank.SL => AccessLevel.NAT,
-        Rank.L  => AccessLevel.LOC,
-        _       => throw new InvalidOperationException($"Unknown rank value: {Rank}.")
+        Rank.L => AccessLevel.LOC,
+        _ => throw new InvalidOperationException($"Unknown rank value: {Rank}.")
     };
 
     // ─── Employment status (XOR) ─────────────────────────────────────────────
@@ -71,6 +72,11 @@ public sealed class Academic : AggregateRoot
     /// <summary>Degrees obtained by this Academic (at least one required by business rules).</summary>
     public IReadOnlyList<AcademicQualification> Qualifications => _qualifications;
 
+    // ─── Domain constants ──────────────────────────────────────────────────────
+
+    /// <summary>Maximum length for an employee name. Single source of truth used by the factory and EF Core mapping.</summary>
+    public const int EmpNameMaxLength = 15;
+
     // ─── Factory ──────────────────────────────────────────────────────────────
 
     /// <summary>
@@ -88,21 +94,21 @@ public sealed class Academic : AggregateRoot
         ArgumentNullException.ThrowIfNull(empNr);
         ArgumentNullException.ThrowIfNull(empName);
 
-        if (empNr.Length != 6)
+        if (empNr.Length != EmpNrVO.RequiredLength)
             throw new ArgumentException(
-                $"EmpNr must be exactly 6 characters (received '{empNr}', length {empNr.Length}).",
+                $"EmpNr must be exactly {EmpNrVO.RequiredLength} characters (received '{empNr}', length {empNr.Length}).",
                 nameof(empNr));
 
-        if (empName.Length > 15)
+        if (empName.Length > EmpNameMaxLength)
             throw new ArgumentException(
-                $"EmpName must not exceed 15 characters (received length {empName.Length}).",
+                $"EmpName must not exceed {EmpNameMaxLength} characters (received length {empName.Length}).",
                 nameof(empName));
 
         return new Academic
         {
-            EmpNr   = empNr,
+            EmpNr = empNr,
             EmpName = empName,
-            Rank    = rank
+            Rank = rank
         };
     }
 
@@ -172,9 +178,9 @@ public sealed class Academic : AggregateRoot
 
         RaiseDomainEvent(new Events.RankChangedEvent
         {
-            EmpNr        = EmpNr,
+            EmpNr = EmpNr,
             PreviousRank = previousRank,
-            NewRank      = newRank
+            NewRank = newRank
         });
     }
 

@@ -385,6 +385,8 @@ Before committing C# code:
 - [ ] No `.Result`, `.Wait()`, or blocking async calls
 - [ ] Expression-bodied members used for simple cases
 - [ ] Records used for immutable data, classes for entities
+- [ ] Factory methods validate all persisted constraints (max-lengths, required fields) against value object constants, not inline literals
+- [ ] Domain value object constants (`MaxCodeLength`, `RequiredLength`, etc.) are used in both factory validation and EF Core configuration — never duplicated as raw literals
 
 ## Integration
 
