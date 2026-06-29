@@ -93,4 +93,5 @@ mode: agent
 - [ ] Assigned and released transitions are reflected.
 - [ ] Empty-result behavior is verified.
 - [ ] Tests cover state changes across lifecycle commands.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice remains query-only.

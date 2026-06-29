@@ -49,9 +49,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                                                | Inputs                                      | Outputs                             | Escalate when                                                                    |
-| -------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------- |
-| slice-coordinator          | confirm route shape and current-assignment query scope                          | execution plan and existing extension model | approved command and query contract | current persistence model cannot express 1:1 uniqueness cleanly                  |
+| Role                 | Responsibilities                                                                | Inputs                                      | Outputs                             | Escalate when                                                                    |
+| -------------------- | ------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm route shape and current-assignment query scope                          | execution plan and existing extension model | approved command and query contract | current persistence model cannot express 1:1 uniqueness cleanly                  |
 | backend-domain       | implement assignment command, current-assignment query, handlers, and endpoints | extension pool model and academic model     | extension-assignment code path      | safe uniqueness requires a schema change beyond the planned constraint           |
 | testing-verification | verify success, duplicate use, and concurrency-sensitive cases                  | implemented slice                           | tests and evidence                  | handler-level checks pass but DB uniqueness still allows conflicting assignments |
 
@@ -70,7 +70,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: consumers can inspect the academic's current extension after assignment.
 4. Verify uniqueness behavior.
-   Targets: integration tests for valid assignment, already-assigned extension, conflicting academic state, and DB constraint alignment.
+   Targets: integration tests for valid assignment, already-assigned extension, conflicting academic state, DB constraint alignment, and proof that the existing committed migration artifact still backs 1:1 uniqueness or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: no extension can be assigned to more than one academic.
 
@@ -98,4 +98,6 @@ mode: agent
 - [ ] 1:1 uniqueness is protected in code and persistence.
 - [ ] Current-assignment visibility is available after success.
 - [ ] Conflict and concurrency-sensitive cases are tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
+- [ ] Verification ties the 1:1 uniqueness rule to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice does not absorb reassignment or release behavior.

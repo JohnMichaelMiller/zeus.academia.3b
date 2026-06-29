@@ -94,4 +94,5 @@ mode: agent
 - [ ] Rank changes update the distribution.
 - [ ] Deregistration effects are reflected.
 - [ ] Tests cover grouped totals.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice remains a compact analytical report.

@@ -94,4 +94,5 @@ mode: agent
 - [ ] Custom thresholds are supported.
 - [ ] Boundary-date handling is tested.
 - [ ] Results match current contract data.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The report stays focused on expiring-window analysis.

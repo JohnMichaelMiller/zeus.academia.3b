@@ -94,4 +94,5 @@ mode: agent
 - [ ] Qualification summaries are present.
 - [ ] Conversion and clear-state transitions are reflected.
 - [ ] Tests cover employment transition effects.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The report remains focused on tenured academics only.

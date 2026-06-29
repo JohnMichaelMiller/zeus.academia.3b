@@ -325,10 +325,15 @@ public sealed class StudentEndpointsTests
 
 ### Testing with Test Database
 
+**MUST NOT** use `UseInMemoryDatabase` (EF Core in-memory provider) or `UseSqlite` with an in-memory connection for persistence configuration tests.
+Both providers skip CHECK constraint enforcement and bypass migration execution, making them unsuitable for validating EF Core mappings against the target schema.
+
+Use SQL Server LocalDB for local runs; use a Testcontainers SQL Server image for CI environments without LocalDB.
+Call `Database.Migrate()` (not `EnsureCreated()`) so that a missing or broken migration causes an immediate test failure.
+
 ```csharp
 // tests/IntegrationTests/Fixtures/TestDatabaseFixture.cs
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Zeus.Academia.Infrastructure.Persistence;
 
 namespace Zeus.Academia.IntegrationTests.Fixtures;
@@ -337,19 +342,17 @@ public sealed class TestDatabaseFixture : IDisposable
 {
     public AcademiaDbContext DbContext { get; }
 
+    private readonly string _dbName = $"Zeus_Test_{Guid.NewGuid():N}";
+
     public TestDatabaseFixture()
     {
-        var serviceProvider = new ServiceCollection()
-            .AddEntityFrameworkInMemoryDatabase()
-            .BuildServiceProvider();
-
         var options = new DbContextOptionsBuilder<AcademiaDbContext>()
-            .UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}")
-            .UseInternalServiceProvider(serviceProvider)
+            .UseSqlServer(
+                $"Server=(localdb)\\mssqllocaldb;Database={_dbName};Trusted_Connection=True;")
             .Options;
 
         DbContext = new AcademiaDbContext(options);
-        DbContext.Database.EnsureCreated();
+        DbContext.Database.Migrate(); // runs migrations — fails fast if none exist
     }
 
     public void Dispose()

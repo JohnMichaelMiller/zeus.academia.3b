@@ -155,6 +155,12 @@ The criteria must cover:
 - integration points affected
 - user-visible outcome or business rule satisfied
 
+Require the generated instruction file to state the intended enforcement layers for every non-trivial business rule. Prompts should explicitly identify whether a rule is enforced in the aggregate, validator, handler, database constraint, or a combination of these.
+
+Require a short enforcement matrix whenever a slice includes durable invariants or schema-backed rules.
+
+Require the generated instruction file to distinguish mapping-only persistence work from schema-changing persistence work. When schema changes are part of the slice, the instruction file must require a committed migration artifact, its expected persistence root, and the evidence that proves it was created.
+
 Require criteria to be written as observable outcomes, not intentions. Include examples of acceptable phrasing such as "Submitting an invalid enrollment request returns validation errors and does not persist data."
 
 ### 7. Verification Workflow
@@ -165,6 +171,10 @@ Require the instruction file to define a verification section for implementation
 - human review checks
 - commands, tests, or inspection steps when available
 - evidence to capture for completed work
+
+Require schema or migration evidence whenever the prompt claims database-backed constraints or persistence foundations. State explicitly that unit tests alone do not prove a durable persistence rule.
+
+Require the generated instruction file to state explicitly that `EnsureCreated()` and mapping tests do not replace a committed migration artifact when the slice changes schema, constraints, indexes, or EF Core model shape.
 
 Distinguish between "implemented" and "verified" so prompts do not stop at code generation.
 

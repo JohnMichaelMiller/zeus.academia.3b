@@ -94,4 +94,5 @@ mode: agent
 - [ ] Derived access-level context is consistent.
 - [ ] Rank changes are reflected.
 - [ ] Tests cover counts and listings.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The report remains distinct from pure access-level analytics.

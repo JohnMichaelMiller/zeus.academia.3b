@@ -51,7 +51,7 @@ Constraint summary:
 - Phase 1 contains every independent reference-data slice that can be built in parallel.
 - `RegisterAcademic` is the first sequential gate and must complete before any dependent slice starts.
 - Report slices stay after the command/query slices that create or mutate their source data.
-- Database constraints back up handler guards for `empNr`, extension assignment uniqueness, and qualification uniqueness.
+- Database constraints back up handler guards for `empNr`, extension assignment uniqueness, qualification uniqueness, and any persistence-level invariant that must survive direct writes or concurrency.
 - Each phase ends with passing automated tests, validator coverage for business rules, and API-level verification where endpoints exist.
 - No new slices are introduced beyond the implementation plan.
 
@@ -70,16 +70,17 @@ Constraint summary:
 - `Academic` aggregate with employment-state guards
 - `Rank`, `AccessLevel`, `Degree`, `University`, and `Extension` value objects
 - `AcademicQualification`, `Result<T>`, `Error`, domain event interfaces, and common exceptions
-- EF Core mappings, base migration, and unique constraints for `empNr` and extension assignment
+- EF Core mappings, base migration, unique constraints for `empNr` and extension assignment, and a CHECK constraint for the employment XOR invariant
 
 **Acceptance criteria:**
 
-- [ ] ExclusiveOr employment rule enforced in the aggregate
+- [ ] ExclusiveOr employment rule enforced in the aggregate and backed by a database constraint
 - [ ] AccessLevel derived from Rank only
 - [ ] Shared Kernel types compile with nullable reference types enabled
-- [ ] Foundational unit tests pass for guards, derivation, and result handling
+- [ ] Foundational unit, persistence, and migration checks pass for guards, derivation, and result handling
+- [ ] A committed migration artifact exists for the Shared Kernel schema changes
 
-**Test strategy:** unit tests for aggregate invariants, mapping tests for persistence, and migration validation for required constraints.
+**Test strategy:** unit tests for aggregate invariants, mapping tests for persistence, migration validation for required constraints, confirmation that the migration artifact is present in the diff, and at least one verification step that proves the schema rejects impossible employment state.
 
 ### Phase 1
 
@@ -231,10 +232,13 @@ Constraint summary:
   - Create aggregate and value-object types used across the domain.
   - Encode employment guards and rank-to-access-level derivation.
   - Add domain events, result wrappers, and common exceptions.
-  - Configure EF Core mappings and foundational constraints.
+  - Configure EF Core mappings and foundational constraints, including any required CHECK constraints for durable invariants.
+  - Produce the committed migration artifact needed to carry those schema changes.
 - **Definition of done**:
   - [ ] Aggregate invariants are enforced in code and covered by tests.
-  - [ ] Database constraints exist for core uniqueness rules.
+  - [ ] Database constraints exist for core uniqueness rules and persistence-level invariants such as employment XOR.
+  - [ ] Required migration files are created or updated in the confirmed persistence root and included in the diff.
+  - [ ] Migration validation proves the database can be created or updated through the migration path, not only through `EnsureCreated()`.
   - [ ] Shared Kernel builds cleanly and is reusable by all slices.
 
 - **ID**: `EP-1-1`
@@ -249,6 +253,7 @@ Constraint summary:
   - [ ] Invalid rank codes are rejected.
   - [ ] Rank records are queryable and unique.
   - [ ] Access-level mapping is verified against rank values.
+  - [ ] If academics still persist raw rank codes before rank-reference FK wiring exists, the plan either adds a temporary persistence safeguard for `P`, `SL`, and `L` or records the accepted gap with the owning follow-up slice.
 
 - **ID**: `EP-1-2`
 - **Slice**: `ManageDegrees`
@@ -301,6 +306,7 @@ Constraint summary:
   - [ ] Registration succeeds only with valid reference data and an unassigned extension.
   - [ ] Duplicate `empNr` and invalid payloads fail deterministically.
   - [ ] Created academic can be retrieved immediately by dependent queries.
+  - [ ] Qualification minimum is enforced at creation time here, and the ongoing last-qualification protection remains tracked for the later qualification-maintenance slice.
 
 - **ID**: `EP-3-1`
 - **Slice**: `ViewAcademicProfile`
@@ -470,6 +476,7 @@ Constraint summary:
   - [ ] Removing the last qualification is rejected.
   - [ ] Remaining qualifications stay queryable.
   - [ ] Rule coverage exists at integration level.
+  - [ ] This slice closes the earlier deferred durability note for minimum-one-qualification retention from `RegisterAcademic`.
 
 - **ID**: `EP-4-5`
 - **Slice**: `ListQualifications`

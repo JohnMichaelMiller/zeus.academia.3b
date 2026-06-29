@@ -95,4 +95,5 @@ mode: agent
 - [ ] Pagination and sorting are deterministic.
 - [ ] Empty-result behavior is clean.
 - [ ] Tests cover filter, sort, and pagination behavior.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice remains operational search, not reporting.

@@ -45,13 +45,13 @@ mode: agent
 
 - Required prior slices: RecordDegreeObtained
 - Blocking risks: updates must target an existing qualification record and preserve the one-university-per-academic-degree rule.
-- Existing patterns to reuse: qualification reference lookups and deterministic missing-record handling.
+- Existing patterns to reuse: qualification reference lookups, deterministic missing-record handling, and duplicate protection aligned between code and persistence.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                         | Inputs                                            | Outputs                     | Escalate when                                                           |
-| -------------------------- | -------------------------------------------------------- | ------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------- |
-| slice-coordinator          | confirm qualification identifier strategy and route      | execution plan and current qualification model    | approved command contract   | qualification records are not uniquely addressable in the current model |
+| Role                 | Responsibilities                                         | Inputs                                            | Outputs                     | Escalate when                                                           |
+| -------------------- | -------------------------------------------------------- | ------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------- |
+| slice-coordinator    | confirm qualification identifier strategy and route      | execution plan and current qualification model    | approved command contract   | qualification records are not uniquely addressable in the current model |
 | backend-domain       | implement update command, validator, handler, endpoint   | qualification model and university reference data | university-update code path | update semantics would break the academic-degree uniqueness rule        |
 | testing-verification | verify existing-record update and missing-record failure | implemented slice                                 | tests and evidence          | updates create new rows instead of modifying the intended record        |
 
@@ -64,9 +64,9 @@ mode: agent
 2. Implement update behavior.
    Targets: command, validator, handler, endpoint.
    Owner: backend-domain.
-   Validation before next step: only existing qualification records are updated and new university references are valid.
+   Validation before next step: only existing qualification records are updated, new university references are valid, and any persisted qualification identifier or code-length rules are enforced before persistence through shared canonical definitions.
 3. Verify update behavior.
-   Targets: tests for successful update, missing qualification, invalid university, and read-model visibility.
+   Targets: tests for successful update, missing qualification, invalid university, read-model visibility, and proof that the existing committed migration artifact still backs qualification uniqueness or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: the updated university is visible and no duplicate qualification is created.
 
@@ -76,6 +76,8 @@ mode: agent
 - Missing qualification targets fail cleanly.
 - Invalid university references are rejected.
 - Qualification reads reflect the updated university after success.
+- Updating a qualification does not create or permit duplicate Academic+Degree state in persistence.
+- Qualification identity, code length, and normalization rules are defined once for reuse across domain validation and EF Core mapping.
 
 ## Human Showcase Steps
 
@@ -92,6 +94,11 @@ mode: agent
 
 - [ ] Existing-record targeting is explicit.
 - [ ] University references are validated.
+- [ ] Shared qualification type mutability is intentional and documented in review notes (immutable-by-default unless lifecycle mutation is required).
+- [ ] Qualification identifier, length, and normalization rules are enforced before persistence using shared constants or a single canonical definition reused by EF Core mappings.
 - [ ] Updated data is visible after success.
 - [ ] Missing-record and invalid-reference paths are tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
+- [ ] Target-provider mappings for qualification keys and related foreign keys are explicit enough to keep generated migrations valid.
+- [ ] Verification ties qualification uniqueness to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice stays focused on updates only.

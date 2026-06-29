@@ -49,9 +49,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                 | Inputs                                          | Outputs                   | Escalate when                                                         |
-| -------------------------- | ------------------------------------------------ | ----------------------------------------------- | ------------------------- | --------------------------------------------------------------------- |
-| slice-coordinator          | confirm transaction boundary and route           | execution plan and existing extension flows     | approved command contract | persistence cannot guarantee atomic transition with the current model |
+| Role                 | Responsibilities                                 | Inputs                                          | Outputs                   | Escalate when                                                         |
+| -------------------- | ------------------------------------------------ | ----------------------------------------------- | ------------------------- | --------------------------------------------------------------------- |
+| slice-coordinator    | confirm transaction boundary and route           | execution plan and existing extension flows     | approved command contract | persistence cannot guarantee atomic transition with the current model |
 | backend-domain       | implement reassign command, handler, endpoint    | extension assignment model and uniqueness rules | reassignment code path    | atomicity requires broader infrastructure changes                     |
 | testing-verification | verify valid reassignments and rollback behavior | implemented slice                               | tests and evidence        | partial updates survive after a failed reassignment                   |
 
@@ -66,7 +66,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: source extension is released only when the target assignment can succeed.
 3. Verify atomic behavior.
-   Targets: tests for valid reassign, invalid target, and rollback on failure.
+   Targets: tests for valid reassign, invalid target, rollback on failure, and proof that the existing committed migration artifact still backs preserved 1:1 uniqueness or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: 1:1 uniqueness remains intact after success and failure.
 
@@ -76,6 +76,7 @@ mode: agent
 - Reassigning to an unavailable target extension fails cleanly.
 - Failed reassignment attempts leave the original assignment intact.
 - Automated tests prove atomicity and preserved uniqueness.
+- The 1:1 uniqueness rule remains protected in persistence throughout successful and failed transitions.
 
 ## Human Showcase Steps
 
@@ -94,4 +95,6 @@ mode: agent
 - [ ] Original assignments survive failed attempts.
 - [ ] Uniqueness remains intact.
 - [ ] Rollback behavior is tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
+- [ ] Verification ties preserved 1:1 uniqueness to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice stays distinct from initial assignment and pure release.

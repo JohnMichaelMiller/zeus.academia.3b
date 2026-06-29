@@ -93,4 +93,5 @@ mode: agent
 - [ ] Grouped counts are accurate.
 - [ ] Mutation effects are reflected.
 - [ ] Tests cover grouped counts and listings.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice remains analytical rather than operational listing.

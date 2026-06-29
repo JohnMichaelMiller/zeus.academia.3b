@@ -96,4 +96,4 @@ mode: agent
 - [ ] Response shape includes all required fields.
 - [ ] Derived access level is consistent with rank.
 - [ ] Not-found behavior is verified.
-- [ ] Tests provide evidence for happy and failure paths.
+- [ ] Verification evidence exists for happy and failure paths.

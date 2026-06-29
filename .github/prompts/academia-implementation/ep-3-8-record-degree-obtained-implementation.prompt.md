@@ -44,14 +44,14 @@ mode: agent
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RegisterAcademic, ManageDegrees, ManageUniversities
-- Blocking risks: duplicate Academic+Degree pairs must be rejected consistently in both code and persistence where practical.
-- Existing patterns to reuse: qualification persistence shape established by registration and reference-data lookup flows.
+- Blocking risks: duplicate Academic+Degree pairs must be rejected consistently in both code and persistence where practical. This slice adds qualifications but does not close the separate last-qualification-removal invariant, which stays explicitly owned by the later removal slice.
+- Existing patterns to reuse: qualification persistence shape established by registration, reference-data lookup flows, and duplicate protection aligned between code and persistence.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                               | Inputs                                        | Outputs                     | Escalate when                                                                |
-| -------------------------- | -------------------------------------------------------------- | --------------------------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
-| slice-coordinator          | confirm qualification storage and identifier strategy          | execution plan and current persistence model  | approved slice targets      | registration stored qualifications in a way this slice cannot extend cleanly |
+| Role                 | Responsibilities                                               | Inputs                                        | Outputs                     | Escalate when                                                                |
+| -------------------- | -------------------------------------------------------------- | --------------------------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
+| slice-coordinator    | confirm qualification storage and identifier strategy          | execution plan and current persistence model  | approved slice targets      | registration stored qualifications in a way this slice cannot extend cleanly |
 | backend-domain       | implement command, validator, handler, endpoint                | qualification rules and reference-data slices | qualification-add code path | duplicate-detection logic requires a broader data redesign                   |
 | testing-verification | verify happy path, invalid references, and duplicate rejection | implemented slice                             | tests and evidence          | duplicate degree records slip through under realistic data                   |
 
@@ -66,7 +66,7 @@ mode: agent
    Owner: backend-domain.
    Validation before next step: valid references persist a new qualification and duplicate Academic+Degree pairs are blocked.
 3. Verify qualification behavior.
-   Targets: tests for happy path, invalid degree or university, duplicate degree pair, and follow-up read checks.
+   Targets: tests for happy path, invalid degree or university, duplicate degree pair, follow-up read checks, and proof that the existing committed migration artifact still backs duplicate Academic+Degree protection or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: the slice leaves the qualification set consistent and queryable.
 
@@ -75,6 +75,8 @@ mode: agent
 - A valid new qualification is added for an existing academic.
 - Invalid degree or university references are rejected.
 - A duplicate Academic+Degree pair is rejected even if the university differs.
+- Duplicate Academic+Degree protection is aligned between application behavior and persistence.
+- This slice increases the qualification set only; the ongoing minimum-one-qualification retention rule remains explicitly tracked for the later removal slice.
 - Qualification queries or profile reads show the new qualification after success.
 
 ## Human Showcase Steps
@@ -94,4 +96,7 @@ mode: agent
 - [ ] Duplicate Academic+Degree pairs are blocked.
 - [ ] Qualification visibility is verified after success.
 - [ ] Failure paths are tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
+- [ ] Verification ties duplicate Academic+Degree protection to the existing committed migration artifact or a new one when this slice changes schema.
+- [ ] The prompt keeps last-qualification protection explicitly deferred to the removal slice instead of implying this add-only slice fully owns that lifecycle invariant.
 - [ ] The slice stays focused on adding, not editing or removing, qualifications.

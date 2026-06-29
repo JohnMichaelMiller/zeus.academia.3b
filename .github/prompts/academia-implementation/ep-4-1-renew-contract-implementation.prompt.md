@@ -45,13 +45,13 @@ mode: agent
 
 - Required prior slices: AssignContract
 - Blocking risks: renewals must fail for academics who are not currently contracted.
-- Existing patterns to reuse: future-date validation, aggregate employment guards, and profile verification.
+- Existing patterns to reuse: future-date validation, aggregate employment guards, persistence-backed employment invariants, and profile verification.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                      | Inputs                                           | Outputs                   | Escalate when                                                                   |
-| -------------------------- | ----------------------------------------------------- | ------------------------------------------------ | ------------------------- | ------------------------------------------------------------------------------- |
-| slice-coordinator          | confirm route and current contract-state precondition | execution plan and employment slices             | approved command contract | current employment state model cannot distinguish contracted academics reliably |
+| Role                 | Responsibilities                                      | Inputs                                           | Outputs                   | Escalate when                                                                   |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------------ | ------------------------- | ------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm route and current contract-state precondition | execution plan and employment slices             | approved command contract | current employment state model cannot distinguish contracted academics reliably |
 | backend-domain       | implement renew command, validator, handler, endpoint | AssignContract semantics and Shared Kernel rules | renewal code path         | renewal requires a broader employment redesign                                  |
 | testing-verification | verify contracted-only and future-date behavior       | implemented slice                                | tests and evidence        | a renewal succeeds without an existing contract                                 |
 
@@ -64,9 +64,9 @@ mode: agent
 2. Implement renewal behavior.
    Targets: command, validator, handler, endpoint.
    Owner: backend-domain.
-   Validation before next step: only currently contracted academics can receive a new future end date.
+   Validation before next step: only currently contracted academics can receive a new future end date, date normalization is explicit and shared across validation and persistence, and no transition logic relies on provider-specific defaults.
 3. Verify renewal behavior.
-   Targets: tests for valid renewal, missing contract, invalid date, and read-model visibility.
+   Targets: tests for valid renewal, missing contract, invalid date, and read-model visibility, plus proof that the existing committed migration artifact still backs the XOR invariant or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: contract data updates predictably.
 
@@ -76,6 +76,8 @@ mode: agent
 - The new contract end date must be in the future.
 - Invalid renewals leave prior persisted state unchanged.
 - Read models and report seed data reflect the updated end date.
+- The persisted employment state remains valid under the Shared Kernel XOR invariant after the transition.
+- Any persistence mapping involved in contract dates or derived employment state remains target-provider-compatible and does not rely on implicit type defaults.
 
 ## Human Showcase Steps
 
@@ -91,7 +93,12 @@ mode: agent
 ## Completion Checklist
 
 - [ ] Contracted-only precondition is enforced.
+- [ ] Employment state-transition logic checks XOR preconditions before committing field mutation.
 - [ ] Future-date validation is reused consistently.
+- [ ] Date validation, normalization, and persistence mapping use the same canonical contract-date semantics across layers.
 - [ ] Read models reflect the renewed end date.
 - [ ] Failure paths are tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
+- [ ] Target-provider mappings for employment state and contract date storage are explicit enough to keep generated migrations valid.
+- [ ] Verification ties the employment XOR invariant to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] The slice remains separate from initial assignment and tenure conversion.

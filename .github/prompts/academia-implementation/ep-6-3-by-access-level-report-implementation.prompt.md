@@ -94,4 +94,5 @@ mode: agent
 - [ ] INT, NAT, and LOC mappings are verified.
 - [ ] Rank changes update grouped output.
 - [ ] Tests cover grouping accuracy.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] No manual access-level assignment path is introduced.

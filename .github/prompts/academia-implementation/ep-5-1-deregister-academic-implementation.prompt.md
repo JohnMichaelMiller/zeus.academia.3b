@@ -94,4 +94,5 @@ mode: agent
 - [ ] Assigned extensions are released.
 - [ ] Retention behavior is explicit and tested.
 - [ ] Event publication is verified.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice is ready for reporting work to build on stable lifecycle data.

@@ -95,4 +95,5 @@ mode: agent
 - [ ] Rename behavior does not alter unrelated academic fields.
 - [ ] Read models reflect the persisted update.
 - [ ] Success and failure paths are tested.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] Missing-record handling is verified.

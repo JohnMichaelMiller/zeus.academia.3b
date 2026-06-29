@@ -94,4 +94,5 @@ mode: agent
 - [ ] Output fields match the execution plan.
 - [ ] Accuracy is verified against source slices.
 - [ ] Performance is checked on seeded data.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The report remains a directory, not grouped analytics.

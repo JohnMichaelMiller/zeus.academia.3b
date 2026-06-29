@@ -94,4 +94,5 @@ mode: agent
 - [ ] Query contracts are stable.
 - [ ] Empty-result behavior is verified.
 - [ ] Tests cover each query mode.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice stays operational, not analytical.

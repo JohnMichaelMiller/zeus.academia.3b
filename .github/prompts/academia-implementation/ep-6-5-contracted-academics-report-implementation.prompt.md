@@ -94,4 +94,5 @@ mode: agent
 - [ ] Sort order is deterministic and ascending.
 - [ ] Renewal effects are reflected.
 - [ ] Tests cover filtering and ordering.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The report stays distinct from expiring-window logic.

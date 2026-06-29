@@ -45,13 +45,13 @@ mode: agent
 
 - Required prior slices: AssignContract
 - Blocking risks: the conversion must only succeed from contracted state and must clear the contract date.
-- Existing patterns to reuse: aggregate guard methods, employment read-model assertions, and transition tests.
+- Existing patterns to reuse: aggregate guard methods, persistence-backed employment invariants, employment read-model assertions, and transition tests.
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                 | Inputs                                          | Outputs                   | Escalate when                                                       |
-| -------------------------- | ------------------------------------------------ | ----------------------------------------------- | ------------------------- | ------------------------------------------------------------------- |
-| slice-coordinator          | confirm transition semantics and route           | execution plan and employment slices            | approved command contract | current model cannot distinguish conversion from direct tenure      |
+| Role                 | Responsibilities                                 | Inputs                                          | Outputs                   | Escalate when                                                       |
+| -------------------- | ------------------------------------------------ | ----------------------------------------------- | ------------------------- | ------------------------------------------------------------------- |
+| slice-coordinator    | confirm transition semantics and route           | execution plan and employment slices            | approved command contract | current model cannot distinguish conversion from direct tenure      |
 | backend-domain       | implement conversion command, handler, endpoint  | Shared Kernel rules and prior employment slices | conversion code path      | conversion needs additional domain events not yet modeled           |
 | testing-verification | verify contracted-only and post-conversion state | implemented slice                               | tests and evidence        | contract data survives the conversion or tenure state is incomplete |
 
@@ -64,9 +64,9 @@ mode: agent
 2. Implement conversion behavior.
    Targets: command, handler, endpoint, mappings.
    Owner: backend-domain.
-   Validation before next step: success clears ContractEndDate and sets tenured state only.
+   Validation before next step: success clears ContractEndDate and sets tenured state only, transition semantics are enforced before persistence, and any persistence-backed employment fields use explicit target-provider-compatible mappings.
 3. Verify transition behavior.
-   Targets: tests for valid conversion, invalid starting state, and follow-up reads.
+   Targets: tests for valid conversion, invalid starting state, and follow-up reads, plus proof that the existing committed migration artifact still backs the XOR invariant or, if this slice changes schema, a new committed migration artifact in the confirmed persistence root.
    Owner: testing-verification.
    Validation before next step: XOR employment rule is preserved after the transition.
 
@@ -76,6 +76,8 @@ mode: agent
 - Successful conversion clears the contract end date.
 - Successful conversion leaves the academic tenured.
 - Read models reflect tenured state only after success.
+- The persisted employment state remains valid under the Shared Kernel XOR invariant after the transition.
+- Persistence for employment-state fields remains target-provider-compatible and does not rely on implicit decimal, bool, or date defaults.
 
 ## Human Showcase Steps
 
@@ -91,7 +93,12 @@ mode: agent
 ## Completion Checklist
 
 - [ ] Contracted-only precondition is enforced.
+- [ ] Employment state-transition logic checks XOR preconditions before committing field mutation.
 - [ ] Contract date is cleared on success.
 - [ ] Tenured state is visible after conversion.
 - [ ] Failure paths are tested.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
+- [ ] Domain transition rules and EF Core mappings for employment state stay aligned and explicit across layers.
+- [ ] Target-provider mappings for employment-state storage are explicit enough to keep generated migrations valid.
+- [ ] Verification ties the employment XOR invariant to the existing committed migration artifact or a new one when this slice changes schema.
 - [ ] XOR employment rule remains intact.

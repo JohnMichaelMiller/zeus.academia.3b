@@ -95,4 +95,5 @@ mode: agent
 - [ ] AccessLevel remains derived, not manually assigned.
 - [ ] Missing-record and invalid-rank cases are tested.
 - [ ] Read models reflect the updated rank and access level.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] Any required event publication is documented or implemented.

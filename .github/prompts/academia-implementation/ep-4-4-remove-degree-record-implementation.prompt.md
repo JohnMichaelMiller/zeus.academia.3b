@@ -94,4 +94,5 @@ mode: agent
 - [ ] Valid removals keep the remaining set consistent.
 - [ ] Missing-record behavior is tested.
 - [ ] Qualification reads are verified after success.
+- [ ] Verification evidence exists for the slice's acceptance criteria.
 - [ ] The slice does not overlap with deregistration behavior.
