@@ -67,3 +67,4 @@ Desktop.ini
 *.db
 *.db-shm
 *.db-wal
+.vs/slnx.sqlite
