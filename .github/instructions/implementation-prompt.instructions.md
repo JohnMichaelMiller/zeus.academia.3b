@@ -45,6 +45,8 @@ Before writing an implementation prompt, gather the minimum evidence:
 
 Ground the prompt in repository evidence. Reference real files, existing instructions, and current patterns. Do not fill gaps with guesses; mark missing context and define the escalation path instead.
 
+The prompt MUST explicitly require the implementation to follow [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) and keep the slice under `src/features/<Feature>/<UseCase>/` rather than splitting it across layer-oriented folders.
+
 ## Required Context Review
 
 Review these sources before drafting when they exist:

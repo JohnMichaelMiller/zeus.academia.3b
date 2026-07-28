@@ -29,7 +29,7 @@ applyTo: ".github/prompts/**/*implementation*.prompt.md"
 - The prompt MUST focus on a single slice or use-case, not an epic or mixed multi-slice backlog.
 - The prompt MUST produce implementation guidance that is concrete enough for both AI agents and humans to execute and verify.
 - The prompt MUST align with existing repository standards before prescribing code changes.
-
+- The prompt MUST explicitly require the implementation to follow [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) and keep the slice under `src/features/<Feature>/<UseCase>/` rather than splitting it across layer-oriented folders.
 ## Naming and Location
 
 - Store reusable implementation prompts in `.github/prompts/`.
