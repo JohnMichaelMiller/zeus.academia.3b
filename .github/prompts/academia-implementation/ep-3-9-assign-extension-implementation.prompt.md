@@ -41,6 +41,8 @@ mode: agent
 - Shared Kernel extension rules and persistence constraints
 - ProvisionExtension and RegisterAcademic slice files
 
+- Follow the vertical-slice instructions and keep the implementation in a feature/use-case folder under `src/features/` with co-located command/query, validator, endpoint, and tests instead of splitting the slice across layer-oriented folders.
+
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RegisterAcademic, ProvisionExtension

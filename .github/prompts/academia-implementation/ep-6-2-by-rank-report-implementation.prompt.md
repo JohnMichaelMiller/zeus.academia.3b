@@ -41,6 +41,8 @@ mode: agent
 - ManageRanks and ChangeRank slice files
 - AcademicDirectory report files when available
 
+- Follow the vertical-slice instructions and keep the implementation in a feature/use-case folder under `src/features/` with co-located command/query, validator, endpoint, and tests instead of splitting the slice across layer-oriented folders.
+
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RegisterAcademic, ChangeRank

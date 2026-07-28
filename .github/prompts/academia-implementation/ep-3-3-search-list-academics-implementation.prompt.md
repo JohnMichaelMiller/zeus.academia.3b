@@ -39,6 +39,7 @@ mode: agent
 
 - .github/models/workflows/academia-execution-plan.md
 - .github/instructions/vertical-slice-implementation.instructions.md
+- Follow the vertical-slice instructions and keep the implementation in a feature/use-case folder under `src/features/` with co-located command/query, validator, endpoint, and tests instead of splitting the slice across layer-oriented folders.
 - RegisterAcademic and ViewAcademicProfile slice files
 - any existing pagination or filter contract in shared API code
 

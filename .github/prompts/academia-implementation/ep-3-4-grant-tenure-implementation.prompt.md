@@ -42,6 +42,8 @@ mode: agent
 - RegisterAcademic and ViewAcademicProfile slice files
 - .github/instructions/fluentvalidation-implementation.instructions.md
 
+- Follow the vertical-slice instructions and keep the implementation in a feature/use-case folder under `src/features/` with co-located command/query, validator, endpoint, and tests instead of splitting the slice across layer-oriented folders.
+
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RegisterAcademic

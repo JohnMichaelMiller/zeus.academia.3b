@@ -41,6 +41,8 @@ mode: agent
 - SearchListAcademics, ViewAcademicProfile, and DeregisterAcademic slice files
 - any shared reporting or pagination contract in the repo
 
+- Follow the vertical-slice instructions and keep the implementation in a feature/use-case folder under `src/features/` with co-located command/query, validator, endpoint, and tests instead of splitting the slice across layer-oriented folders.
+
 ## Prerequisites and Dependency Checks
 
 - Required prior slices: RegisterAcademic, later lifecycle slices that affect active state

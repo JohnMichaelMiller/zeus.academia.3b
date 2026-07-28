@@ -39,6 +39,7 @@ mode: agent
 
 - .github/models/workflows/academia-execution-plan.md
 - .github/instructions/vertical-slice-implementation.instructions.md
+- Follow the vertical-slice instructions and keep the implementation in a feature/use-case folder under `src/features/` with co-located command/query, validator, endpoint, and tests instead of splitting the slice across layer-oriented folders.
 - .github/instructions/mediatr-implementation.instructions.md
 - .github/instructions/aspnetcore-implementation.instructions.md
 - RegisterAcademic slice files and tests
