@@ -1,1 +1,77 @@
+# Local project metadata
 .clockwork.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE and editors
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.sln.docstates
+*.user
+*.userosscache
+*.suo
+*.rsuser
+
+# .NET / ASP.NET Core
+bin/
+obj/
+out/
+artifacts/
+*.cache
+*.db
+*.db-shm
+*.db-wal
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+*.trx
+*.pdb
+*.pubxml
+*.publishsettings
+*.snk
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+*.log
+
+# Node / Vite / Vue / TypeScript
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+.yarn-cache/
+.vite/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+vite.config.ts.*.timestamp-*
+*.local
+
+# Azure / deployment
+.azure/
+.env
+.env.*
+!.env.example
+*.pfx
+*.cer
+*.pem
+*.key
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.orig
