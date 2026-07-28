@@ -20,6 +20,9 @@ public class AppDbContext : DbContext
     /// <summary>Academic qualification records.</summary>
     public DbSet<AcademicQualification> AcademicQualifications => Set<AcademicQualification>();
 
+    /// <summary>Canonical degree reference data.</summary>
+    public DbSet<DegreeCatalogEntry> Degrees => Set<DegreeCatalogEntry>();
+
     /// <summary>Provisioned telephony extensions.</summary>
     public DbSet<Extension> Extensions => Set<Extension>();
 

@@ -43,23 +43,25 @@ public sealed class AcademicQualification
             throw new ArgumentException(
                 $"Academic EmpNr must be exactly {EmpNr.RequiredLength} characters.", nameof(academicEmpNr));
 
-        if (string.IsNullOrWhiteSpace(degreeCode))
+        string normalizedDegreeCode = degreeCode.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(normalizedDegreeCode))
             throw new ArgumentException("Degree code must not be empty.", nameof(degreeCode));
-        if (degreeCode.Length > Degree.MaxCodeLength)
+        if (normalizedDegreeCode.Length > Degree.MaxCodeLength)
             throw new ArgumentException(
                 $"Degree code must not exceed {Degree.MaxCodeLength} characters.", nameof(degreeCode));
 
-        if (string.IsNullOrWhiteSpace(universityCode))
+        string normalizedUniversityCode = universityCode.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(normalizedUniversityCode))
             throw new ArgumentException("University code must not be empty.", nameof(universityCode));
-        if (universityCode.Length > University.MaxCodeLength)
+        if (normalizedUniversityCode.Length > University.MaxCodeLength)
             throw new ArgumentException(
                 $"University code must not exceed {University.MaxCodeLength} characters.", nameof(universityCode));
 
         return new AcademicQualification
         {
             AcademicEmpNr = academicEmpNr,
-            DegreeCode = degreeCode,
-            UniversityCode = universityCode
+            DegreeCode = normalizedDegreeCode,
+            UniversityCode = normalizedUniversityCode
         };
     }
 }
