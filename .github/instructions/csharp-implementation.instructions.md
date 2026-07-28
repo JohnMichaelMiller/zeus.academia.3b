@@ -114,6 +114,25 @@ public Order FindOrder(Guid id)
 }
 ```
 
+## String normalization and validation
+
+**Rules:**
+
+- Before calling `.Trim()`, `.ToUpperInvariant()`, `.ToLowerInvariant()`, or similar string methods, guard against `null`, empty, and whitespace input first.
+- Prefer `string.IsNullOrWhiteSpace(value)` or `ArgumentNullException.ThrowIfNull(value)` plus a whitespace check when a caller-supplied string is required.
+- For public or handler-facing APIs, throw `ArgumentException` for null/empty/whitespace input and keep the message specific; do not allow a `NullReferenceException` from a later `.Trim()` call.
+- Example:
+
+```csharp
+public static string NormalizeCode(string? value)
+{
+    if (string.IsNullOrWhiteSpace(value))
+        throw new ArgumentException("Degree code must not be empty.", nameof(value));
+
+    return value.Trim().ToUpperInvariant();
+}
+```
+
 ## Type Selection
 
 | Use Case                   | Type     | Rationale                             |
@@ -122,7 +141,7 @@ public Order FindOrder(Guid id)
 | Mutable entities           | `class`  | Identity equality, lifecycle          |
 | Single-value wrapper       | `record` | Strong typing, no primitive obsession |
 | Behavior + state           | `class`  | Methods + encapsulation               |
-| Collection of values       | `record` | Structural equality                   |
+| Collection of values      | `record` | Structural equality                   |
 
 **Examples:**
 

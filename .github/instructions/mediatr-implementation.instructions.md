@@ -43,6 +43,13 @@ tags: [mediatr, cqrs, backend, csharp, commands, queries]
 - **Validation**: FluentValidation pipeline before handlers
 - **Naming**: Clear, action-based command names, question-based query names
 
+## Reference-data uniqueness and concurrency
+
+- For persistence-backed reference data (codes, slugs, identifiers), treat uniqueness as a durable database invariant.
+- Do not depend on a pre-check such as `AnyAsync`/`ExistsAsync` as the only safeguard; create a uniqueness constraint or unique index in EF Core and let the database enforce it.
+- In handlers, catch the resulting `DbUpdateException` (or provider-specific constraint exception) and translate it to `ConflictException` or a 409-style response.
+- Use pre-checks only as a fast-fail UX hint or to avoid an unnecessary write; they must not be the only enforcement path.
+
 ## File Organization
 
 - `src/features/<Feature>/<UseCase>/` - Keep the request, handler, DTOs, and mapping for one command or query together

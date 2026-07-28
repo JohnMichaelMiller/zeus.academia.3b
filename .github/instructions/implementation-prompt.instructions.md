@@ -134,6 +134,35 @@ Required coverage:
 - Tests, checks, or inspections to run
 - User-visible outcome or business rule satisfied
 
+For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
+
+For any persistence-backed field constraint such as max length, precision, scale, uniqueness, or required normalization, the prompt must say where the canonical rule lives and how drift is prevented. Prefer shared domain constants or a single canonical definition reused by factories, validators, and EF Core mappings rather than repeating raw values across layers.
+
+When a rule is durability-sensitive or uniqueness-sensitive, the prompt must explicitly say whether the database constraint is the source of truth and whether the handler translates constraint failures into a conflict-style response. Do not assume that `AnyAsync`/`ExistsAsync` pre-checks alone are sufficient for uniqueness enforcement.
+
+Use a short enforcement matrix when the slice includes durable invariants, schema changes, or persistence-backed rules:
+
+| Rule           | Canonical layer      | Persistence backing required | Verification evidence                 |
+| -------------- | -------------------- | ---------------------------- | ------------------------------------- |
+| Employment XOR | Aggregate + database | Yes, CHECK constraint        | Unit test + schema or migration proof |
+
+When a rule's final durable enforcement belongs to a later slice, the prompt must say so explicitly. Do not imply that a rule is fully durable now if the current slice only enforces it at the validator, handler, or aggregate level.
+
+For each deferred durable invariant, the prompt must include a short deferral ledger with these fields: rule, enforced now by, not yet enforced in, owning follow-up slice, reviewer-visible risk, and verification evidence for the current temporary state.
+
+If the current slice leaves a persistence gap open until a later slice, the prompt must explicitly choose one of these paths:
+
+- add a temporary persistence safeguard now, such as a CHECK constraint or transitional uniqueness/index protection
+- waive the safeguard for now and record the accepted gap, why it is acceptable, the owning follow-up slice, and the condition that removes the waiver
+
+When a slice changes schema, constraints, indexes, or EF Core model shape, the prompt must explicitly say whether a committed migration artifact is required. If it is required, name the expected persistence root, the migration artifact to create or update, and the evidence that proves the migration is part of the slice deliverable.
+
+When persisted data can drift outside domain expectations, read-path failure handling must be named explicitly. Treat invalid stored values as a persistence or data-corruption concern, not as an ordinary business-rule validation path, unless the prompt explicitly justifies a different contract.
+
+When the slice depends on provider-specific EF Core behavior, such as SQL Server decimal precision, filtered indexes, collations, computed columns, or constraint translation, the prompt must require verification against the target provider or generated migration output. SQLite-only checks are not sufficient unless the prompt explicitly states that provider parity is out of scope.
+
+Do not let a schema-changing prompt stop at "migration support" or "schema evidence." The prompt must distinguish mapping-only persistence work from schema-changing persistence work.
+
 Preferred phrasing:
 
 - "Submitting an invalid enrollment request returns validation errors and does not persist data."

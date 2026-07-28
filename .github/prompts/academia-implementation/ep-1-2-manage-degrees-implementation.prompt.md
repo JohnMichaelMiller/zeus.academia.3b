@@ -48,7 +48,8 @@ mode: agent
 
 - Required prior slices: Shared Kernel
 - Blocking risks: degree codes may already appear in fixtures or examples; normalize them instead of creating duplicate catalogs.
-- Existing patterns to reuse: reference-data command/query shape, unique code validation, and deterministic list contracts.
+- Existing patterns to reuse: reference-data command/query shape, unique code validation backed by database constraints, and deterministic list contracts.
+- Uniqueness rule: degree codes must be enforced by a persistence constraint and translated to a conflict-style response in the handler; a pre-check such as `AnyAsync`/`ExistsAsync` is not sufficient as the only protection.
 
 ## Assigned Agents and Role Boundaries
 
@@ -67,7 +68,7 @@ mode: agent
 2. Implement add-degree behavior.
    Targets: AddDegree command, validator, handler, response, endpoint, and any mappings.
    Owner: backend-domain.
-   Validation before next step: duplicate degree codes are rejected and valid codes persist successfully.
+   Validation before next step: duplicate degree codes are rejected and valid codes persist successfully, with constraint violations translated into a conflict-style response rather than an unhandled database exception.
 3. Implement list-degree behavior.
    Targets: ListDegrees query, handler, response contract, and endpoint.
    Owner: backend-domain.
@@ -81,6 +82,9 @@ mode: agent
 
 - Adding a new degree code persists one canonical reference-data record.
 - Adding a duplicate degree code fails without creating a second record.
+- Degree-code uniqueness is protected in both application behavior and persistence.
+- Duplicate-add requests return a conflict-style result (or equivalent) and do not rely solely on `AnyAsync`/`ExistsAsync` pre-checks.
+- If this slice introduces or changes the uniqueness schema, a committed migration artifact exists in the confirmed persistence root.
 - Listing degrees returns stable records that downstream registration and qualification slices can resolve.
 - Validation and persistence rules agree on what constitutes a valid degree payload.
 - Automated tests cover the success path, duplicate path, and list-query behavior.
@@ -100,6 +104,9 @@ mode: agent
 
 - [ ] ManageDegrees stays limited to degree reference-data behavior.
 - [ ] Degree code uniqueness is enforced.
+- [ ] Required migration files are present when this slice introduces or changes reference-data uniqueness schema.
+- [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
+- [ ] String normalization uses null-safe guards before `Trim`/`ToUpperInvariant` and null/empty inputs fail with controlled validation/domain exceptions rather than `NullReferenceException`.
 - [ ] List behavior is stable and reusable by dependent slices.
 - [ ] Tests cover add and list success and failure cases.
 - [ ] Any seed or bootstrap path is documented.
