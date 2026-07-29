@@ -52,6 +52,9 @@ applyTo: "**"
   - No mutable collection escape through read-only interfaces.
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
   - Method and type naming remains compliant with language conventions (for example PascalCase in C#).
+  - Exception and failure messages never include secrets (connection strings, credentials, tokens, keys).
+  - Public/shared parse or mapping APIs retain direct acceptance tests when touched; do not remove only-path coverage without replacement.
+  - Constrained-code parse/validation failures remain actionable by including allowed values (prefer constants over inline literals).
 
 **Prohibited Without Review:**
 
