@@ -20,4 +20,15 @@ public sealed class RankTests
   {
     Assert.Throws<ArgumentException>(() => Rank.FromCode("X"));
   }
+
+  [Theory]
+  [InlineData("INT")]
+  [InlineData("NAT")]
+  [InlineData("LOC")]
+  public void AccessLevel_FromCode_ShouldAcceptExpectedValues(string code)
+  {
+    var accessLevel = AccessLevel.FromCode(code);
+
+    Assert.Equal(code, accessLevel.Code);
+  }
 }

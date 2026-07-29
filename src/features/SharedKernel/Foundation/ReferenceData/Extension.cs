@@ -6,7 +6,7 @@ public sealed record Extension
   {
     if (number <= 0)
     {
-      throw new ArgumentOutOfRangeException(nameof(number), "Extension number must be positive.");
+      throw new ArgumentOutOfRangeException(nameof(number), "Extension number must be greater than zero.");
     }
 
     Number = number;

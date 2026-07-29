@@ -6,7 +6,7 @@ public sealed record University
   {
     if (string.IsNullOrWhiteSpace(code))
     {
-      throw new ArgumentException("University code must not be empty.", nameof(code));
+      throw new ArgumentException("University code is required.", nameof(code));
     }
 
     Code = code.Trim().ToUpperInvariant();

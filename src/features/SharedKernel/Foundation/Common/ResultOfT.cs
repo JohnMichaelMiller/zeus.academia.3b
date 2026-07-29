@@ -2,19 +2,23 @@ namespace Zeus.Academia.Features.SharedKernel.Foundation.Common;
 
 public sealed class Result<TValue> : Result
 {
+  private readonly TValue? _value;
+
   private Result(TValue value)
     : base(true, Error.None)
   {
-    Value = value;
+    _value = value;
   }
 
   private Result(Error error)
     : base(false, error)
   {
-    Value = default;
+    _value = default;
   }
 
-  public TValue? Value { get; }
+  public TValue Value => IsSuccess
+    ? _value ?? throw new InvalidOperationException("Successful result must include a value.")
+    : throw new InvalidOperationException("Cannot access Value when result is a failure.");
 
   public static Result<TValue> Success(TValue value)
   {

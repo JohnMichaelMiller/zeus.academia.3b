@@ -2,9 +2,9 @@ namespace Zeus.Academia.Features.SharedKernel.Foundation.ReferenceData;
 
 public sealed record AccessLevel
 {
-  public const string InternationalCode = "INT";
-  public const string NationalCode = "NAT";
-  public const string LocalCode = "LOC";
+  private const string InternationalCode = "INT";
+  private const string NationalCode = "NAT";
+  private const string LocalCode = "LOC";
 
   private AccessLevel(string code)
   {
@@ -23,15 +23,17 @@ public sealed record AccessLevel
   {
     if (string.IsNullOrWhiteSpace(code))
     {
-      throw new ArgumentException("Access level code must not be empty.", nameof(code));
+      throw new ArgumentException("Access level code is required. Allowed values: INT, NAT, LOC.", nameof(code));
     }
 
-    return code.Trim().ToUpperInvariant() switch
+    var normalized = code.Trim().ToUpperInvariant();
+
+    return normalized switch
     {
       InternationalCode => International,
       NationalCode => National,
       LocalCode => Local,
-      _ => throw new ArgumentException("Invalid access level code.", nameof(code))
+      _ => throw new ArgumentException("Invalid access level code. Allowed values: INT, NAT, LOC.", nameof(code))
     };
   }
 }

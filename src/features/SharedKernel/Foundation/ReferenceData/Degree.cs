@@ -6,7 +6,7 @@ public sealed record Degree
   {
     if (string.IsNullOrWhiteSpace(code))
     {
-      throw new ArgumentException("Degree code must not be empty.", nameof(code));
+      throw new ArgumentException("Degree code is required.", nameof(code));
     }
 
     Code = code.Trim().ToUpperInvariant();

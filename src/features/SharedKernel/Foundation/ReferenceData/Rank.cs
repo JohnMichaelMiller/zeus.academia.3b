@@ -2,9 +2,9 @@ namespace Zeus.Academia.Features.SharedKernel.Foundation.ReferenceData;
 
 public sealed record Rank
 {
-  public const string ProfessorCode = "P";
-  public const string SeniorLecturerCode = "SL";
-  public const string LecturerCode = "L";
+  private const string ProfessorCode = "P";
+  private const string SeniorLecturerCode = "SL";
+  private const string LecturerCode = "L";
 
   private Rank(string code)
   {
@@ -23,10 +23,12 @@ public sealed record Rank
   {
     if (string.IsNullOrWhiteSpace(code))
     {
-      throw new ArgumentException("Rank code must not be empty.", nameof(code));
+      throw new ArgumentException("Rank code is required. Allowed values: P, SL, L.", nameof(code));
     }
 
-    return code.Trim().ToUpperInvariant() switch
+    var normalized = code.Trim().ToUpperInvariant();
+
+    return normalized switch
     {
       ProfessorCode => Professor,
       SeniorLecturerCode => SeniorLecturer,
