@@ -31,7 +31,7 @@ public sealed record AccessLevel
       InternationalCode => International,
       NationalCode => National,
       LocalCode => Local,
-      _ => throw new ArgumentException("Invalid access level code. Allowed values are INT, NAT, LOC.", nameof(code))
+      _ => throw new ArgumentException("Invalid access level code.", nameof(code))
     };
   }
 }
