@@ -1,10 +1,10 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
-using Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
-using Zeus.Academia.Features.SharedKernel.Foundation.ReferenceData;
+using Zeus.Academia.Backend.SharedKernel.Academics;
+using Zeus.Academia.Backend.SharedKernel.Persistence;
+using Zeus.Academia.Backend.SharedKernel.ReferenceData;
 
-namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation.Persistence;
+namespace Zeus.Academia.Tests.SharedKernel.Persistence;
 
 public sealed class AcademicSqlServerConstraintTests
 {
@@ -89,7 +89,7 @@ public sealed class AcademicSqlServerConstraintTests
         "Invalid",
         "P",
         true,
-        DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5)),
+        DateTime.UtcNow.AddDays(5).Date,
         300));
   }
 

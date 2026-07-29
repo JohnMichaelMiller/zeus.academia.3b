@@ -1,8 +1,8 @@
-using Zeus.Academia.Features.SharedKernel.Foundation.Common.Exceptions;
-using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
-using Zeus.Academia.Features.SharedKernel.Foundation.ReferenceData;
+using Zeus.Academia.Backend.SharedKernel.Academics;
+using Zeus.Academia.Backend.SharedKernel.Common.Exceptions;
+using Zeus.Academia.Backend.SharedKernel.ReferenceData;
 
-namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation.Domain;
+namespace Zeus.Academia.Tests.SharedKernel.Domain;
 
 public sealed class AcademicTests
 {

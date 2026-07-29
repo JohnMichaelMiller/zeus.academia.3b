@@ -1,6 +1,6 @@
-using Zeus.Academia.Features.SharedKernel.Foundation.ReferenceData;
+using Zeus.Academia.Backend.SharedKernel.ReferenceData;
 
-namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation.ReferenceData;
+namespace Zeus.Academia.Tests.SharedKernel.ReferenceData;
 
 public sealed class RankTests
 {
