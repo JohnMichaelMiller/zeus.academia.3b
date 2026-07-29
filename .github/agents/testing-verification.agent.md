@@ -40,6 +40,7 @@ Default operating sequence:
 3. Execute or specify verification steps for backend, frontend, data, and contract behavior as applicable.
 4. Capture pass or fail evidence, including unresolved gaps.
 5. Return a completion verdict tied to evidence, not implementation intent.
+6. For Shared Kernel persistence checks, run SQL Server verification tooling before sign-off.
 
 ## Skills
 
@@ -61,6 +62,7 @@ Default operating sequence:
 | Capture evidence and unresolved gaps before sign-off                     | Simple | -           |
 | Verify that state changes are observable through the intended read paths | Simple | -           |
 | Reject completion claims that are not backed by evidence                 | Simple | -           |
+| Run Shared Kernel SQL Server verification tooling                        | Simple | -           |
 
 ## Expertise
 
@@ -84,6 +86,7 @@ Verification specialist for multi-surface vertical slices. Advanced in proving d
 - For Shared Kernel persistence verification, run:
   - `dotnet test tests/Features/SharedKernel/Foundation/Zeus.Academia.Tests.Features.SharedKernel.Foundation.csproj --filter "FullyQualifiedName~Zeus.Academia.Tests.Features.SharedKernel.Foundation.Persistence"`
   - or run `powershell -NoProfile -ExecutionPolicy Bypass -File eng/verify-shared-kernel-sqlserver.ps1`.
+  - or run the VS Code task `verify:shared-kernel:sqlserver`.
 - The environment variable `ZEUS_SQLSERVER_CONNECTION` should be used when provided.
 - If `ZEUS_SQLSERVER_CONNECTION` is absent, LocalDB `(localdb)\\MSSQLLocalDB` is the expected fallback.
 - On non-Windows hosts, require `ZEUS_SQLSERVER_CONNECTION` instead of assuming LocalDB.

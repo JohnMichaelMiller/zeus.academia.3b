@@ -4,6 +4,14 @@ The third iteration of the Zeus Academia experiment
 
 ## AI-Assisted Artifacts
 
+- [Shared Kernel Foundation Slice (EP-0-1)](src/features/SharedKernel/Foundation) - Shared domain primitives, invariants, result/error contracts, and persistence mappings for Academia.
+- [Shared Kernel SQL Server Verification Tests](tests/Features/SharedKernel/Foundation/Persistence/AcademiaSqlServerConstraintTests.cs) - Runtime SQL Server uniqueness and check-constraint verification for foundational persistence rules.
+- [Shared Kernel Solution Scaffold](zeus.academia.3b.sln) - Minimal .NET solution wiring for building and testing the Shared Kernel slice.
+- [Shared Kernel SQL Server Verification Script](eng/verify-shared-kernel-sqlserver.ps1) - One-command restore and focused test execution for Shared Kernel SQL Server checks.
+- [Shared Kernel PR Creation Script](eng/create-pr-shared-kernel.ps1) - Standardized PR body provenance preparation, branch push, and pull request creation workflow for EP-0-1 slice delivery.
+- [Shared Kernel PR Body Template](eng/pr-ep-0-1-shared-kernel.md) - Reusable PR body with acceptance criteria and verification evidence placeholders.
+- [VS Code Shared Kernel Verification Task](.vscode/tasks.json) - Runs verify:shared-kernel:sqlserver to execute SQL Server persistence validation from the editor.
+- [VS Code Shared Kernel PR Task](.vscode/tasks.json) - Runs pr:shared-kernel:create to push and open the EP-0-1 pull request.
 - [Academia Slice Implementation Prompts](.github/prompts/academia/README.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-implementation-prompts/conversation.md))
 - [Academia Slice Execution Plan](.github/prompts/academia/execution-plan.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
 - [Backend Slice Implementer Agent Profile](.github/agents/backend-slice-implementer.agent.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
