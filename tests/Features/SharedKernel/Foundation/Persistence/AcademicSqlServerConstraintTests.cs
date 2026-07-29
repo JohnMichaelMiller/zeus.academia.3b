@@ -25,7 +25,7 @@ public sealed class AcademicSqlServerConstraintTests
     return "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;TrustServerCertificate=True;Initial Catalog=ZeusSharedKernelTests_" + Guid.NewGuid().ToString("N");
   }
 
-  private static AcademicDbContext? CreateContext(string connectionString)
+  private static AcademicDbContext CreateContext(string connectionString)
   {
     try
     {
@@ -38,13 +38,13 @@ public sealed class AcademicSqlServerConstraintTests
       context.Database.EnsureCreated();
       return context;
     }
-    catch (SqlException)
+    catch (SqlException ex)
     {
-      return null;
+      throw new InvalidOperationException($"SQL Server setup failed while creating the test database. Connection: '{connectionString}'.", ex);
     }
-    catch (InvalidOperationException)
+    catch (InvalidOperationException ex)
     {
-      return null;
+      throw new InvalidOperationException($"SQL Server setup failed while preparing test context. Connection: '{connectionString}'.", ex);
     }
   }
 
@@ -53,10 +53,6 @@ public sealed class AcademicSqlServerConstraintTests
   {
     var connection = ResolveConnectionString();
     await using var context = CreateContext(connection);
-    if (context is null)
-    {
-      return;
-    }
 
     context.Academics.Add(CreateAcademic("AB1234", 100));
     context.Academics.Add(CreateAcademic("AB1234", 101));
@@ -69,10 +65,6 @@ public sealed class AcademicSqlServerConstraintTests
   {
     var connection = ResolveConnectionString();
     await using var context = CreateContext(connection);
-    if (context is null)
-    {
-      return;
-    }
 
     context.Academics.Add(CreateAcademic("AB1234", 200));
     context.Academics.Add(CreateAcademic("CD5678", 200));
@@ -85,10 +77,6 @@ public sealed class AcademicSqlServerConstraintTests
   {
     var connection = ResolveConnectionString();
     await using var context = CreateContext(connection);
-    if (context is null)
-    {
-      return;
-    }
 
     var sql = "INSERT INTO [Academics] ([Id], [EmpNr], [EmpName], [RankCode], [IsTenured], [ContractEndDate], [ExtensionNumber]) " +
               "VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)";

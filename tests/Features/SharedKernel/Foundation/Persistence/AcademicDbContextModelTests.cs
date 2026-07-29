@@ -43,7 +43,7 @@ public sealed class AcademicDbContextModelTests
   }
 
   [Fact]
-  public void Model_ShouldConfigureQualificationUniqueDegreePerAcademic()
+  public void Model_ShouldUseCompositePrimaryKeyForQualificationPerAcademic()
   {
     var options = new DbContextOptionsBuilder<AcademicDbContext>()
       .UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=ZeusModelQualifications;Trusted_Connection=True;TrustServerCertificate=True")
@@ -55,10 +55,10 @@ public sealed class AcademicDbContextModelTests
       .GetEntityTypes()
       .Single(entityType => entityType.GetTableName() == "AcademicQualifications");
 
-    var indexes = qualificationEntity.GetIndexes().ToList();
-    Assert.Contains(indexes, i =>
-      i.IsUnique &&
-      i.Properties.Any(p => p.Name == "AcademicId") &&
-      i.Properties.Any(p => p.Name == nameof(AcademicQualification.DegreeCode)));
+    var key = qualificationEntity.FindPrimaryKey();
+    Assert.NotNull(key);
+
+    var keyNames = key!.Properties.Select(p => p.Name).ToArray();
+    Assert.Equal(new[] { "AcademicId", nameof(AcademicQualification.DegreeCode) }, keyNames);
   }
 }

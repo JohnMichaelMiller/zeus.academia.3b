@@ -41,4 +41,12 @@ public sealed class ResultTests
     Assert.True(result.IsFailure);
     Assert.Equal(error, result.Error);
   }
+
+  [Fact]
+  public void GenericFailure_ValueAccess_ShouldThrow()
+  {
+    var result = Result<string>.Failure(Error.NotFound("academic.missing", "Academic was not found."));
+
+    Assert.Throws<InvalidOperationException>(() => _ = result.Value);
+  }
 }

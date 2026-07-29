@@ -182,6 +182,8 @@ public Order GetOrder(Guid orderId)
 - MUST NOT throw generic `Exception`
 - MUST validate at API boundaries (controllers, handlers)
 - MUST log exceptions before rethrowing or wrapping
+- MUST NOT include secrets (connection strings, credentials, tokens, keys) in exception or log messages; redact or omit sensitive values
+- SHOULD keep validation/parse failures actionable by listing allowed values when inputs are constrained (using existing constants, not duplicated literals)
 - SHOULD create domain-specific exceptions for business rule violations
 
 **Template:**
@@ -430,6 +432,8 @@ Before committing C# code:
 - [ ] Factory methods validate all persisted constraints (max-lengths, required fields) against value object constants, not inline literals
 - [ ] Domain value object constants (`MaxCodeLength`, `RequiredLength`, etc.) are used in both factory validation and EF Core configuration — never duplicated as raw literals
 - [ ] Result wrappers protect invariants (`Value` is inaccessible for failures, success values are non-null)
+- [ ] Exception and log messages are sanitized (no raw secrets, credentials, or full connection strings)
+- [ ] Constrained-input parse/validation errors remain actionable and reference allowed values via named constants
 
 ## Integration
 

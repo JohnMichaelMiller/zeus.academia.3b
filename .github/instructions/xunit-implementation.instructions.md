@@ -488,7 +488,9 @@ student.Should().Match<Student>(s =>
 - [ ] Expensive setup shared via fixtures
 - [ ] Tests don't depend on execution order
 - [ ] No hardcoded waits (`Task.Delay`)
-- [ ] Environment-dependent tests fail explicitly when prerequisites (DB/service/connection) are unavailable
+- [ ] Public/shared parsing or mapping APIs touched by a change retain direct acceptance tests for valid inputs
+- [ ] Invalid-input tests verify behavior and actionable diagnostics (for constrained codes, include allowed-value hints)
+- [ ] Refactors do not remove the only direct test coverage of a public/shared API without adding equivalent replacement tests
 
 ## Anti-Patterns
 

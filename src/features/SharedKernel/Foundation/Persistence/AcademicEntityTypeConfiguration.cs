@@ -67,7 +67,6 @@ public sealed class AcademicEntityTypeConfiguration : IEntityTypeConfiguration<A
         .IsRequired();
 
       qualificationBuilder.HasKey("AcademicId", nameof(AcademicQualification.DegreeCode));
-      qualificationBuilder.HasIndex("AcademicId", nameof(AcademicQualification.DegreeCode)).IsUnique();
 
       qualificationBuilder.Ignore(x => x.Degree);
       qualificationBuilder.Ignore(x => x.University);

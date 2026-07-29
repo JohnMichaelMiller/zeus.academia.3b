@@ -58,24 +58,24 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
 {
     private readonly AppDbContext _context;
     private readonly IValidator<CreateOrderCommand> _validator;
-    
+
     public async Task<Result<Guid>> Handle(CreateOrderCommand cmd, CancellationToken ct)
     {
         // 1. Validate
         var validationResult = await _validator.ValidateAsync(cmd, ct);
-        if (!validationResult.IsValid) 
+        if (!validationResult.IsValid)
             return Result<Guid>.Failure(validationResult.Errors);
-        
+
         // 2. Execute domain logic
         var order = Order.Create(cmd.CustomerId, cmd.Items);
-        
+
         // 3. Persist
         _context.Orders.Add(order);
         await _context.SaveChangesAsync(ct);
-        
+
         // 4. Publish events (if using domain events)
         // await _mediator.DispatchDomainEventsAsync(order, ct);
-        
+
         return Result<Guid>.Success(order.Id);
     }
 }
@@ -120,7 +120,7 @@ public record GetOrderByIdQuery(Guid OrderId) : IRequest<OrderDto?>;
 public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, OrderDto?>
 {
     private readonly AppDbContext _context;
-    
+
     public async Task<OrderDto?> Handle(GetOrderByIdQuery query, CancellationToken ct)
     {
         return await _context.Orders
@@ -204,21 +204,21 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
     where TRequest : IRequest<TResponse>
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
-    
+
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
     {
         if (!_validators.Any()) return await next();
-        
+
         var context = new ValidationContext<TRequest>(request);
         var failures = _validators
             .Select(v => v.Validate(context))
             .SelectMany(r => r.Errors)
             .Where(f => f != null)
             .ToList();
-            
+
         if (failures.Any())
             throw new ValidationException(failures);
-            
+
         return await next();
     }
 }
@@ -251,7 +251,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Guid>
 {
     private readonly AppDbContext _context;
-    
+
     public async Task<Guid> Handle(CreateOrderCommand cmd, CancellationToken ct)
     {
         var order = Order.Create(cmd.CustomerId);
@@ -321,7 +321,7 @@ public class Result<T>
             ? _value ?? throw new InvalidOperationException("Successful result must include a value.")
             : throw new InvalidOperationException("Cannot access Value when result is a failure.");
     public string Error { get; }
-    
+
     public static Result<T> Success(T value)
     {
         ArgumentNullException.ThrowIfNull(value);
@@ -344,7 +344,7 @@ Use `LoggingBehavior<TRequest, TResponse>` in pipeline:
 public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
 {
     private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
-    
+
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
     {
         _logger.LogInformation("Handling {RequestName}", typeof(TRequest).Name);
@@ -392,10 +392,10 @@ public async Task Handle_ValidCommand_CreatesOrder()
     var context = CreateInMemoryContext();
     var handler = new CreateOrderCommandHandler(context);
     var command = new CreateOrderCommand(Guid.NewGuid(), new List<OrderItemDto>());
-    
+
     // Act
     var result = await handler.Handle(command, CancellationToken.None);
-    
+
     // Assert
     Assert.True(result.IsSuccess);
     Assert.Single(context.Orders);
@@ -413,13 +413,13 @@ public async Task Handle_ExistingOrder_ReturnsDto()
     var order = Order.Create(Guid.NewGuid());
     context.Orders.Add(order);
     await context.SaveChangesAsync();
-    
+
     var handler = new GetOrderByIdQueryHandler(context);
     var query = new GetOrderByIdQuery(order.Id);
-    
+
     // Act
     var result = await handler.Handle(query, CancellationToken.None);
-    
+
     // Assert
     Assert.NotNull(result);
     Assert.Equal(order.Id, result.Id);
@@ -435,11 +435,11 @@ public async Task CommandToQuery_FullFlow_WorksEndToEnd()
     // Arrange: Create via command
     var createCmd = new CreateOrderCommand(customerId, items);
     var orderId = await _mediator.Send(createCmd);
-    
+
     // Act: Retrieve via query
     var query = new GetOrderByIdQuery(orderId);
     var dto = await _mediator.Send(query);
-    
+
     // Assert
     Assert.NotNull(dto);
     Assert.Equal(customerId, dto.CustomerId);
