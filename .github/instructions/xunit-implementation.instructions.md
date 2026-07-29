@@ -44,6 +44,18 @@ tags: [xunit, testing, csharp, backend, unit-tests, integration-tests]
 - **Fast Execution**: Unit tests <100ms, integration tests <1s
 - **No Silent Passes**: Missing infrastructure or setup errors MUST fail with actionable diagnostics, not skip via `return`
 
+## Database Test Safety
+
+- MUST isolate database-backed tests from shared environments by using a unique test-scoped database name even when a connection string is supplied.
+- MUST preserve the server/instance/credentials from the environment variable and only override the catalog/database segment with a temporary test name.
+- MUST NOT execute destructive setup such as `EnsureDeleted`/`EnsureCreated` against a shared or production database unless the database name is explicitly test-scoped and temporary.
+- SHOULD use helpers such as `SqlConnectionStringBuilder` to mutate `Initial Catalog` safely and fail fast with actionable diagnostics when the target is unavailable.
+
+```csharp
+var builder = new SqlConnectionStringBuilder(connectionString);
+builder.InitialCatalog = $"ZeusTests_{Guid.NewGuid():N}";
+```
+
 ## File Organization
 
 - `tests/Zeus.Academia.UnitTests/` - Unit tests

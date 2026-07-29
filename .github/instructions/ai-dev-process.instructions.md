@@ -61,6 +61,8 @@ applyTo: "**"
   - Shared foundational primitives (for example Result/Error base types) retain direct tests for both non-generic and generic invariants when touched.
   - Public/shared parse or mapping APIs retain direct acceptance tests when touched; do not remove only-path coverage without replacement.
   - Constrained-code parse/validation failures remain actionable by including allowed values (prefer constants over inline literals).
+  - Validation messages must derive allowed values from a single source of truth rather than duplicating hard-coded literals across exception messages.
+  - Database-backed tests must use unique test-scoped database names and safe connection-string handling; never use a provided connection string verbatim against a shared or non-test database.
 
 **Prohibited Without Review:**
 

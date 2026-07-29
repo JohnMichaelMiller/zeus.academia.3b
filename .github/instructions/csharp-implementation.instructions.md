@@ -184,6 +184,8 @@ public Order GetOrder(Guid orderId)
 - MUST log exceptions before rethrowing or wrapping
 - MUST NOT include secrets (connection strings, credentials, tokens, keys) in exception or log messages; redact or omit sensitive values
 - SHOULD keep validation/parse failures actionable by listing allowed values when inputs are constrained (using existing constants, not duplicated literals)
+- MUST derive allowed-value messages from existing constants or shared helpers rather than re-declaring the same literal set in multiple messages
+- SHOULD build exception messages from a single source of truth (for example, a `AllowedValues` array or helper) so messages stay consistent when the accepted set changes
 - SHOULD create domain-specific exceptions for business rule violations
 
 **Template:**
@@ -401,16 +403,16 @@ public class Order
 
 ## Anti-Patterns
 
-| ❌ Anti-Pattern              | ✅ Correct Approach              |
-| ---------------------------- | -------------------------------- |
-| Public setters on entities   | Private/init-only setters        |
-| Primitive obsession          | Value objects (records)          |
-| `.Result` or `.Wait()`       | `await` with async               |
-| Catch generic `Exception`    | Specific exception types         |
-| `var` for non-obvious types  | Explicit type declaration        |
-| Mutable static state         | Dependency injection             |
-| Service locator              | Constructor injection            |
-| String concatenation in loop | `StringBuilder` or interpolation |
+| ❌ Anti-Pattern                       | ✅ Correct Approach                  |
+| ------------------------------------- | ------------------------------------ |
+| Public setters on entities            | Private/init-only setters            |
+| Primitive obsession                   | Value objects (records)              |
+| `.Result` or `.Wait()`                | `await` with async                   |
+| Catch generic `Exception`             | Specific exception types             |
+| `var` for non-obvious types           | Explicit type declaration            |
+| Mutable static state                  | Dependency injection                 |
+| Service locator                       | Constructor injection                |
+| String concatenation in loop          | `StringBuilder` or interpolation     |
 | `Result<T>.Value` readable on failure | Throw when failure value is accessed |
 
 ## Validation Checklist
