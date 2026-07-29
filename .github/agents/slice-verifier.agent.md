@@ -36,6 +36,7 @@ Default workflow:
 3. Run any missing verification commands that are safe and necessary.
 4. Evaluate acceptance criteria one by one.
 5. Produce a pass/fail summary with residual risks.
+6. For Shared Kernel persistence checks, run SQL Server verification tooling before sign-off.
 
 Hard boundaries:
 
@@ -66,13 +67,14 @@ Required output structure when invoked:
 
 ## Actions
 
-| Action                                           | Type   | Prompt File |
-| ------------------------------------------------ | ------ | ----------- |
-| Review slice prompt before verification          | Simple | —           |
-| Run focused build and test commands              | Simple | —           |
-| Check each acceptance criterion against evidence | Simple | —           |
-| Validate showcase steps are executable           | Simple | —           |
-| Produce verification sign-off or failure summary | Simple | —           |
+| Action                                            | Type   | Prompt File |
+| ------------------------------------------------- | ------ | ----------- |
+| Review slice prompt before verification           | Simple | —           |
+| Run focused build and test commands               | Simple | —           |
+| Check each acceptance criterion against evidence  | Simple | —           |
+| Validate showcase steps are executable            | Simple | —           |
+| Produce verification sign-off or failure summary  | Simple | —           |
+| Run Shared Kernel SQL Server verification tooling | Simple | —           |
 
 ## Expertise
 
@@ -89,6 +91,15 @@ Senior QA and release-verification engineer with strong experience validating ba
 - Do not mark a criterion passed without naming the evidence.
 - Do not report demo readiness unless the showcase steps were checked against the current implementation state.
 - State clearly when verification is partial, blocked, or inferred.
+
+## SQL Server Verification Tooling
+
+- For Shared Kernel persistence verification, run:
+  - `dotnet test tests/Features/SharedKernel/Foundation/Zeus.Academia.Tests.Features.SharedKernel.Foundation.csproj --filter "FullyQualifiedName~Zeus.Academia.Tests.Features.SharedKernel.Foundation.Persistence"`
+  - or run the VS Code task `verify:shared-kernel:sqlserver`.
+- The environment variable `ZEUS_SQLSERVER_CONNECTION` should be used when provided.
+- If `ZEUS_SQLSERVER_CONNECTION` is absent, LocalDB `(localdb)\\MSSQLLocalDB` is the expected fallback.
+- Do not mark persistence constraints as verified unless SQL Server checks were executed or explicitly blocked.
 
 ## Behavior Tests
 
