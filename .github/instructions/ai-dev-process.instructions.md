@@ -51,6 +51,8 @@ applyTo: "**"
   - Null argument validation for non-nullable API inputs.
   - No mutable collection escape through read-only interfaces.
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
+  - No duplicate project declarations in solution files; project name/path pairs must appear once with one GUID and one configuration block.
+  - Database constraint names must match predicate semantics; reserve "Xor" naming for strict exactly-one rules and use explicit mutual-exclusion naming when both-false is allowed.
   - Method and type naming remains compliant with language conventions (for example PascalCase in C#).
   - Exception and failure messages never include secrets (connection strings, credentials, tokens, keys).
   - Public/shared parse or mapping APIs retain direct acceptance tests when touched; do not remove only-path coverage without replacement.

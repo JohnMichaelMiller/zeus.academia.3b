@@ -30,6 +30,7 @@ applyTo: ".github/prompts/**/*implementation*.prompt.md"
 - The prompt MUST produce implementation guidance that is concrete enough for both AI agents and humans to execute and verify.
 - The prompt MUST align with existing repository standards before prescribing code changes.
 - The prompt MUST explicitly require the implementation to follow [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) and keep the slice under `src/features/<Feature>/<UseCase>/` rather than splitting it across layer-oriented folders.
+
 ## Naming and Location
 
 - Store reusable implementation prompts in `.github/prompts/`.
@@ -184,6 +185,8 @@ The section MUST cover, when applicable:
 - test coverage expectations
 - result-wrapper invariants for success/failure access patterns (for example, `Result<T>.Value` must not be consumable on failure)
 - database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
+- named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
+- solution-file integrity when `.sln` is touched (no duplicate project name/path entries and no duplicate configuration blocks for equivalent projects)
 
 Bad:
 

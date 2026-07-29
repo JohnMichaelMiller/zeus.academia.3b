@@ -133,16 +133,19 @@ Required coverage:
 - Integration points or contracts affected
 - Tests, checks, or inspections to run
 - User-visible outcome or business rule satisfied
+- Solution hygiene when `.sln` files change: no duplicate project name/path entries, no duplicate GUID configuration blocks.
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
+
+For every named database constraint in acceptance criteria, the constraint name must reflect the exact predicate semantics. Do not label a rule as XOR unless the predicate enforces strict exactly-one semantics.
 
 For any persistence-backed field constraint such as max length, precision, scale, uniqueness, or required normalization, the prompt must say where the canonical rule lives and how drift is prevented. Prefer shared domain constants or a single canonical definition reused by factories, validators, and EF Core mappings rather than repeating raw values across layers.
 
 Use a short enforcement matrix when the slice includes durable invariants, schema changes, or persistence-backed rules:
 
-| Rule           | Canonical layer      | Persistence backing required | Verification evidence                 |
-| -------------- | -------------------- | ---------------------------- | ------------------------------------- |
-| Employment XOR | Aggregate + database | Yes, CHECK constraint        | Unit test + schema or migration proof |
+| Rule                        | Canonical layer      | Persistence backing required | Verification evidence                 |
+| --------------------------- | -------------------- | ---------------------------- | ------------------------------------- |
+| Employment mutual exclusion | Aggregate + database | Yes, CHECK constraint        | Unit test + schema or migration proof |
 
 When a rule's final durable enforcement belongs to a later slice, the prompt must say so explicitly. Do not imply that a rule is fully durable now if the current slice only enforces it at the validator, handler, or aggregate level.
 
