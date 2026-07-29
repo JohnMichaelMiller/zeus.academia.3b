@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
+using Zeus.Academia.Backend.SharedKernel.Academics;
+using Zeus.Academia.Backend.SharedKernel.Persistence.Configurations;
 
-namespace Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
+namespace Zeus.Academia.Backend.SharedKernel.Persistence;
 
 public sealed class AcademicDbContext : DbContext
 {

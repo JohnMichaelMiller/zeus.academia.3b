@@ -1,4 +1,4 @@
-namespace Zeus.Academia.Features.SharedKernel.Foundation.Common;
+namespace Zeus.Academia.Backend.SharedKernel.Common;
 
 public sealed record Error(string Code, string Message)
 {

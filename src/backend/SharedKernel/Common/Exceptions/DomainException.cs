@@ -1,4 +1,4 @@
-namespace Zeus.Academia.Features.SharedKernel.Foundation.Common.Exceptions;
+namespace Zeus.Academia.Backend.SharedKernel.Common.Exceptions;
 
 public class DomainException : Exception
 {
