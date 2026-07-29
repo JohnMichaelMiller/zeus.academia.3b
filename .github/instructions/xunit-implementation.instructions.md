@@ -490,6 +490,8 @@ student.Should().Match<Student>(s =>
 - [ ] Mocks configured before Act phase
 - [ ] Async tests use `async Task` (not `async void`)
 - [ ] CancellationToken passed to async methods
+- [ ] SQL Server-backed tests treat the configured connection string as server-level and override `InitialCatalog` to a unique per-run database name
+- [ ] Destructive SQL setup (`EnsureDeleted`, schema reset) runs only against isolated test databases, never shared or production catalogs
 - [ ] Integration tests use test database or in-memory provider
 - [ ] Expensive setup shared via fixtures
 - [ ] Tests don't depend on execution order

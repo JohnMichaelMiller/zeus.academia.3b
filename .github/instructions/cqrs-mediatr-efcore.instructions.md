@@ -295,16 +295,30 @@ catch
 - Commands: Return `Result<T>` or throw domain exceptions
 - Queries: Return `null`/empty or use `Result<T>`
 - Global exception handler for API layer
+- `Result<T>` should expose a non-nullable `Value` for success and throw on failure; do not model success as a nullable public payload
+- Non-`None` errors must reject null, empty, or whitespace values for `code` and `message`
 
 ```csharp
-public class Result<T>
+public sealed class Result<T>
 {
+    private readonly T? _value;
+
+    private Result(bool isSuccess, T? value, string error)
+    {
+        IsSuccess = isSuccess;
+        _value = value;
+        Error = error;
+    }
+
     public bool IsSuccess { get; }
-    public T Value { get; }
     public string Error { get; }
-    
+
+    public T Value => IsSuccess
+        ? _value ?? throw new InvalidOperationException("A successful result must contain a value.")
+        : throw new InvalidOperationException("Cannot access the value of a failed result.");
+
     public static Result<T> Success(T value) => new(true, value, string.Empty);
-    public static Result<T> Failure(string error) => new(false, default!, error);
+    public static Result<T> Failure(string error) => new(false, default, error);
 }
 ```
 

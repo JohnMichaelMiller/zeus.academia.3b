@@ -53,6 +53,7 @@ Foundational C# best practices for clean, maintainable, type-safe code using mod
 - MUST use file-scoped namespaces (C# 10+)
 - MUST organize members: fields → constructors → properties → methods
 - MUST match namespace to folder structure
+- MUST use the SDK-style C# project type GUID in `.sln` files for SDK-style `.csproj` projects
 
 **Template:**
 
@@ -204,22 +205,8 @@ public Order GetOrder(Guid orderId)
 - MUST keep exception messages consistent with the type name and surrounding conventions, especially for value objects and public API failures
 - MUST log exceptions before rethrowing or wrapping
 - SHOULD create domain-specific exceptions for business rule violations
-
-## Encapsulation and Collection Safety
-
-**Rules:**
-
-- MUST NOT expose mutable internal collections directly, even when typed as `IReadOnlyCollection<T>` or `IReadOnlyList<T>`.
-- MUST return read-only wrappers (`AsReadOnly()` or immutable snapshots) for externally visible collection properties.
-- SHOULD keep mutation methods explicit on the aggregate/entity and prevent external downcast-based mutation.
-
-## EF Core Persistence Guardrails
-
-**Rules:**
-
-- MUST avoid duplicate uniqueness enforcement for the same key path.
-- If a property is the primary key, do not add a second unique index on that same property unless there is a documented and measurable reason.
-- Keep SQL baseline scripts consistent with EF mapping decisions to avoid redundant indexes and review churn.
+- MUST reject null, empty, or whitespace values for non-`None` errors (including `code` and `message`)
+- MUST preserve result invariants so a success result exposes a non-nullable value and a failed result cannot be treated as success
 
 **Template:**
 
@@ -239,6 +226,22 @@ public void AddItem(OrderItem item)
     _items.Add(item);
 }
 ```
+
+## Encapsulation and Collection Safety
+
+**Rules:**
+
+- MUST NOT expose mutable internal collections directly, even when typed as `IReadOnlyCollection<T>` or `IReadOnlyList<T>`.
+- MUST return read-only wrappers (`AsReadOnly()` or immutable snapshots) for externally visible collection properties.
+- SHOULD keep mutation methods explicit on the aggregate/entity and prevent external downcast-based mutation.
+
+## EF Core Persistence Guardrails
+
+**Rules:**
+
+- MUST avoid duplicate uniqueness enforcement for the same key path.
+- If a property is the primary key, do not add a second unique index on that same property unless there is a documented and measurable reason.
+- Keep SQL baseline scripts consistent with EF mapping decisions to avoid redundant indexes and review churn.
 
 ## Expression-Bodied Members
 

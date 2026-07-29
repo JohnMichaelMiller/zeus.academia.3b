@@ -138,6 +138,8 @@ Required coverage:
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
 
+Before implementation begins, the prompt must reconcile the rule description with the persistence plan and explicitly name the enforcement layer(s). If the slice description references an XOR, uniqueness, or other durable invariant, the prompt must not leave the rule ambiguous between validator-only and database-constraint enforcement.
+
 For any persistence-backed field constraint such as max length, precision, scale, uniqueness, or required normalization, the prompt must say where the canonical rule lives and how drift is prevented. Prefer shared domain constants or a single canonical definition reused by factories, validators, and EF Core mappings rather than repeating raw values across layers.
 
 When a rule is durability-sensitive or uniqueness-sensitive, the prompt must explicitly say whether the database constraint is the source of truth and whether the handler translates constraint failures into a conflict-style response. Do not assume that `AnyAsync`/`ExistsAsync` pre-checks alone are sufficient for uniqueness enforcement.
@@ -185,6 +187,8 @@ Implementation prompts must separate implementation from verification. The verif
 - unresolved issues that block moving from implemented to verified
 
 If the prompt claims persistence foundations, database constraints, or migration support, verification must include schema evidence. Passing unit tests or mapping tests alone is insufficient when the rule is supposed to be durable at the database level.
+
+The verification section must also require a consistency check between acceptance criteria, tests, and persistence mappings; mismatches are blockers before the slice is considered complete.
 
 If the slice changes schema, verification must also confirm that a committed migration artifact exists in the diff unless the prompt explicitly waives migrations and explains why.
 
