@@ -81,7 +81,7 @@ mode: agent
 5. Verify invariants and persistence behavior.
    Targets: unit tests, mapping tests, and migration validation.
    Owner: testing-verification.
-   Validation before next step: all foundational tests pass, failures clearly identify which invariant broke, infrastructure/setup failures fail explicitly (no catch-and-return skip path), and any touched solution file has no duplicate project declarations.
+   Validation before next step: all foundational tests pass, failures clearly identify which invariant broke, infrastructure/setup failures fail explicitly (no catch-and-return skip path), any touched solution file has no duplicate project declarations, and any touched solution file keeps the Visual Studio header as line 1.
 
 ## Verification and Acceptance Criteria
 
@@ -90,6 +90,7 @@ mode: agent
 - Shared Kernel types compile with nullable reference types enabled and are reusable by later slices.
 - Database constraints back up the code-level uniqueness rules for empNr and extension assignment.
 - Foundational tests cover invariant success and failure paths for employment guards, derivation, and result handling.
+- Result tests include direct coverage of both non-generic `Result` and generic `Result<T>` success/failure invariants.
 - `Result<T>.Value` is accessible only for successful results and throws a clear exception for failure results.
 - Model verification checks primary key shape directly and does not require a redundant unique index on the same key columns.
 - SQL Server constraint verification fails with actionable diagnostics when connectivity/setup is unavailable; tests must not silently return.
@@ -112,6 +113,7 @@ mode: agent
 - [ ] Database constraints back up the critical uniqueness rules.
 - [ ] Result, error, event, and exception primitives are reusable by later slices.
 - [ ] Verification evidence exists for invariant and mapping behavior.
+- [ ] Result primitive tests cover both `Result` and `Result<T>` invariants after any refactor.
 - [ ] Any repo-layout deviation from the plan is documented before dependent slice work begins.
 - [ ] No unique index duplicates a primary key column set unless explicitly justified and documented.
 - [ ] Environment/setup failures in persistence verification fail explicitly; no silent pass path remains.

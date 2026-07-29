@@ -134,6 +134,8 @@ Required coverage:
 - Tests, checks, or inspections to run
 - User-visible outcome or business rule satisfied
 - Solution hygiene when `.sln` files change: no duplicate project name/path entries, no duplicate GUID configuration blocks.
+- Solution-file format hygiene when `.sln` files change: the `Microsoft Visual Studio Solution File` header remains on line 1 with no leading blank line.
+- Foundational primitive coverage when shared base types are touched (for example `Result` and `Result<T>`): direct tests for non-generic and generic success/failure invariants.
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
 
