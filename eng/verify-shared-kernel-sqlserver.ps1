@@ -17,7 +17,18 @@ if (-not (Test-Path $testProject)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($env:ZEUS_SQLSERVER_CONNECTION)) {
-  if (-not $IsWindows) {
+  $isRunningOnWindows = $false
+  if ($PSVersionTable.PSVersion.Major -lt 6) {
+    $isRunningOnWindows = $true
+  }
+  elseif ($null -ne $IsWindows) {
+    $isRunningOnWindows = [bool]$IsWindows
+  }
+  else {
+    $isRunningOnWindows = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
+  }
+
+  if (-not $isRunningOnWindows) {
     throw "ZEUS_SQLSERVER_CONNECTION is required on non-Windows hosts because LocalDB is not available."
   }
 
@@ -26,11 +37,17 @@ if ([string]::IsNullOrWhiteSpace($env:ZEUS_SQLSERVER_CONNECTION)) {
 
 Write-Host "Restoring solution..." -ForegroundColor Cyan
 dotnet restore $solution
+if ($LASTEXITCODE -ne 0) {
+  throw "dotnet restore failed with exit code $LASTEXITCODE."
+}
 
 Write-Host "Running focused Shared Kernel tests..." -ForegroundColor Cyan
 dotnet test $testProject `
   --configuration $Configuration `
   --filter "FullyQualifiedName~Zeus.Academia.Tests.Features.SharedKernel.Foundation" `
   --logger "console;verbosity=normal"
+if ($LASTEXITCODE -ne 0) {
+  throw "dotnet test failed with exit code $LASTEXITCODE."
+}
 
 Write-Host "Shared Kernel SQL Server verification completed." -ForegroundColor Green
