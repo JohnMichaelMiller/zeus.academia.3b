@@ -1,6 +1,6 @@
-using Zeus.Academia.Features.SharedKernel.Foundation.ReferenceData;
+using Zeus.Academia.Backend.SharedKernel.ReferenceData;
 
-namespace Zeus.Academia.Features.SharedKernel.Foundation.Domain;
+namespace Zeus.Academia.Backend.SharedKernel.Academics;
 
 public sealed class AcademicQualification
 {

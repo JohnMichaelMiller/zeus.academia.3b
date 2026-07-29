@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
+using Zeus.Academia.Backend.SharedKernel.Academics;
 
-namespace Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
+namespace Zeus.Academia.Backend.SharedKernel.Persistence.Configurations;
 
 public sealed class AcademicEntityTypeConfiguration : IEntityTypeConfiguration<Academic>
 {
@@ -13,7 +13,7 @@ public sealed class AcademicEntityTypeConfiguration : IEntityTypeConfiguration<A
     builder.ToTable("Academics", tableBuilder =>
     {
       tableBuilder.HasCheckConstraint(
-        "CK_Academics_TenureContract_Xor",
+        "CK_Academics_TenureContract_Exclusive",
         "NOT ([IsTenured] = 1 AND [ContractEndDate] IS NOT NULL)");
     });
 

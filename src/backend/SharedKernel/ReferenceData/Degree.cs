@@ -1,4 +1,4 @@
-namespace Zeus.Academia.Features.SharedKernel.Foundation.ReferenceData;
+namespace Zeus.Academia.Backend.SharedKernel.ReferenceData;
 
 public sealed record Degree
 {

@@ -1,8 +1,8 @@
-using Zeus.Academia.Features.SharedKernel.Foundation.Abstractions;
-using Zeus.Academia.Features.SharedKernel.Foundation.Common.Exceptions;
-using Zeus.Academia.Features.SharedKernel.Foundation.ReferenceData;
+using Zeus.Academia.Backend.SharedKernel.Abstractions;
+using Zeus.Academia.Backend.SharedKernel.Common.Exceptions;
+using Zeus.Academia.Backend.SharedKernel.ReferenceData;
 
-namespace Zeus.Academia.Features.SharedKernel.Foundation.Domain;
+namespace Zeus.Academia.Backend.SharedKernel.Academics;
 
 public sealed class Academic
 {
@@ -218,13 +218,13 @@ public sealed class Academic
 
   private static void EnsureNoDuplicateDegrees(IEnumerable<AcademicQualification> qualifications)
   {
-    var duplicates = qualifications
+    var duplicateDegree = qualifications
       .GroupBy(q => q.DegreeCode, StringComparer.Ordinal)
-      .Any(group => group.Count() > 1);
+      .FirstOrDefault(group => group.Count() > 1);
 
-    if (duplicates)
+    if (duplicateDegree is not null)
     {
-      throw new BusinessRuleViolationException("Duplicate degree entries are not allowed for an academic.");
+      throw new BusinessRuleViolationException($"Duplicate degree '{duplicateDegree.Key}' is not allowed.");
     }
   }
 
@@ -232,22 +232,22 @@ public sealed class Academic
   {
     if (!qualifications.Any())
     {
-      throw new BusinessRuleViolationException("At least one qualification is required.");
+      throw new BusinessRuleViolationException("An academic must have at least one qualification.");
     }
   }
 
   private static void EnsureEmploymentState(bool isTenured, DateOnly? contractEndDate)
   {
-    if (isTenured && contractEndDate is not null)
+    if (isTenured && contractEndDate.HasValue)
     {
-      throw new BusinessRuleViolationException("An academic cannot be tenured and contracted at the same time.");
+      throw new BusinessRuleViolationException(
+        "An academic cannot be both tenured and contracted at the same time.");
     }
   }
 
   private static void EnsureContractEndDateIsFuture(DateOnly contractEndDate)
   {
-    var today = DateOnly.FromDateTime(DateTime.UtcNow);
-    if (contractEndDate <= today)
+    if (contractEndDate <= DateOnly.FromDateTime(DateTime.UtcNow))
     {
       throw new BusinessRuleViolationException("Contract end date must be in the future.");
     }
