@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Path $PSScriptRoot -Parent
 $solution = Join-Path $repoRoot "zeus.academia.3b.sln"
-$testProject = Join-Path $repoRoot "tests/Features/SharedKernel/Foundation/Zeus.Academia.Tests.Features.SharedKernel.Foundation.csproj"
+$testProject = Join-Path $repoRoot "tests/SharedKernel/Zeus.Academia.Tests.SharedKernel.csproj"
 
 if (-not (Test-Path $solution)) {
   throw "Solution file not found: $solution"
@@ -27,11 +27,17 @@ if ([string]::IsNullOrWhiteSpace($env:ZEUS_SQLSERVER_CONNECTION)) {
 
 Write-Host "Restoring solution..." -ForegroundColor Cyan
 dotnet restore $solution
+if ($LASTEXITCODE -ne 0) {
+  throw "dotnet restore failed with exit code $LASTEXITCODE"
+}
 
 Write-Host "Running focused Shared Kernel tests..." -ForegroundColor Cyan
 dotnet test $testProject `
   --configuration $Configuration `
-  --filter "FullyQualifiedName~Zeus.Academia.Tests.Features.SharedKernel.Foundation" `
+  --filter "FullyQualifiedName~Zeus.Academia.Tests.SharedKernel" `
   --logger "console;verbosity=normal"
+if ($LASTEXITCODE -ne 0) {
+  throw "dotnet test failed with exit code $LASTEXITCODE"
+}
 
 Write-Host "Shared Kernel SQL Server verification completed." -ForegroundColor Green
