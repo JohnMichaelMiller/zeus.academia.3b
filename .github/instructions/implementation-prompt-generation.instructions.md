@@ -30,6 +30,7 @@ applyTo: ".github/prompts/**/*implementation*.prompt.md"
 - The prompt MUST produce implementation guidance that is concrete enough for both AI agents and humans to execute and verify.
 - The prompt MUST align with existing repository standards before prescribing code changes.
 - The prompt MUST explicitly require the implementation to follow [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) and keep the slice under `src/features/<Feature>/<UseCase>/` rather than splitting it across layer-oriented folders.
+
 ## Naming and Location
 
 - Store reusable implementation prompts in `.github/prompts/`.
@@ -182,6 +183,10 @@ The section MUST cover, when applicable:
 - authorization or role restrictions
 - user-visible feedback
 - test coverage expectations
+- result-wrapper invariants for success/failure access patterns (for example, `Result<T>.Value` must not be consumable on failure)
+- database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
+- named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
+- solution-file integrity when `.sln` is touched (no duplicate project name/path entries and no duplicate configuration blocks for equivalent projects)
 
 Bad:
 
@@ -202,6 +207,7 @@ Specify how the slice will be verified:
 - manual checks
 - evidence to collect
 - residual-risk callouts if verification is partial
+- behavior when environment prerequisites are missing (tests MUST fail explicitly with actionable diagnostics; no early return/skipped-by-default pattern)
 
 The prompt MUST distinguish between required verification and optional follow-up checks.
 
@@ -258,6 +264,9 @@ End the prompt with a checklist that verifies prompt quality before use.
 - [ ] Showcase steps can be executed by a human without hidden knowledge.
 - [ ] The value of the slice is demonstrated explicitly.
 - [ ] Non-goals and dependency constraints are stated.
+- [ ] Persistence rules avoid redundant uniqueness definitions (no PK + duplicate unique index on same columns unless explicitly justified).
+- [ ] Verification instructions require explicit failure for missing infrastructure prerequisites (no silent pass/early return).
+- [ ] Shared result contracts include invariant access rules for success/failure payloads.
 
 ## Anti-Patterns
 
@@ -268,6 +277,8 @@ End the prompt with a checklist that verifies prompt quality before use.
 - Demo steps that omit expected outcomes.
 - Verification sections that say "run tests" without naming the test scope or commands.
 - Prompts that assume a missing custom agent already exists.
+- Prompting persistence work that adds a unique index on the same columns as an existing primary key.
+- Prompting integration/constraint tests to catch-and-return on connection/setup errors instead of failing explicitly.
 
 ## Output Standard
 

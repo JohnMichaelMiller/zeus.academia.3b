@@ -51,7 +51,14 @@ applyTo: "**"
   - Null argument validation for non-nullable API inputs.
   - No mutable collection escape through read-only interfaces.
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
+  - No duplicate project declarations in solution files; project name/path pairs must appear once with one GUID and one configuration block.
+  - Any touched solution file must keep the required Visual Studio header as the first line with no leading blank line or stray BOM-only line.
+  - Database constraint names must match predicate semantics; reserve "Xor" naming for strict exactly-one rules and use explicit mutual-exclusion naming when both-false is allowed.
   - Method and type naming remains compliant with language conventions (for example PascalCase in C#).
+  - Exception and failure messages never include secrets (connection strings, credentials, tokens, keys).
+  - Shared foundational primitives (for example Result/Error base types) retain direct tests for both non-generic and generic invariants when touched.
+  - Public/shared parse or mapping APIs retain direct acceptance tests when touched; do not remove only-path coverage without replacement.
+  - Constrained-code parse/validation failures remain actionable by including allowed values (prefer constants over inline literals).
 
 **Prohibited Without Review:**
 

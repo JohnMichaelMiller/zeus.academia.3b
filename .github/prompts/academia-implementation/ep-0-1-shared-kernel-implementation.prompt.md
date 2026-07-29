@@ -53,12 +53,12 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                 | Responsibilities                                                                | Inputs                                                   | Outputs                                   | Escalate when                                                                  |
-| -------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------ |
-| slice-coordinator    | confirm folder roots, final type list, and sequence                             | execution plan, implementation plan, current source tree | approved artifact map and blocker list    | current repo layout conflicts with the planned SharedKernel location           |
-| backend-domain       | implement aggregate, value objects, result types, exceptions, and domain events | approved artifact map, business rules                    | domain types and invariant logic          | a rule cannot be expressed cleanly without clarifying the aggregate boundary   |
-| data-persistence     | implement EF Core mappings, indexes, and migration support                      | domain model, persistence standards                      | mappings, constraints, migration updates  | a database rule would drift from the aggregate rule                            |
-| testing-verification | add invariant tests, mapping tests, and migration validation evidence           | implemented kernel artifacts                             | passing tests and proof of enforced rules | tests expose ambiguity in XOR, access-level derivation, or qualification rules |
+| Role                 | Responsibilities                                                                | Inputs                                                   | Outputs                                   | Escalate when                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm folder roots, final type list, and sequence                             | execution plan, implementation plan, current source tree | approved artifact map and blocker list    | current repo layout conflicts with the planned SharedKernel location                                 |
+| backend-domain       | implement aggregate, value objects, result types, exceptions, and domain events | approved artifact map, business rules                    | domain types and invariant logic          | a rule cannot be expressed cleanly without clarifying the aggregate boundary                         |
+| data-persistence     | implement EF Core mappings, indexes, and migration support                      | domain model, persistence standards                      | mappings, constraints, migration updates  | a database rule would drift from the aggregate rule                                                  |
+| testing-verification | add invariant tests, mapping tests, and migration validation evidence           | implemented kernel artifacts                             | passing tests and proof of enforced rules | tests expose ambiguity in employment-rule semantics, access-level derivation, or qualification rules |
 
 ## Ordered Implementation Steps
 
@@ -69,27 +69,31 @@ mode: agent
 2. Implement the domain model and invariant methods.
    Targets: Shared Kernel aggregate and value-object files, especially Academic employment guards and Rank to AccessLevel derivation.
    Owner: backend-domain.
-   Validation before next step: the aggregate enforces tenured XOR contracted state and AccessLevel is derived only from Rank.
+   Validation before next step: the aggregate enforces the employment mutual-exclusion rule (never both tenured and contracted) and AccessLevel is derived only from Rank.
 3. Implement persistence mappings and hard database constraints.
    Targets: EF Core entity configurations, indexes, and base migration updates for empNr uniqueness and extension uniqueness.
    Owner: data-persistence.
-   Validation before next step: mappings align with domain rules and no persistence rule contradicts the aggregate.
+   Validation before next step: mappings align with domain rules, no persistence rule contradicts the aggregate, no unique index duplicates an existing primary key column set, and check-constraint naming matches predicate semantics (do not use Xor naming unless strict exactly-one is enforced).
 4. Add reusable error/result plumbing and domain event contracts.
    Targets: Shared Kernel result types, error primitives, event interfaces, and common exceptions.
    Owner: backend-domain.
-   Validation before next step: later slices can consume common result and exception types without redefining them.
+   Validation before next step: later slices can consume common result and exception types without redefining them, and `Result<T>.Value` throws on failure access instead of exposing `default!`.
 5. Verify invariants and persistence behavior.
    Targets: unit tests, mapping tests, and migration validation.
    Owner: testing-verification.
-   Validation before next step: all foundational tests pass and failures clearly identify which invariant broke.
+   Validation before next step: all foundational tests pass, failures clearly identify which invariant broke, infrastructure/setup failures fail explicitly (no catch-and-return skip path), any touched solution file has no duplicate project declarations, and any touched solution file keeps the Visual Studio header as line 1.
 
 ## Verification and Acceptance Criteria
 
-- Creating or mutating an Academic cannot leave both IsTenured and ContractEndDate set at the same time.
+- Creating or mutating an Academic cannot leave both IsTenured and ContractEndDate set at the same time; constraint names and test names must reflect this mutual-exclusion semantic unless strict XOR is explicitly required.
 - Rank values map only as P -> INT, SL -> NAT, and L -> LOC, and AccessLevel is never assigned directly.
 - Shared Kernel types compile with nullable reference types enabled and are reusable by later slices.
 - Database constraints back up the code-level uniqueness rules for empNr and extension assignment.
 - Foundational tests cover invariant success and failure paths for employment guards, derivation, and result handling.
+- Result tests include direct coverage of both non-generic `Result` and generic `Result<T>` success/failure invariants.
+- `Result<T>.Value` is accessible only for successful results and throws a clear exception for failure results.
+- Model verification checks primary key shape directly and does not require a redundant unique index on the same key columns.
+- SQL Server constraint verification fails with actionable diagnostics when connectivity/setup is unavailable; tests must not silently return.
 
 ## Human Showcase Steps
 
@@ -109,4 +113,7 @@ mode: agent
 - [ ] Database constraints back up the critical uniqueness rules.
 - [ ] Result, error, event, and exception primitives are reusable by later slices.
 - [ ] Verification evidence exists for invariant and mapping behavior.
+- [ ] Result primitive tests cover both `Result` and `Result<T>` invariants after any refactor.
 - [ ] Any repo-layout deviation from the plan is documented before dependent slice work begins.
+- [ ] No unique index duplicates a primary key column set unless explicitly justified and documented.
+- [ ] Environment/setup failures in persistence verification fail explicitly; no silent pass path remains.

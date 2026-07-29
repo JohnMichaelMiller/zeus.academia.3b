@@ -53,7 +53,6 @@ Foundational C# best practices for clean, maintainable, type-safe code using mod
 - MUST use file-scoped namespaces (C# 10+)
 - MUST organize members: fields → constructors → properties → methods
 - MUST match namespace to folder structure
-- MUST use the SDK-style C# project type GUID in `.sln` files for SDK-style `.csproj` projects
 
 **Template:**
 
@@ -91,7 +90,6 @@ public sealed class Order
 - MUST NOT use `!` null-forgiving operator without validation
 - MUST use null-conditional (`?.`) and null-coalescing (`??`) operators
 - MUST validate parameters with `ArgumentNullException.ThrowIfNull(param)` (C# 12+)
-- MUST validate factory/static inputs for non-nullable reference parameters (including error/result wrappers)
 
 **Examples:**
 
@@ -113,25 +111,6 @@ public void ProcessOrder(Order order)
 public Order FindOrder(Guid id)
 {
     return _repository.GetById(id)!; // Null-forgiving without validation
-}
-```
-
-## String normalization and validation
-
-**Rules:**
-
-- Before calling `.Trim()`, `.ToUpperInvariant()`, `.ToLowerInvariant()`, or similar string methods, guard against `null`, empty, and whitespace input first.
-- Prefer `string.IsNullOrWhiteSpace(value)` or `ArgumentNullException.ThrowIfNull(value)` plus a whitespace check when a caller-supplied string is required.
-- For public or handler-facing APIs, throw `ArgumentException` for null/empty/whitespace input and keep the message specific; do not allow a `NullReferenceException` from a later `.Trim()` call.
-- Example:
-
-```csharp
-public static string NormalizeCode(string? value)
-{
-    if (string.IsNullOrWhiteSpace(value))
-        throw new ArgumentException("Degree code must not be empty.", nameof(value));
-
-    return value.Trim().ToUpperInvariant();
 }
 ```
 
@@ -202,11 +181,10 @@ public Order GetOrder(Guid orderId)
 - MUST use specific exception types (`ArgumentException`, `InvalidOperationException`, custom)
 - MUST NOT throw generic `Exception`
 - MUST validate at API boundaries (controllers, handlers)
-- MUST keep exception messages consistent with the type name and surrounding conventions, especially for value objects and public API failures
 - MUST log exceptions before rethrowing or wrapping
+- MUST NOT include secrets (connection strings, credentials, tokens, keys) in exception or log messages; redact or omit sensitive values
+- SHOULD keep validation/parse failures actionable by listing allowed values when inputs are constrained (using existing constants, not duplicated literals)
 - SHOULD create domain-specific exceptions for business rule violations
-- MUST reject null, empty, or whitespace values for non-`None` errors (including `code` and `message`)
-- MUST preserve result invariants so a success result exposes a non-nullable value and a failed result cannot be treated as success
 
 **Template:**
 
@@ -227,21 +205,46 @@ public void AddItem(OrderItem item)
 }
 ```
 
-## Encapsulation and Collection Safety
+## Result and Invariant Access Patterns
+
+Use explicit state guards for success/failure wrappers so invalid states fail loudly.
 
 **Rules:**
 
-- MUST NOT expose mutable internal collections directly, even when typed as `IReadOnlyCollection<T>` or `IReadOnlyList<T>`.
-- MUST return read-only wrappers (`AsReadOnly()` or immutable snapshots) for externally visible collection properties.
-- SHOULD keep mutation methods explicit on the aggregate/entity and prevent external downcast-based mutation.
+- MUST prevent value consumption from failed results (`Value` access throws on failure)
+- MUST prevent null success values for reference-type payloads
+- MUST validate failure payloads so "empty error" failures are not representable
+- MUST NOT expose `default!` as a consumable failure value
 
-## EF Core Persistence Guardrails
+**Template:**
 
-**Rules:**
+```csharp
+public sealed class Result<TValue>
+{
+    private readonly TValue? _value;
 
-- MUST avoid duplicate uniqueness enforcement for the same key path.
-- If a property is the primary key, do not add a second unique index on that same property unless there is a documented and measurable reason.
-- Keep SQL baseline scripts consistent with EF mapping decisions to avoid redundant indexes and review churn.
+    private Result(TValue value)
+    {
+        IsSuccess = true;
+        _value = value;
+    }
+
+    private Result(Error error)
+    {
+        IsSuccess = false;
+        Error = error;
+    }
+
+    public bool IsSuccess { get; }
+    public bool IsFailure => !IsSuccess;
+    public Error Error { get; } = Error.None;
+
+    public TValue Value =>
+        IsSuccess
+            ? _value ?? throw new InvalidOperationException("Successful result must include a value.")
+            : throw new InvalidOperationException("Cannot access Value when result is a failure.");
+}
+```
 
 ## Expression-Bodied Members
 
@@ -408,6 +411,7 @@ public class Order
 | Mutable static state         | Dependency injection             |
 | Service locator              | Constructor injection            |
 | String concatenation in loop | `StringBuilder` or interpolation |
+| `Result<T>.Value` readable on failure | Throw when failure value is accessed |
 
 ## Validation Checklist
 
@@ -427,6 +431,9 @@ Before committing C# code:
 - [ ] Records used for immutable data, classes for entities
 - [ ] Factory methods validate all persisted constraints (max-lengths, required fields) against value object constants, not inline literals
 - [ ] Domain value object constants (`MaxCodeLength`, `RequiredLength`, etc.) are used in both factory validation and EF Core configuration — never duplicated as raw literals
+- [ ] Result wrappers protect invariants (`Value` is inaccessible for failures, success values are non-null)
+- [ ] Exception and log messages are sanitized (no raw secrets, credentials, or full connection strings)
+- [ ] Constrained-input parse/validation errors remain actionable and reference allowed values via named constants
 
 ## Integration
 

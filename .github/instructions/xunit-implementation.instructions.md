@@ -42,13 +42,7 @@ tags: [xunit, testing, csharp, backend, unit-tests, integration-tests]
 - **Descriptive Names**: Test name explains what/when/expected
 - **Isolated Tests**: No dependencies between tests
 - **Fast Execution**: Unit tests <100ms, integration tests <1s
-
-## Infrastructure-Backed Tests
-
-- Database-backed tests should be configurable through environment variables and should not hard-code LocalDB or other provider-specific defaults.
-- When connection configuration is absent, fail clearly with actionable guidance instead of silently using a platform-specific fallback.
-- For SQL Server or other external dependency tests, prefer focused test filters or narrower verification steps for the relevant persistence path unless the broader suite is explicitly required.
-- Tests should cover the missing-configuration or invalid-connection case when a slice introduces new infrastructure-backed verification.
+- **No Silent Passes**: Missing infrastructure or setup errors MUST fail with actionable diagnostics, not skip via `return`
 
 ## File Organization
 
@@ -490,12 +484,13 @@ student.Should().Match<Student>(s =>
 - [ ] Mocks configured before Act phase
 - [ ] Async tests use `async Task` (not `async void`)
 - [ ] CancellationToken passed to async methods
-- [ ] SQL Server-backed tests treat the configured connection string as server-level and override `InitialCatalog` to a unique per-run database name
-- [ ] Destructive SQL setup (`EnsureDeleted`, schema reset) runs only against isolated test databases, never shared or production catalogs
 - [ ] Integration tests use test database or in-memory provider
 - [ ] Expensive setup shared via fixtures
 - [ ] Tests don't depend on execution order
 - [ ] No hardcoded waits (`Task.Delay`)
+- [ ] Public/shared parsing or mapping APIs touched by a change retain direct acceptance tests for valid inputs
+- [ ] Invalid-input tests verify behavior and actionable diagnostics (for constrained codes, include allowed-value hints)
+- [ ] Refactors do not remove the only direct test coverage of a public/shared API without adding equivalent replacement tests
 
 ## Anti-Patterns
 
@@ -522,3 +517,6 @@ student.Should().Match<Student>(s =>
 
 ❌ Production database in tests
 ✅ In-memory database or test containers
+
+❌ Catching setup exceptions and returning from a test
+✅ Fail with a clear assertion/message so verification cannot silently pass
