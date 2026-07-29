@@ -53,6 +53,17 @@ function Invoke-Gh {
   }
 }
 
+function Get-GhOutput {
+  param([Parameter(Mandatory = $true)][string[]]$Args)
+
+  $output = & gh @Args 2>$null
+  if ($LASTEXITCODE -ne 0) {
+    return $null
+  }
+
+  return ($output | Out-String).Trim()
+}
+
 Assert-Command -Name "git"
 Assert-Command -Name "gh"
 
@@ -123,8 +134,19 @@ Invoke-Git @("merge", "--no-ff", $BranchName, "-m", "merge: $BranchName into $Ma
 Write-Host "Pushing $MainBranch to origin..." -ForegroundColor Cyan
 Invoke-Git @("push", "origin", $MainBranch)
 
-Write-Host "Closing PR #$PrNumber..." -ForegroundColor Cyan
-Invoke-Gh @("pr", "close", "$PrNumber", "--comment", "Closed by reset-part-eight-branch automation after merge to $MainBranch.")
+Write-Host "Checking PR #$PrNumber state..." -ForegroundColor Cyan
+$prState = Get-GhOutput @("pr", "view", "$PrNumber", "--json", "state", "--jq", ".state")
+if ([string]::IsNullOrWhiteSpace($prState)) {
+  throw "Unable to read state for PR #$PrNumber."
+}
+
+if ($prState -eq "OPEN") {
+  Write-Host "Closing PR #$PrNumber..." -ForegroundColor Cyan
+  Invoke-Gh @("pr", "close", "$PrNumber", "--comment", "Closed by reset-branch automation after merge to $MainBranch.")
+}
+else {
+  Write-Host "PR #$PrNumber is $prState. Skipping close." -ForegroundColor Yellow
+}
 
 $branchExistsLocalAfterMerge = -not [string]::IsNullOrWhiteSpace((Get-GitOutput @("show-ref", "--verify", "refs/heads/$BranchName")))
 if ($branchExistsLocalAfterMerge) {
