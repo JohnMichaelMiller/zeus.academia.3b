@@ -128,6 +128,7 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 
 - [ ] No obvious bugs or logic errors
 - [ ] Follows project conventions (naming, structure, patterns)
+- [ ] Follows [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) for slice scope, folder boundaries, and naming
 - [ ] Security best practices applied (no hardcoded secrets, SQL injection risks)
 - [ ] Error handling appropriate for context
 - [ ] Performance acceptable (no N+1 queries, excessive allocations)
@@ -231,6 +232,7 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 - [ ] All commits signed (if repository requires)
 - [ ] Commit messages use conventional format: `<type>(<scope>): <subject>`
 - [ ] AI-generated files include complete metadata
+- [ ] Slice changes comply with [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) and keep use-case artifacts co-located under the feature-domain tree
 - [ ] Tests added/updated for all functional changes
 - [ ] No secrets, credentials, or PII in diff
 - [ ] Linting passes (`eslint`, `pylint`, `clippy`, etc.)

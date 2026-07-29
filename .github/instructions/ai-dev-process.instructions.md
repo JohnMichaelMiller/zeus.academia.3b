@@ -36,6 +36,7 @@ applyTo: "**"
 - MUST include complete provenance metadata (see ai-assisted-output.instructions.md)
 - MUST pass existing tests or include new passing tests
 - MUST follow project style, patterns, and conventions
+- MUST follow [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) for all slice implementation work (feature-domain first, use-case folder ownership, no layer-root splitting)
 - MUST document non-obvious logic, edge cases, assumptions
 - MUST reference source prompt or instruction file
 
@@ -48,6 +49,7 @@ applyTo: "**"
   - Windows-only fallbacks (for example LocalDB) must be explicitly guarded.
   - On non-Windows, require explicit environment configuration instead of silent fallback.
 - MUST run a focused self-review for common correctness regressions before opening PR:
+  - Vertical slice layout and boundaries match [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md).
   - Null argument validation for non-nullable API inputs.
   - No mutable collection escape through read-only interfaces.
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
