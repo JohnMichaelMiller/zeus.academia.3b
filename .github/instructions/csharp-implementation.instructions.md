@@ -90,6 +90,7 @@ public sealed class Order
 - MUST NOT use `!` null-forgiving operator without validation
 - MUST use null-conditional (`?.`) and null-coalescing (`??`) operators
 - MUST validate parameters with `ArgumentNullException.ThrowIfNull(param)` (C# 12+)
+- MUST validate factory/static inputs for non-nullable reference parameters (including error/result wrappers)
 
 **Examples:**
 
@@ -141,7 +142,7 @@ public static string NormalizeCode(string? value)
 | Mutable entities           | `class`  | Identity equality, lifecycle          |
 | Single-value wrapper       | `record` | Strong typing, no primitive obsession |
 | Behavior + state           | `class`  | Methods + encapsulation               |
-| Collection of values      | `record` | Structural equality                   |
+| Collection of values       | `record` | Structural equality                   |
 
 **Examples:**
 
@@ -202,6 +203,22 @@ public Order GetOrder(Guid orderId)
 - MUST validate at API boundaries (controllers, handlers)
 - MUST log exceptions before rethrowing or wrapping
 - SHOULD create domain-specific exceptions for business rule violations
+
+## Encapsulation and Collection Safety
+
+**Rules:**
+
+- MUST NOT expose mutable internal collections directly, even when typed as `IReadOnlyCollection<T>` or `IReadOnlyList<T>`.
+- MUST return read-only wrappers (`AsReadOnly()` or immutable snapshots) for externally visible collection properties.
+- SHOULD keep mutation methods explicit on the aggregate/entity and prevent external downcast-based mutation.
+
+## EF Core Persistence Guardrails
+
+**Rules:**
+
+- MUST avoid duplicate uniqueness enforcement for the same key path.
+- If a property is the primary key, do not add a second unique index on that same property unless there is a documented and measurable reason.
+- Keep SQL baseline scripts consistent with EF mapping decisions to avoid redundant indexes and review churn.
 
 **Template:**
 

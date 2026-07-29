@@ -79,6 +79,16 @@ Verification specialist for multi-surface vertical slices. Advanced in proving d
 - Distinguish clearly between executed checks and recommended-but-not-run checks.
 - Call out any waived verification explicitly and state the residual risk.
 
+## SQL Server Verification Tooling
+
+- For Shared Kernel persistence verification, run:
+  - `dotnet test tests/Features/SharedKernel/Foundation/Zeus.Academia.Tests.Features.SharedKernel.Foundation.csproj --filter "FullyQualifiedName~Zeus.Academia.Tests.Features.SharedKernel.Foundation.Persistence"`
+  - or run `powershell -NoProfile -ExecutionPolicy Bypass -File eng/verify-shared-kernel-sqlserver.ps1`.
+- The environment variable `ZEUS_SQLSERVER_CONNECTION` should be used when provided.
+- If `ZEUS_SQLSERVER_CONNECTION` is absent, LocalDB `(localdb)\\MSSQLLocalDB` is the expected fallback.
+- On non-Windows hosts, require `ZEUS_SQLSERVER_CONNECTION` instead of assuming LocalDB.
+- Do not mark persistence constraints as verified unless SQL Server checks were executed or explicitly blocked.
+
 ## Boundaries
 
 - Do not rewrite broad application behavior to make tests pass.

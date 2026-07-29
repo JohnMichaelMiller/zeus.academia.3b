@@ -39,6 +39,20 @@ applyTo: "**"
 - MUST document non-obvious logic, edge cases, assumptions
 - MUST reference source prompt or instruction file
 
+**Pre-PR Review-Prevention Checks (Required):**
+
+- MUST verify reference integrity for every documented command/path before commit:
+  - If documentation or agent guidance references a file, that file must be committed in the same change.
+  - If guidance references an editor task (for example a VS Code task), the corresponding task file must exist in the repository; otherwise reference a committed script command instead.
+- MUST validate platform assumptions for runtime tooling:
+  - Windows-only fallbacks (for example LocalDB) must be explicitly guarded.
+  - On non-Windows, require explicit environment configuration instead of silent fallback.
+- MUST run a focused self-review for common correctness regressions before opening PR:
+  - Null argument validation for non-nullable API inputs.
+  - No mutable collection escape through read-only interfaces.
+  - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
+  - Method and type naming remains compliant with language conventions (for example PascalCase in C#).
+
 **Prohibited Without Review:**
 
 - Security-critical code (auth, crypto, permissions)
@@ -106,7 +120,6 @@ applyTo: "**"
 **Approval Gates:**
 
 1. **AI Review Pass** (automated)
-
    - No high-severity issues unresolved
    - All required tests passing
    - Provenance metadata complete (AI-generated code)
@@ -140,6 +153,7 @@ applyTo: "**"
 Refer to [Git Workflow](git-workflow.instructions.md) for all CI, testing, and metadata requirements.
 
 **Process Gates:**
+
 - [ ] AI Review completed
 - [ ] Human Review completed
 - [ ] PR Approval granted

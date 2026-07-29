@@ -99,6 +99,7 @@ Agent profiles are Markdown files with YAML frontmatter plus a Markdown prompt b
 - Unrestricted shell execution when unnecessary.
 - Missing output constraints (format, scope, files).
 - Implied behavior that depends on hidden assumptions.
+- Referencing local editor tasks or helper files that are not committed in the repository.
 
 ### Persona Definition (required for role/persona-type agents)
 
@@ -202,6 +203,8 @@ Expected: Agent declines/escalates and states the reason
 - [ ] **Persona agents**: escalation triggers explicitly stated.
 - [ ] **Persona agents**: evidence standards defined for all recommendation behaviors.
 - [ ] At least two behavior test prompts included (one core, one boundary/refusal).
+- [ ] Any command, script path, or task reference in the prompt body is executable from repository contents as committed.
+- [ ] If a task reference is used, the corresponding task definition file exists in-repo; otherwise a canonical script command is provided.
 
 ## Example Profiles
 
