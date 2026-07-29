@@ -47,6 +47,9 @@ applyTo: "**"
 - MUST validate platform assumptions for runtime tooling:
   - Windows-only fallbacks (for example LocalDB) must be explicitly guarded.
   - On non-Windows, require explicit environment configuration instead of silent fallback.
+  - Repository helper scripts and tests that depend on external services must prefer environment-variable-based configuration rather than hard-coded platform defaults.
+  - PR or verification scripts must not hard-code branch names or assume optional files exist; use dynamic branch detection or explicit parameters and guard missing files before invoking CLI tools.
+  - When a slice adds verification tooling, prefer the narrowest relevant test scope unless a broader suite is explicitly required.
 - MUST run a focused self-review for common correctness regressions before opening PR:
   - Null argument validation for non-nullable API inputs.
   - No mutable collection escape through read-only interfaces.

@@ -43,6 +43,13 @@ tags: [xunit, testing, csharp, backend, unit-tests, integration-tests]
 - **Isolated Tests**: No dependencies between tests
 - **Fast Execution**: Unit tests <100ms, integration tests <1s
 
+## Infrastructure-Backed Tests
+
+- Database-backed tests should be configurable through environment variables and should not hard-code LocalDB or other provider-specific defaults.
+- When connection configuration is absent, fail clearly with actionable guidance instead of silently using a platform-specific fallback.
+- For SQL Server or other external dependency tests, prefer focused test filters or narrower verification steps for the relevant persistence path unless the broader suite is explicitly required.
+- Tests should cover the missing-configuration or invalid-connection case when a slice introduces new infrastructure-backed verification.
+
 ## File Organization
 
 - `tests/Zeus.Academia.UnitTests/` - Unit tests

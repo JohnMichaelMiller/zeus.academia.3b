@@ -163,6 +163,8 @@ When persisted data can drift outside domain expectations, read-path failure han
 
 When the slice depends on provider-specific EF Core behavior, such as SQL Server decimal precision, filtered indexes, collations, computed columns, or constraint translation, the prompt must require verification against the target provider or generated migration output. SQLite-only checks are not sufficient unless the prompt explicitly states that provider parity is out of scope.
 
+For repository automation, verification scripts, or tests that depend on external services or platform-specific defaults, the prompt must require repository-safe configuration conventions. For SQL Server-backed verification, require environment-variable-based connection resolution (for example `ZEUS_SQLSERVER_CONNECTION`) and only allow Windows-only fallbacks such as LocalDB when the platform is Windows. On non-Windows hosts, the prompt must require explicit configuration and a clear failure path instead of a silent fallback. For helper scripts such as PR creation or verification scripts, the prompt must require dynamic branch handling or an explicit parameter rather than hard-coding the current branch, and it must guard optional input files before invoking CLI tools. When a slice introduces verification tooling, the prompt must require the narrowest relevant test scope unless the wider suite is explicitly required.
+
 Do not let a schema-changing prompt stop at "migration support" or "schema evidence." The prompt must distinguish mapping-only persistence work from schema-changing persistence work.
 
 Preferred phrasing:
@@ -181,6 +183,12 @@ Implementation prompts must separate implementation from verification. The verif
 - tests, commands, or manual inspection steps when available
 - evidence to capture, such as logs, screenshots, response samples, or test output
 - unresolved issues that block moving from implemented to verified
+
+If the prompt claims persistence foundations, database constraints, or migration support, verification must include schema evidence. Passing unit tests or mapping tests alone is insufficient when the rule is supposed to be durable at the database level.
+
+If the slice changes schema, verification must also confirm that a committed migration artifact exists in the diff unless the prompt explicitly waives migrations and explains why.
+
+Verification should also call out reviewer-facing hygiene when the slice produces durable artifacts or tests. At minimum, require durable README entries to link back to the artifact log when traceability applies, and require test names to describe the actual scenario and expectation rather than a nearby but different failure mode.
 
 A slice is not complete because code exists. It is complete when the prompt's verification path has been executed and evidence has been captured or explicitly waived by a human.
 
@@ -283,6 +291,8 @@ Example for a single slice:
 - [ ] Implementation steps are ordered and concrete
 - [ ] Acceptance criteria are observable
 - [ ] Verification evidence is captured
+- [ ] Schema-changing work names the required migration artifact and how it will be verified
+- [ ] Deferred durable invariants are either temporarily safeguarded now or tracked with an explicit owning follow-up slice and risk note
 - [ ] Showcase steps demonstrate business value
 ```
 
@@ -293,6 +303,7 @@ Do not author implementation prompts that:
 - assign all work to one generic agent without role boundaries
 - skip repository context review and invent new patterns unnecessarily
 - use acceptance criteria that cannot be observed, tested, or inspected
+- imply a rule is durably enforced without stating whether it is enforced now, temporarily safeguarded, or deferred to a later slice
 - describe showcase steps only in terms of code internals
 - span multiple unrelated slices in one prompt
 - stop at implementation instructions and omit verification or showcase paths

@@ -201,6 +201,7 @@ public Order GetOrder(Guid orderId)
 - MUST use specific exception types (`ArgumentException`, `InvalidOperationException`, custom)
 - MUST NOT throw generic `Exception`
 - MUST validate at API boundaries (controllers, handlers)
+- MUST keep exception messages consistent with the type name and surrounding conventions, especially for value objects and public API failures
 - MUST log exceptions before rethrowing or wrapping
 - SHOULD create domain-specific exceptions for business rule violations
 
@@ -421,6 +422,8 @@ Before committing C# code:
 - [ ] No `.Result`, `.Wait()`, or blocking async calls
 - [ ] Expression-bodied members used for simple cases
 - [ ] Records used for immutable data, classes for entities
+- [ ] Factory methods validate all persisted constraints (max-lengths, required fields) against value object constants, not inline literals
+- [ ] Domain value object constants (`MaxCodeLength`, `RequiredLength`, etc.) are used in both factory validation and EF Core configuration — never duplicated as raw literals
 
 ## Integration
 

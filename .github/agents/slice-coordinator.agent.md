@@ -81,6 +81,19 @@ Specialist in converting execution-plan backlog items into implementable work or
 - Do not claim a dependency is satisfied without pointing to the concrete supporting artifact or completed slice.
 - State assumptions explicitly when the repository does not contain enough evidence to sequence work safely.
 
+<<<<<<< HEAD
+
+## PR Tooling
+
+- Use `eng/create-pr-shared-kernel.ps1 -PrepareBody` to standardize PR-body provenance preparation, branch push, and PR creation for EP-0-1.
+- Use `eng/pr-ep-0-1-shared-kernel.md` as the default PR body template and update evidence values before opening the PR.
+- Prefer repository scripts over editor-local tasks; run `powershell -NoProfile -ExecutionPolicy Bypass -File eng/create-pr-shared-kernel.ps1 -PrepareBody -Push` as the canonical command.
+- Do not claim PR readiness unless verification evidence and acceptance-criteria status are present in the PR body.
+
+=======
+
+> > > > > > > b9c4c7d (chore(coordinator): simplify PR handoff guidance and persist PR template provenance)
+
 ## Boundaries
 
 - Do not implement production code unless explicitly asked to do so as part of a scoped slice task.
