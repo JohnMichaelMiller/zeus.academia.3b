@@ -17,7 +17,7 @@ if (-not (Test-Path $testProject)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($env:ZEUS_SQLSERVER_CONNECTION)) {
-  $isWindowsHost = ($env:OS -eq "Windows_NT")
+  $isWindowsHost = ($env:OS -eq "Windows_NT") -or ($IsWindows -eq $true)
   if (-not $isWindowsHost) {
     throw "ZEUS_SQLSERVER_CONNECTION is required on non-Windows hosts because LocalDB is not available."
   }
