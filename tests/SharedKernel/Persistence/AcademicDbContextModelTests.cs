@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
-using Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
+using Zeus.Academia.Backend.SharedKernel.Academics;
+using Zeus.Academia.Backend.SharedKernel.Persistence;
 
-namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation.Persistence;
+namespace Zeus.Academia.Tests.SharedKernel.Persistence;
 
 public sealed class AcademicDbContextModelTests
 {
@@ -21,7 +21,7 @@ public sealed class AcademicDbContextModelTests
 
     Assert.NotNull(entityType);
     var checkConstraints = entityType!.GetCheckConstraints();
-    Assert.Contains(checkConstraints, c => c.Name == "CK_Academics_TenureContract_Xor");
+    Assert.Contains(checkConstraints, c => c.Name == "CK_Academics_TenureContract_Exclusive");
   }
 
   [Fact]
