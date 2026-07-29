@@ -31,6 +31,12 @@ public class Result
   public static Result Failure(Error error)
   {
     ArgumentNullException.ThrowIfNull(error);
+
+    if (error == Error.None)
+    {
+      throw new ArgumentException("A failed result requires a non-empty error.", nameof(error));
+    }
+
     return new(false, error);
   }
 }

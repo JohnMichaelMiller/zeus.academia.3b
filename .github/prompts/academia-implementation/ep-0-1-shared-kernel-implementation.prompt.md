@@ -73,15 +73,15 @@ mode: agent
 3. Implement persistence mappings and hard database constraints.
    Targets: EF Core entity configurations, indexes, and base migration updates for empNr uniqueness and extension uniqueness.
    Owner: data-persistence.
-   Validation before next step: mappings align with domain rules and no persistence rule contradicts the aggregate.
+   Validation before next step: mappings align with domain rules, no persistence rule contradicts the aggregate, and no unique index duplicates an existing primary key column set.
 4. Add reusable error/result plumbing and domain event contracts.
    Targets: Shared Kernel result types, error primitives, event interfaces, and common exceptions.
    Owner: backend-domain.
-   Validation before next step: later slices can consume common result and exception types without redefining them.
+   Validation before next step: later slices can consume common result and exception types without redefining them, and `Result<T>.Value` throws on failure access instead of exposing `default!`.
 5. Verify invariants and persistence behavior.
    Targets: unit tests, mapping tests, and migration validation.
    Owner: testing-verification.
-   Validation before next step: all foundational tests pass and failures clearly identify which invariant broke.
+   Validation before next step: all foundational tests pass, failures clearly identify which invariant broke, and infrastructure/setup failures fail explicitly (no catch-and-return skip path).
 
 ## Verification and Acceptance Criteria
 
@@ -90,6 +90,9 @@ mode: agent
 - Shared Kernel types compile with nullable reference types enabled and are reusable by later slices.
 - Database constraints back up the code-level uniqueness rules for empNr and extension assignment.
 - Foundational tests cover invariant success and failure paths for employment guards, derivation, and result handling.
+- `Result<T>.Value` is accessible only for successful results and throws a clear exception for failure results.
+- Model verification checks primary key shape directly and does not require a redundant unique index on the same key columns.
+- SQL Server constraint verification fails with actionable diagnostics when connectivity/setup is unavailable; tests must not silently return.
 
 ## Human Showcase Steps
 
@@ -110,3 +113,5 @@ mode: agent
 - [ ] Result, error, event, and exception primitives are reusable by later slices.
 - [ ] Verification evidence exists for invariant and mapping behavior.
 - [ ] Any repo-layout deviation from the plan is documented before dependent slice work begins.
+- [ ] No unique index duplicates a primary key column set unless explicitly justified and documented.
+- [ ] Environment/setup failures in persistence verification fail explicitly; no silent pass path remains.

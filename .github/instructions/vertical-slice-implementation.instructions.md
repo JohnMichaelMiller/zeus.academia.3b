@@ -387,7 +387,6 @@ public sealed class SendEnrollmentConfirmationHandler(IEmailService email)
 - Never mock `DbContext`; use `SqliteInMemory` or a real test container.
 - Cover the full use-case path from request through persistence.
 - Test validators separately for failure-path detail.
-- When a slice introduces durability-sensitive rules (XOR, uniqueness, filtered indexes, check constraints), the acceptance criteria, tests, and persistence artifact must all describe the same enforcement layer; do not claim the rule exists if the implementation only validates it in code or if the persisted schema is missing.
 - Place UI tests under the same use-case folder, for example `src/features/Enrollment/CreateEnrollment/__tests__/CreateEnrollmentForm.spec.ts`.
 - Cover component rendering, store behavior, and API error handling.
 - Keep request and response types aligned with the DTO contract.
@@ -441,5 +440,4 @@ Before marking a use-case complete:
 - [ ] Component, API client, store, composable, route, and types live in the same use-case folder.
 - [ ] Handler and validator rely on assembly scanning, not manual DI registration.
 - [ ] Tests mirror the slice structure.
-- [ ] Persistence-backed rules have matching enforcement, test coverage, and migration or baseline SQL evidence when required.
 - [ ] No code imports another feature domain's private slice artifacts.

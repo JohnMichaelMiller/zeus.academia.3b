@@ -268,6 +268,13 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
 - Queries: Use `.AsNoTracking()`
 - Updates: Load entity, modify properties, `SaveChangesAsync()`
 
+### Key and Index Rules
+
+- Treat the primary key as the canonical uniqueness constraint for its key columns.
+- Do not create an additional unique index on the exact same column set as a primary key.
+- Add unique indexes only for alternate keys or query patterns that differ from the primary key.
+- Model tests must verify the intended primary key shape directly, not infer it from a redundant unique index.
+
 ## Cross-Cutting Concerns
 
 ### Transaction Boundaries
@@ -295,11 +302,9 @@ catch
 - Commands: Return `Result<T>` or throw domain exceptions
 - Queries: Return `null`/empty or use `Result<T>`
 - Global exception handler for API layer
-- `Result<T>` should expose a non-nullable `Value` for success and throw on failure; do not model success as a nullable public payload
-- Non-`None` errors must reject null, empty, or whitespace values for `code` and `message`
 
 ```csharp
-public sealed class Result<T>
+public class Result<T>
 {
     private readonly T? _value;
 
@@ -311,14 +316,23 @@ public sealed class Result<T>
     }
 
     public bool IsSuccess { get; }
+    public T Value =>
+        IsSuccess
+            ? _value ?? throw new InvalidOperationException("Successful result must include a value.")
+            : throw new InvalidOperationException("Cannot access Value when result is a failure.");
     public string Error { get; }
+    
+    public static Result<T> Success(T value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return new(true, value, string.Empty);
+    }
 
-    public T Value => IsSuccess
-        ? _value ?? throw new InvalidOperationException("A successful result must contain a value.")
-        : throw new InvalidOperationException("Cannot access the value of a failed result.");
-
-    public static Result<T> Success(T value) => new(true, value, string.Empty);
-    public static Result<T> Failure(string error) => new(false, default, error);
+    public static Result<T> Failure(string error)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(error);
+        return new(false, default, error);
+    }
 }
 ```
 
@@ -364,6 +378,7 @@ services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 | Share models between commands/queries | Separate write models and read DTOs |
 | Cross-aggregate transactions in single command | Use domain events + eventual consistency |
 | Inject `IMediator` into domain entities | Keep domain pure, use from handlers |
+| Add unique index duplicating a primary key | Keep PK as canonical uniqueness and test key shape directly |
 
 ## Testing
 
