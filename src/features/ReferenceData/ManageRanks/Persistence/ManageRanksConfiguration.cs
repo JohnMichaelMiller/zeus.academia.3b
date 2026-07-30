@@ -10,7 +10,7 @@ public sealed class ManageRanksConfiguration : IEntityTypeConfiguration<ManagedR
   {
     builder.ToTable("Ranks", tableBuilder =>
     {
-      tableBuilder.HasCheckConstraint("CK_Ranks_Code_Allowed", "[Rank] IN ('P', 'SL', 'L')");
+      tableBuilder.HasCheckConstraint("CK_Ranks_Code_Allowed", RankCodeMapping.SqlAllowedCodeConstraint);
     });
 
     builder.HasKey(x => x.Rank);

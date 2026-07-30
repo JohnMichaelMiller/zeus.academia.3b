@@ -13,7 +13,7 @@ public static class AddRankMappings
     {
       throw new ArgumentException(
           $"Rank code must be one of: {RankCodeMapping.AllowedCodesDisplay}.",
-          nameof(command));
+          nameof(command.Code));
     }
 
     return ManagedRank.Create(rank);
