@@ -201,6 +201,7 @@ The section MUST cover, when applicable:
 - non-lossy parse/create behavior for constrained value objects (reject silent truncation or coercion unless explicitly required)
 - database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
 - named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
+- ownership-safe association mutations (for example, releasing an extension must validate it belongs to the target academic; assignment must not overwrite an existing different assignment)
 - solution-file integrity when `.sln` is touched (no duplicate project name/path entries and no duplicate configuration blocks for equivalent projects)
 - scaffold cleanup and naming hygiene (no leftover placeholder starter files; file names must match their primary type or test behavior)
 - solution-file encoding hygiene when `.sln` is touched (no BOM-only line or blank line ahead of the required Visual Studio header)
@@ -226,6 +227,7 @@ Specify how the slice will be verified:
 - evidence to collect
 - residual-risk callouts if verification is partial
 - behavior when environment prerequisites are missing (tests MUST fail explicitly with actionable diagnostics; no early return/skipped-by-default pattern)
+- teardown robustness for infrastructure-backed tests (cleanup must be best-effort and must not mask primary assertion failures if teardown encounters transient errors)
 
 The prompt MUST distinguish between required verification and optional follow-up checks.
 

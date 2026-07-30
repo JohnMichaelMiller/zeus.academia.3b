@@ -52,9 +52,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                 | Inputs                                          | Outputs                   | Escalate when                                                         |
-| -------------------------- | ------------------------------------------------ | ----------------------------------------------- | ------------------------- | --------------------------------------------------------------------- |
-| slice-coordinator          | confirm transaction boundary and route           | execution plan and existing extension flows     | approved command contract | persistence cannot guarantee atomic transition with the current model |
+| Role                 | Responsibilities                                 | Inputs                                          | Outputs                   | Escalate when                                                         |
+| -------------------- | ------------------------------------------------ | ----------------------------------------------- | ------------------------- | --------------------------------------------------------------------- |
+| slice-coordinator    | confirm transaction boundary and route           | execution plan and existing extension flows     | approved command contract | persistence cannot guarantee atomic transition with the current model |
 | backend-domain       | implement reassign command, handler, endpoint    | extension assignment model and uniqueness rules | reassignment code path    | atomicity requires broader infrastructure changes                     |
 | testing-verification | verify valid reassignments and rollback behavior | implemented slice                               | tests and evidence        | partial updates survive after a failed reassignment                   |
 
@@ -67,7 +67,7 @@ mode: agent
 2. Implement reassignment behavior.
    Targets: command, handler, endpoint.
    Owner: backend-domain.
-   Validation before next step: source extension is released only when the target assignment can succeed.
+   Validation before next step: source extension is released only when the target assignment can succeed, and release/assign operations validate ownership so the flow cannot clear or overwrite links that belong to a different academic.
 3. Verify atomic behavior.
    Targets: tests for valid reassign, invalid target, and rollback on failure.
    Owner: testing-verification.
@@ -81,9 +81,11 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- Integration-test teardown failures are non-fatal to primary behavior assertions (cleanup errors do not mask atomicity or ownership failures).
 - Reassigning to a valid free extension succeeds.
 - Reassigning to an unavailable target extension fails cleanly.
 - Failed reassignment attempts leave the original assignment intact.
+- Reassignment fails when source/target ownership preconditions are not met, and no unrelated academic assignment is modified.
 - Automated tests prove atomicity and preserved uniqueness.
 
 ## Human Showcase Steps

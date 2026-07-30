@@ -70,7 +70,7 @@ mode: agent
 2. Implement the domain model and invariant methods.
    Targets: Shared Kernel aggregate and value-object files, especially Academic employment guards and Rank to AccessLevel derivation.
    Owner: backend-domain.
-   Validation before next step: the aggregate enforces the employment mutual-exclusion rule (never both tenured and contracted) and AccessLevel is derived only from Rank.
+   Validation before next step: the aggregate enforces the employment mutual-exclusion rule (never both tenured and contracted), AccessLevel is derived only from Rank, extension assignment cannot overwrite a different existing assignment, and extension release cannot clear an extension owned by a different academic.
 3. Implement persistence mappings and hard database constraints.
    Targets: EF Core entity configurations, indexes, and base migration updates for empNr uniqueness and extension uniqueness.
    Owner: data-persistence.
@@ -96,10 +96,12 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- Integration-test teardown failures are non-fatal to the primary assertion signal (cleanup errors are surfaced separately and do not mask the behavioral failure under test).
 - Creating or mutating an Academic cannot leave both IsTenured and ContractEndDate set at the same time; constraint names and test names must reflect this mutual-exclusion semantic unless strict XOR is explicitly required.
 - Rank values map only as P -> INT, SL -> NAT, and L -> LOC, and AccessLevel is never assigned directly.
 - Shared Kernel types compile with nullable reference types enabled and are reusable by later slices.
 - Database constraints back up the code-level uniqueness rules for empNr and extension assignment.
+- Extension-association invariants prevent cross-academic state corruption: assignment cannot overwrite a different active assignment, and release validates ownership before clearing links.
 - Foundational tests cover invariant success and failure paths for employment guards, derivation, and result handling.
 - Result tests include direct coverage of both non-generic `Result` and generic `Result<T>` success/failure invariants.
 - `Result<T>.Value` is accessible only for successful results and throws a clear exception for failure results.

@@ -52,9 +52,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                                                | Inputs                                      | Outputs                             | Escalate when                                                                    |
-| -------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------- |
-| slice-coordinator          | confirm route shape and current-assignment query scope                          | execution plan and existing extension model | approved command and query contract | current persistence model cannot express 1:1 uniqueness cleanly                  |
+| Role                 | Responsibilities                                                                | Inputs                                      | Outputs                             | Escalate when                                                                    |
+| -------------------- | ------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm route shape and current-assignment query scope                          | execution plan and existing extension model | approved command and query contract | current persistence model cannot express 1:1 uniqueness cleanly                  |
 | backend-domain       | implement assignment command, current-assignment query, handlers, and endpoints | extension pool model and academic model     | extension-assignment code path      | safe uniqueness requires a schema change beyond the planned constraint           |
 | testing-verification | verify success, duplicate use, and concurrency-sensitive cases                  | implemented slice                           | tests and evidence                  | handler-level checks pass but DB uniqueness still allows conflicting assignments |
 
@@ -67,7 +67,7 @@ mode: agent
 2. Implement assignment behavior.
    Targets: command, validator, handler, endpoint, and any assignment query DTOs.
    Owner: backend-domain.
-   Validation before next step: only provisioned, unassigned extensions can be linked to an academic.
+   Validation before next step: only provisioned, unassigned extensions can be linked to an academic, and assignment cannot overwrite an existing different extension link on the academic.
 3. Implement current-assignment query behavior if the slice keeps that read concern locally.
    Targets: query, handler, response DTO, and endpoint.
    Owner: backend-domain.
@@ -85,9 +85,11 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- Integration-test teardown failures are non-fatal to primary behavior assertions (cleanup errors do not mask assignment-rule failures).
 - A provisioned, unassigned extension can be assigned to an existing academic.
 - Attempting to assign an unprovisioned or already assigned extension fails cleanly.
 - The slice preserves 1:1 uniqueness between academic and extension in both handler logic and persistence.
+- Attempting to assign a second different extension to an academic that already has one fails cleanly and preserves the original assignment.
 - A follow-up query or profile read shows the current assignment after success.
 
 ## Human Showcase Steps

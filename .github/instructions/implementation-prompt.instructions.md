@@ -146,6 +146,7 @@ Required coverage:
 - User-visible outcome or business rule satisfied
 - Dependency compatibility checks for coupled tooling packages (for example xUnit core/runner major-version alignment)
 - Test resource lifecycle rules for integration tests that provision external resources (must include teardown strategy)
+- Ownership-safe aggregate mutation rules for linked entities (for example, release operations must verify current ownership and assignment operations must not overwrite a different existing link)
 - No lossy value coercion in domain parse/create APIs unless explicitly required and tested
 - Shared result/failure factories guard non-null failure payload invariants in both generic and non-generic forms
 - Solution hygiene when `.sln` files change: no duplicate project name/path entries, no duplicate GUID configuration blocks.
@@ -153,6 +154,7 @@ Required coverage:
 - Foundational primitive coverage when shared base types are touched (for example `Result` and `Result<T>`): direct tests for non-generic and generic success/failure invariants.
 - Scaffold cleanup and naming hygiene when new files are introduced: no leftover `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter artifacts; file names must match the primary type or test behavior.
 - Script and setup-helper hygiene when verification touches infrastructure configuration: environment variables are read once per value and reused through a local variable or helper instead of duplicated lookups.
+- Teardown failure isolation for integration tests: cleanup runs as best-effort in `finally` and teardown exceptions must not replace the primary assertion failure signal.
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
 

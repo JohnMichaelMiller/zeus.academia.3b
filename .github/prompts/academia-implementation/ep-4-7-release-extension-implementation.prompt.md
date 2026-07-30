@@ -52,9 +52,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                               | Inputs                              | Outputs                   | Escalate when                                               |
-| -------------------------- | ---------------------------------------------- | ----------------------------------- | ------------------------- | ----------------------------------------------------------- |
-| slice-coordinator          | confirm route and released-state semantics     | execution plan and extension slices | approved command contract | current model does not expose a clear released state        |
+| Role                 | Responsibilities                               | Inputs                              | Outputs                   | Escalate when                                               |
+| -------------------- | ---------------------------------------------- | ----------------------------------- | ------------------------- | ----------------------------------------------------------- |
+| slice-coordinator    | confirm route and released-state semantics     | execution plan and extension slices | approved command contract | current model does not expose a clear released state        |
 | backend-domain       | implement release command, handler, endpoint   | extension assignment model          | release code path         | release behavior would conflict with deregistration cleanup |
 | testing-verification | verify state cleanup and returned availability | implemented slice                   | tests and evidence        | released extensions do not re-enter the available pool      |
 
@@ -67,7 +67,7 @@ mode: agent
 2. Implement release behavior.
    Targets: command, handler, endpoint.
    Owner: backend-domain.
-   Validation before next step: academic no longer references the extension and the extension becomes available.
+   Validation before next step: release clears links only when the extension is currently assigned to the target academic, and does not modify state for unrelated academics.
 3. Verify release behavior.
    Targets: tests for valid release, no-current-extension cases, and follow-up availability checks.
    Owner: testing-verification.
@@ -81,7 +81,9 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- Integration-test teardown failures are non-fatal to primary behavior assertions (cleanup errors do not mask ownership or state-transition failures).
 - Releasing a current extension succeeds and clears the academic-side reference.
+- Releasing an extension through the wrong academic context fails cleanly and preserves the original owning academic link.
 - Released extensions become available for later assignment.
 - Invalid release requests fail cleanly.
 - Automated tests verify both academic and extension-pool state after success.
