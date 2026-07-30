@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\features\SharedKernel\Foundation\Zeus.Academia.Features.SharedKernel.Foundation.csproj" />
+    <ProjectReference Include="..\..\..\..\src\features\ReferenceData\ManageRanks\Zeus.Academia.Features.ReferenceData.ManageRanks.csproj" />
   </ItemGroup>
 
 </Project>

@@ -34,9 +34,11 @@ Write-Host "Restoring solution..." -ForegroundColor Cyan
 dotnet restore $solution
 
 Write-Host "Running focused Shared Kernel tests..." -ForegroundColor Cyan
+$testFilter = "(FullyQualifiedName~Zeus.Academia.Tests.Features.SharedKernel.Foundation|FullyQualifiedName~Zeus.Academia.Tests.Features.ReferenceData.ManageRanks)"
+
 dotnet test $testProject `
   --configuration $Configuration `
-  --filter "FullyQualifiedName~Zeus.Academia.Tests.Features.SharedKernel.Foundation" `
+  --filter $testFilter `
   --logger "console;verbosity=normal"
 
 Write-Host "Shared Kernel SQL Server verification completed." -ForegroundColor Green
