@@ -2,8 +2,6 @@ namespace Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 public static class RankExtensions
 {
-  private static readonly Rank[] SupportedRanks = [Rank.P, Rank.SL, Rank.L];
-
   public static AccessLevel ToAccessLevel(this Rank rank)
   {
     return rank switch
@@ -14,7 +12,7 @@ public static class RankExtensions
       _ => throw new ArgumentOutOfRangeException(
           nameof(rank),
           rank,
-          $"Unsupported rank value. Allowed values: {string.Join(", ", SupportedRanks)}")
+          $"Unsupported rank value. Allowed values: {RankCatalog.AllowedCodesDisplay}")
     };
   }
 }
