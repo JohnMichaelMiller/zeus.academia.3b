@@ -43,6 +43,7 @@ mode: agent
 - .github/instructions/vertical-slice-implementation.instructions.md
 - Follow the vertical-slice instructions and keep the implementation in a feature/use-case folder under `src/features/` with co-located command/query, validator, endpoint, and tests instead of splitting the slice across layer-oriented folders.
 - .github/instructions/csharp-implementation.instructions.md
+- .github/instructions/xunit-implementation.instructions.md
 - .github/instructions/cqrs-mediatr-efcore.instructions.md
 
 ## Prerequisites and Dependency Checks
@@ -78,10 +79,14 @@ mode: agent
    Targets: Shared Kernel result types, error primitives, event interfaces, and common exceptions.
    Owner: backend-domain.
    Validation before next step: later slices can consume common result and exception types without redefining them, and `Result<T>.Value` throws on failure access instead of exposing `default!`.
-5. Verify invariants and persistence behavior.
+5. Remove scaffolding leftovers and normalize file hygiene before final verification.
+   Targets: any newly added source, test, project, and solution files.
+   Owner: slice-coordinator.
+   Validation before next step: no `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter artifacts remain, and file names match their primary type or test behavior.
+6. Verify invariants and persistence behavior.
    Targets: unit tests, mapping tests, and migration validation.
    Owner: testing-verification.
-   Validation before next step: all foundational tests pass, failures clearly identify which invariant broke, infrastructure/setup failures fail explicitly (no catch-and-return skip path), any touched solution file has no duplicate project declarations, and any touched solution file keeps the Visual Studio header as line 1.
+   Validation before next step: all foundational tests pass, failures clearly identify which invariant broke, infrastructure/setup failures fail explicitly (no catch-and-return skip path), environment configuration is read once per value in setup helpers and verification scripts, any touched solution file has no duplicate project declarations, and any touched solution file keeps the Visual Studio header as line 1 with no BOM-only leading line.
 
 ## Verification and Acceptance Criteria
 
@@ -100,6 +105,8 @@ mode: agent
 - `Result<T>.Value` is accessible only for successful results and throws a clear exception for failure results.
 - Model verification checks primary key shape directly and does not require a redundant unique index on the same key columns.
 - SQL Server constraint verification fails with actionable diagnostics when connectivity/setup is unavailable; tests must not silently return.
+- Newly created source and test files do not retain placeholder scaffolding; file names match the primary type or test behavior under review.
+- Support scripts and database-test helpers read each environment variable once and reuse the parsed value instead of duplicating lookups across branches.
 
 ## Human Showcase Steps
 
@@ -127,3 +134,4 @@ mode: agent
 - [ ] Any repo-layout deviation from the plan is documented before dependent slice work begins.
 - [ ] No unique index duplicates a primary key column set unless explicitly justified and documented.
 - [ ] Environment/setup failures in persistence verification fail explicitly; no silent pass path remains.
+- [ ] Newly created files were checked for leftover scaffolding placeholders before review.

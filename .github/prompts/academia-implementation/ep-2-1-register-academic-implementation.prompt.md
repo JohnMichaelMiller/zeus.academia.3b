@@ -42,6 +42,7 @@ mode: agent
 - .github/instructions/project-overview.instructions.md
 - .github/instructions/vertical-slice-implementation.instructions.md
 - Follow the vertical-slice instructions and keep the implementation in a feature/use-case folder under `src/features/` with co-located command/query, validator, endpoint, and tests instead of splitting the slice across layer-oriented folders.
+- .github/instructions/xunit-implementation.instructions.md
 - .github/instructions/mediatr-implementation.instructions.md
 - .github/instructions/fluentvalidation-implementation.instructions.md
 

@@ -50,6 +50,8 @@ Read these files first when they exist:
 4. `.github/instructions/ai-assisted-output.instructions.md` for provenance requirements.
 5. Scan `.github/agents/` and `.github/prompts/` for any existing implementation-role agents or implementation prompt patterns that should be referenced rather than duplicated.
 
+Require the generated instruction file to tell authors to include the concrete repository instruction files for every touched layer, including backend C#, ASP.NET Core, MediatR/CQRS, FluentValidation, Vue 3, TypeScript, Pinia, xUnit, and Vitest where applicable.
+
 If any expected file is missing, state that explicitly in the generated instruction file and continue with the best available repository context.
 
 ## Output File Requirements
@@ -155,6 +157,12 @@ The criteria must cover:
 - integration points affected
 - user-visible outcome or business rule satisfied
 
+Also require reviewer-facing hygiene coverage when applicable:
+
+- scaffold cleanup and file naming after new files are created
+- solution-file header and encoding hygiene when `.sln` files are touched
+- single-source environment lookup in setup helpers and verification scripts
+
 Require criteria to be written as observable outcomes, not intentions. Include examples of acceptable phrasing such as "Submitting an invalid enrollment request returns validation errors and does not persist data."
 
 ### 7. Verification Workflow
@@ -165,6 +173,8 @@ Require the instruction file to define a verification section for implementation
 - human review checks
 - commands, tests, or inspection steps when available
 - evidence to capture for completed work
+
+Require the generated instruction file to say that verification includes a final scaffold audit when a slice creates new project, source, or test files.
 
 Distinguish between "implemented" and "verified" so prompts do not stop at code generation.
 

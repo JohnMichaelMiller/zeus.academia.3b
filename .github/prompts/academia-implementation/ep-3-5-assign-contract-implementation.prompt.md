@@ -43,6 +43,7 @@ mode: agent
 - .github/instructions/fluentvalidation-implementation.instructions.md
 
 - Follow the vertical-slice instructions and keep the implementation in a feature/use-case folder under `src/features/` with co-located command/query, validator, endpoint, and tests instead of splitting the slice across layer-oriented folders.
+- .github/instructions/xunit-implementation.instructions.md
 
 ## Prerequisites and Dependency Checks
 

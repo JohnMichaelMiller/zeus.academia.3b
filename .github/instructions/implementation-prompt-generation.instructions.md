@@ -95,6 +95,17 @@ Before drafting the prompt, gather the implementation context in this order:
 
 If the slice touches backend C#, frontend Vue 3, Pinia stores, or tests, the prompt MUST pull in the corresponding instruction files before prescribing work.
 
+At minimum, the prompt author MUST include the matching repository instructions for applicable surfaces:
+
+- backend C#: `.github/instructions/csharp-implementation.instructions.md`
+- ASP.NET Core endpoints: `.github/instructions/aspnetcore-implementation.instructions.md`
+- MediatR/CQRS handlers: `.github/instructions/mediatr-implementation.instructions.md`, `.github/instructions/cqrs-mediatr-efcore.instructions.md`, or `.github/instructions/cqrs-es-csharp-mediatr.instructions.md` as appropriate
+- FluentValidation: `.github/instructions/fluentvalidation-implementation.instructions.md`
+- frontend Vue 3 and TypeScript: `.github/instructions/vue3-implementation.instructions.md`, `.github/instructions/typescript-frontend-implementation.instructions.md`
+- Pinia stores: `.github/instructions/pinia-implementation.instructions.md`
+- backend tests: `.github/instructions/xunit-implementation.instructions.md`
+- frontend tests: `.github/instructions/vitest-implementation.instructions.md`
+
 ## Agent Orchestration Requirements
 
 - The prompt MUST use custom agents specialized in implementation roles rather than assigning the entire slice to one generic actor.
@@ -191,6 +202,9 @@ The section MUST cover, when applicable:
 - database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
 - named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
 - solution-file integrity when `.sln` is touched (no duplicate project name/path entries and no duplicate configuration blocks for equivalent projects)
+- scaffold cleanup and naming hygiene (no leftover placeholder starter files; file names must match their primary type or test behavior)
+- solution-file encoding hygiene when `.sln` is touched (no BOM-only line or blank line ahead of the required Visual Studio header)
+- environment/setup helper hygiene when scripts or infrastructure-backed tests are touched (read each environment variable once and reuse the parsed value or helper result)
 
 Bad:
 
@@ -214,6 +228,8 @@ Specify how the slice will be verified:
 - behavior when environment prerequisites are missing (tests MUST fail explicitly with actionable diagnostics; no early return/skipped-by-default pattern)
 
 The prompt MUST distinguish between required verification and optional follow-up checks.
+
+When the slice adds new source, test, or project files, the verification plan MUST also require a quick scaffold audit so placeholder starter artifacts are removed or renamed before review.
 
 ### 8. Showcase Steps
 

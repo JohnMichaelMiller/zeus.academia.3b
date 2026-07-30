@@ -128,6 +128,8 @@ It MUST explicitly require reading:
 - custom agent standards
 - any stack-specific implementation instruction files relevant to the slice
 
+At minimum, require the generated instruction file to name the concrete repository instruction files for backend C#, ASP.NET Core, MediatR/CQRS, FluentValidation, Vue 3, TypeScript, Pinia, xUnit, and Vitest whenever those surfaces are touched.
+
 ### 5. Agent Orchestration Requirements
 
 Require implementation prompts to define:
@@ -181,6 +183,8 @@ Require acceptance criteria to be:
 
 The instruction file MUST distinguish good behavioral acceptance criteria from bad task-based criteria.
 
+It MUST also require acceptance criteria to cover scaffold cleanup and naming hygiene for newly created files, solution-file header and encoding hygiene when `.sln` files change, and environment/setup helper hygiene when scripts or infra-backed tests read environment variables.
+
 ### 9. Verification Requirements
 
 Require implementation prompts to specify:
@@ -190,6 +194,8 @@ Require implementation prompts to specify:
 - manual checks
 - evidence expected from verification
 - residual risks if verification is incomplete
+
+The generated instruction file MUST say that verification includes a final scaffold audit whenever the slice creates new project, source, or test files.
 
 ### 10. Showcase Requirements
 

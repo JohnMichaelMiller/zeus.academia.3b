@@ -50,12 +50,15 @@ applyTo: "**"
   - On non-Windows, require explicit environment configuration instead of silent fallback.
 - MUST run a focused self-review for common correctness regressions before opening PR:
   - Vertical slice layout and boundaries match [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md).
+  - Placeholder scaffolding artifacts are removed or renamed before review; do not leave `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter files in committed slices.
+  - C# file names match their primary type name and xUnit test files contain real test classes named for the behavior under test.
   - Null argument validation for non-nullable API inputs.
   - Dependency package families remain version-compatible (for example xUnit core package major version aligned with its runner package major version).
   - No mutable collection escape through read-only interfaces.
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
   - No duplicate project declarations in solution files; project name/path pairs must appear once with one GUID and one configuration block.
   - Any touched solution file must keep the required Visual Studio header as the first line with no leading blank line or stray BOM-only line.
+  - Test/setup helpers and verification scripts read environment configuration once per value and reuse the parsed result instead of duplicating environment-variable lookups across branches.
   - Database constraint names must match predicate semantics; reserve "Xor" naming for strict exactly-one rules and use explicit mutual-exclusion naming when both-false is allowed.
   - Method and type naming remains compliant with language conventions (for example PascalCase in C#).
   - Exception and failure messages never include secrets (connection strings, credentials, tokens, keys).

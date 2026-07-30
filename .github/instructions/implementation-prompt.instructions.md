@@ -58,6 +58,17 @@ Review these sources before drafting when they exist:
 
 If one of these sources is missing, say so in the implementation prompt and continue with the remaining repository evidence.
 
+Include layer-specific instructions for every touched surface. At minimum:
+
+- backend C#: `.github/instructions/csharp-implementation.instructions.md`
+- ASP.NET Core endpoints: `.github/instructions/aspnetcore-implementation.instructions.md`
+- MediatR/CQRS: `.github/instructions/mediatr-implementation.instructions.md`, `.github/instructions/cqrs-mediatr-efcore.instructions.md`, or `.github/instructions/cqrs-es-csharp-mediatr.instructions.md`
+- FluentValidation: `.github/instructions/fluentvalidation-implementation.instructions.md`
+- frontend Vue/TypeScript: `.github/instructions/vue3-implementation.instructions.md`, `.github/instructions/typescript-frontend-implementation.instructions.md`
+- Pinia: `.github/instructions/pinia-implementation.instructions.md`
+- backend tests: `.github/instructions/xunit-implementation.instructions.md`
+- frontend tests: `.github/instructions/vitest-implementation.instructions.md`
+
 ## Agent-Oriented Roles
 
 Implementation prompts must use role-specialized custom agents when the slice spans multiple concerns. For a multi-surface slice, define at least three roles. Each role must state responsibilities, expected inputs, expected outputs, handoff targets, and escalation triggers.
@@ -140,6 +151,8 @@ Required coverage:
 - Solution hygiene when `.sln` files change: no duplicate project name/path entries, no duplicate GUID configuration blocks.
 - Solution-file format hygiene when `.sln` files change: the `Microsoft Visual Studio Solution File` header remains on line 1 with no leading blank line.
 - Foundational primitive coverage when shared base types are touched (for example `Result` and `Result<T>`): direct tests for non-generic and generic success/failure invariants.
+- Scaffold cleanup and naming hygiene when new files are introduced: no leftover `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter artifacts; file names must match the primary type or test behavior.
+- Script and setup-helper hygiene when verification touches infrastructure configuration: environment variables are read once per value and reused through a local variable or helper instead of duplicated lookups.
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
 
@@ -192,6 +205,8 @@ If the prompt claims persistence foundations, database constraints, or migration
 If the slice changes schema, verification must also confirm that a committed migration artifact exists in the diff unless the prompt explicitly waives migrations and explains why.
 
 Verification should also call out reviewer-facing hygiene when the slice produces durable artifacts or tests. At minimum, require durable README entries to link back to the artifact log when traceability applies, and require test names to describe the actual scenario and expectation rather than a nearby but different failure mode.
+
+When a slice adds project, source, or test files, verification must include a final scaffold audit so starter placeholders are removed or renamed before review.
 
 A slice is not complete because code exists. It is complete when the prompt's verification path has been executed and evidence has been captured or explicitly waived by a human.
 
