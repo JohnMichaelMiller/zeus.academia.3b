@@ -44,6 +44,12 @@ tags: [xunit, testing, csharp, backend, unit-tests, integration-tests]
 - **Fast Execution**: Unit tests <100ms, integration tests <1s
 - **No Silent Passes**: Missing infrastructure or setup errors MUST fail with actionable diagnostics, not skip via `return`
 
+## Model Metadata and EF Core Test Safety
+
+- Model verification tests SHOULD inspect the EF Core `IModel` via `DbContext.Model` directly rather than using `context.GetService<IDesignTimeModel>()` in ordinary unit tests.
+- When a test asserts on keys, indexes, or check constraints, it should target the model metadata that the context actually exposes rather than a design-time service dependency.
+- Schema or migration assertions SHOULD verify the intended model shape and the emitted migration output, not only an in-memory database configuration.
+
 ## Database Test Safety
 
 - MUST isolate database-backed tests from shared environments by using a unique test-scoped database name even when a connection string is supplied.

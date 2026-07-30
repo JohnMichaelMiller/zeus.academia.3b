@@ -216,8 +216,17 @@ Use explicit state guards for success/failure wrappers so invalid states fail lo
 - MUST prevent value consumption from failed results (`Value` access throws on failure)
 - MUST prevent null success values for reference-type payloads
 - MUST validate failure payloads so "empty error" failures are not representable
+- MUST reserve `Error.None` for successful results only; failed results must carry actionable error details instead of using the success sentinel
 - MUST guard failure factory inputs (for example `Result.Failure(Error error)` and `Result<T>.Failure(Error error)`) against `null` before constructing failures
 - MUST NOT expose `default!` as a consumable failure value
+
+## Persistence and Exception Hygiene
+
+**Rules:**
+
+- WHEN adding EF Core migrations, keep the migration plus the standard metadata artifacts required by the project tooling (for example snapshot/Designer files) in the same change unless the work explicitly waives them
+- MUST keep domain exception types organized so file names and type names stay aligned; prefer one primary exception type per file when the exception set grows
+- MUST verify persistence rules through the EF Core model and migration output rather than relying on ad-hoc assumptions or provider-agnostic shortcuts
 
 ## Parsing and Normalization Safety
 

@@ -198,10 +198,14 @@ The section MUST cover, when applicable:
 - integration-test resource lifecycle requirements (external resources must include deterministic teardown)
 - result-wrapper invariants for success/failure access patterns (for example, `Result<T>.Value` must not be consumable on failure)
 - result failure-factory null guards (for example `Failure(Error error)` cannot accept null error payloads)
+- result semantics that reserve `Error.None` for success only, so failed results must carry actionable error details rather than an empty success sentinel
 - non-lossy parse/create behavior for constrained value objects (reject silent truncation or coercion unless explicitly required)
 - database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
 - named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
 - ownership-safe association mutations (for example, releasing an extension must validate it belongs to the target academic; assignment must not overwrite an existing different assignment)
+- EF Core migration hygiene when schema changes are part of the slice (required migration artifacts, model snapshot, and metadata files must be part of the deliverable unless explicitly waived)
+- model metadata testing that inspects `context.Model` directly rather than relying on `IDesignTimeModel` from the service provider in normal tests
+- exception organization hygiene (domain exceptions should be split into dedicated files/types so file names and type names stay aligned as the exception set grows)
 - solution-file integrity when `.sln` is touched (no duplicate project name/path entries and no duplicate configuration blocks for equivalent projects)
 - scaffold cleanup and naming hygiene (no leftover placeholder starter files; file names must match their primary type or test behavior)
 - solution-file encoding hygiene when `.sln` is touched (no BOM-only line or blank line ahead of the required Visual Studio header)
@@ -289,6 +293,10 @@ End the prompt with a checklist that verifies prompt quality before use.
 - [ ] Persistence rules avoid redundant uniqueness definitions (no PK + duplicate unique index on same columns unless explicitly justified).
 - [ ] Verification instructions require explicit failure for missing infrastructure prerequisites (no silent pass/early return).
 - [ ] Shared result contracts include invariant access rules for success/failure payloads.
+- [ ] Result semantics explicitly reserve `Error.None` for success and forbid empty-error failures.
+- [ ] Schema-changing prompts require migration artifacts and metadata hygiene for EF Core work.
+- [ ] Model metadata checks use the EF Core model directly rather than a design-time service lookup in normal tests.
+- [ ] Domain exception types are organized into dedicated files/types with aligned names.
 
 ## Anti-Patterns
 

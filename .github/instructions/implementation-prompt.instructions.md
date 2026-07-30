@@ -149,6 +149,10 @@ Required coverage:
 - Ownership-safe aggregate mutation rules for linked entities (for example, release operations must verify current ownership and assignment operations must not overwrite a different existing link)
 - No lossy value coercion in domain parse/create APIs unless explicitly required and tested
 - Shared result/failure factories guard non-null failure payload invariants in both generic and non-generic forms
+- Result semantics reserve `Error.None` for success only; failed results must carry actionable details and cannot be constructed with an empty success sentinel.
+- EF Core schema changes require migration artifacts and metadata hygiene (for example, migration plus snapshot/Designer files when the project uses migrations) unless the prompt explicitly waives them and explains the tradeoff.
+- Model metadata verification should inspect `context.Model` directly instead of relying on `context.GetService<IDesignTimeModel>()` in normal tests.
+- Exception types should be split into dedicated files/types with names that stay aligned as the exception set grows.
 - Solution hygiene when `.sln` files change: no duplicate project name/path entries, no duplicate GUID configuration blocks.
 - Solution-file format hygiene when `.sln` files change: the `Microsoft Visual Studio Solution File` header remains on line 1 with no leading blank line.
 - Foundational primitive coverage when shared base types are touched (for example `Result` and `Result<T>`): direct tests for non-generic and generic success/failure invariants.
@@ -204,7 +208,9 @@ Implementation prompts must separate implementation from verification. The verif
 
 If the prompt claims persistence foundations, database constraints, or migration support, verification must include schema evidence. Passing unit tests or mapping tests alone is insufficient when the rule is supposed to be durable at the database level.
 
-If the slice changes schema, verification must also confirm that a committed migration artifact exists in the diff unless the prompt explicitly waives migrations and explains why.
+If the slice changes schema, verification must also confirm that a committed migration artifact exists in the diff unless the prompt explicitly waives migrations and explains why. For EF Core migrations, the verification path should call out the expected migration artifact, snapshot/Designer metadata, and provider-specific validation evidence.
+
+For model metadata assertions, the verification section should require direct inspection of the EF Core model and avoid a normal test dependency on `IDesignTimeModel` service resolution.
 
 Verification should also call out reviewer-facing hygiene when the slice produces durable artifacts or tests. At minimum, require durable README entries to link back to the artifact log when traceability applies, and require test names to describe the actual scenario and expectation rather than a nearby but different failure mode.
 
@@ -327,6 +333,9 @@ Do not author implementation prompts that:
 - describe showcase steps only in terms of code internals
 - span multiple unrelated slices in one prompt
 - stop at implementation instructions and omit verification or showcase paths
+- suggest schema changes without naming the migration artifact or metadata hygiene expectations
+- define result/failure contracts that allow `Error.None` on failures or allow failure access to `Value` without explicit guards
+- rely on `IDesignTimeModel` in normal model tests instead of inspecting the EF Core model directly
 
 ## Validation Checklist
 

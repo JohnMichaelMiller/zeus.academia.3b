@@ -162,6 +162,10 @@ Also require reviewer-facing hygiene coverage when applicable:
 - scaffold cleanup and file naming after new files are created
 - solution-file header and encoding hygiene when `.sln` files are touched
 - single-source environment lookup in setup helpers and verification scripts
+- result semantics that reserve `Error.None` for success only and prevent empty-error failures
+- EF Core migration hygiene including migration artifact and metadata expectations for schema-changing work
+- direct EF Core model inspection in metadata tests rather than using `IDesignTimeModel` in normal tests
+- exception organization that keeps file/type names aligned as the exception set grows
 
 Require criteria to be written as observable outcomes, not intentions. Include examples of acceptable phrasing such as "Submitting an invalid enrollment request returns validation errors and does not persist data."
 
@@ -212,6 +216,9 @@ Require a short anti-pattern section covering failures such as:
 - acceptance criteria that cannot be observed or tested
 - showcase steps that only describe code internals instead of user value
 - prompts that span multiple unrelated slices
+- prompts that leave result/failure semantics ambiguous or allow `Error.None` on failures
+- prompts that describe schema changes without naming the migration artifact and metadata expectations
+- prompts that rely on `IDesignTimeModel` in normal model tests instead of inspecting `context.Model` directly
 
 ### 11. Validation Checklist
 

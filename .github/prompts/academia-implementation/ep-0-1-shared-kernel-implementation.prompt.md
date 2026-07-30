@@ -94,6 +94,8 @@ mode: agent
 
 - Dependency compatibility is validated for coupled tooling packages when touched (for example xUnit core and runner major versions align).
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
+- `Error.None` remains reserved for success only; failure results cannot use the empty success sentinel and must carry actionable details.
+- Domain exceptions are split into dedicated files/types with aligned names as the exception set grows.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - Integration-test teardown failures are non-fatal to the primary assertion signal (cleanup errors are surfaced separately and do not mask the behavioral failure under test).
@@ -101,6 +103,8 @@ mode: agent
 - Rank values map only as P -> INT, SL -> NAT, and L -> LOC, and AccessLevel is never assigned directly.
 - Shared Kernel types compile with nullable reference types enabled and are reusable by later slices.
 - Database constraints back up the code-level uniqueness rules for empNr and extension assignment.
+- EF Core schema changes include the required migration artifact and metadata files in the same slice unless explicitly waived, and the verification evidence shows the migration output matches the intended model.
+- Model verification checks inspect `context.Model` directly and do not depend on `IDesignTimeModel` service resolution in normal tests.
 - Extension-association invariants prevent cross-academic state corruption: assignment cannot overwrite a different active assignment, and release validates ownership before clearing links.
 - Foundational tests cover invariant success and failure paths for employment guards, derivation, and result handling.
 - Result tests include direct coverage of both non-generic `Result` and generic `Result<T>` success/failure invariants.
@@ -129,6 +133,8 @@ mode: agent
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] Shared Kernel scope is still limited to reusable domain and persistence foundations.
 - [ ] Aggregate invariants and derived properties are enforced in code.
+- [ ] Result failure paths use actionable errors and do not rely on `Error.None` for failures.
+- [ ] Exception types are organized into dedicated files/types with aligned names.
 - [ ] Database constraints back up the critical uniqueness rules.
 - [ ] Result, error, event, and exception primitives are reusable by later slices.
 - [ ] Verification evidence exists for invariant and mapping behavior.
