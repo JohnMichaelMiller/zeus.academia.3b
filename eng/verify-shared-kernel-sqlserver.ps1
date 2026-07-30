@@ -4,6 +4,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+$isWindowsHost = if (Get-Variable -Name IsWindows -ErrorAction SilentlyContinue) {
+  [bool]$IsWindows
+}
+else {
+  $env:OS -eq "Windows_NT"
+}
+
 $repoRoot = Split-Path -Path $PSScriptRoot -Parent
 $solution = Join-Path $repoRoot "zeus.academia.3b.sln"
 $testProject = Join-Path $repoRoot "tests/Features/SharedKernel/Foundation/Zeus.Academia.Tests.Features.SharedKernel.Foundation.csproj"
@@ -17,7 +24,7 @@ if (-not (Test-Path $testProject)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($env:ZEUS_SQLSERVER_CONNECTION)) {
-  if (-not $IsWindows) {
+  if (-not $isWindowsHost) {
     throw "ZEUS_SQLSERVER_CONNECTION is required on non-Windows hosts because LocalDB is not available."
   }
 
