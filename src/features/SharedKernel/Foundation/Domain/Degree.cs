@@ -2,6 +2,8 @@ namespace Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 public sealed class Degree
 {
+  public const int CodeMaxLength = SharedKernelFieldLengths.Code;
+
   private Degree()
   {
     Code = string.Empty;
@@ -16,11 +18,6 @@ public sealed class Degree
 
   public static Degree Create(string code)
   {
-    if (string.IsNullOrWhiteSpace(code))
-    {
-      throw new ArgumentException("Degree code is required.", nameof(code));
-    }
-
-    return new Degree(code.Trim().ToUpperInvariant());
+    return new Degree(SharedKernelNormalization.NormalizeCode(code, nameof(code), "Degree code"));
   }
 }

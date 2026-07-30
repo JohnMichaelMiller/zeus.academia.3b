@@ -2,6 +2,8 @@ namespace Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 public sealed class University
 {
+  public const int CodeMaxLength = SharedKernelFieldLengths.Code;
+
   private University()
   {
     Code = string.Empty;
@@ -16,11 +18,6 @@ public sealed class University
 
   public static University Create(string code)
   {
-    if (string.IsNullOrWhiteSpace(code))
-    {
-      throw new ArgumentException("University code is required.", nameof(code));
-    }
-
-    return new University(code.Trim().ToUpperInvariant());
+    return new University(SharedKernelNormalization.NormalizeCode(code, nameof(code), "University code"));
   }
 }

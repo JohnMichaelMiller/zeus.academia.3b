@@ -16,6 +16,6 @@ public sealed record Error(string Code, string Description)
       throw new ArgumentException("Error description cannot be null or whitespace.", nameof(description));
     }
 
-    return new Error(code, description);
+    return new Error(code.Trim(), description.Trim());
   }
 }

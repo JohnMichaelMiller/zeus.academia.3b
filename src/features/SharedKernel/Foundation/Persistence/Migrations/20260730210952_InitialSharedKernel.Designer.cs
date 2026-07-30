@@ -12,7 +12,7 @@ using Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
 namespace Zeus.Academia.Features.SharedKernel.Foundation.Persistence.Migrations
 {
     [DbContext(typeof(SharedKernelDbContext))]
-    [Migration("20260730190855_InitialSharedKernel")]
+    [Migration("20260730210952_InitialSharedKernel")]
     partial class InitialSharedKernel
     {
         /// <inheritdoc />

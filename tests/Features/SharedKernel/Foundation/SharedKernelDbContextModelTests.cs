@@ -6,7 +6,7 @@ namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation;
 public sealed class SharedKernelDbContextModelTests
 {
   [Fact]
-  public void Academic_HasExpectedPrimaryKeyAndNoDuplicateUniqueIndexOnPrimaryKey()
+  public void Academic_HasPrimaryKeyOnEmpNr_AndNoDuplicateUniqueIndex()
   {
     using var context = CreateContext();
     var entityType = context.Model.FindEntityType("Zeus.Academia.Features.SharedKernel.Foundation.Domain.Academic");
@@ -52,6 +52,20 @@ public sealed class SharedKernelDbContextModelTests
 
     Assert.NotNull(index);
     Assert.Equal("[AssignedEmpNr] IS NOT NULL", index!.GetFilter());
+  }
+
+  [Fact]
+  public void AcademicQualification_HasCompositePrimaryKey()
+  {
+    using var context = CreateContext();
+    var entityType = context.Model.FindEntityType("Zeus.Academia.Features.SharedKernel.Foundation.Domain.AcademicQualification");
+
+    Assert.NotNull(entityType);
+
+    var primaryKey = entityType!.FindPrimaryKey();
+
+    Assert.NotNull(primaryKey);
+    Assert.Equal(["EmpNr", "DegreeCode"], primaryKey!.Properties.Select(p => p.Name).ToArray());
   }
 
   private static SharedKernelDbContext CreateContext()

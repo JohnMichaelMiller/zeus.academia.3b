@@ -5,6 +5,16 @@ namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation;
 public sealed class ResultTests
 {
   [Fact]
+  public void Success_HasErrorNoneAndIsSuccess()
+  {
+    var result = Result.Success();
+
+    Assert.True(result.IsSuccess);
+    Assert.False(result.IsFailure);
+    Assert.Equal(Error.None, result.Error);
+  }
+
+  [Fact]
   public void Failure_WithNullError_ThrowsArgumentNullException()
   {
     Assert.Throws<ArgumentNullException>(() => Result.Failure(null!));
@@ -17,6 +27,14 @@ public sealed class ResultTests
     var exception = Assert.Throws<InvalidOperationException>(() => Result.Failure(Error.None));
 
     Assert.Contains("non-empty error", exception.Message, StringComparison.OrdinalIgnoreCase);
+  }
+
+  [Fact]
+  public void GenericSuccess_WithNullValue_ThrowsInvalidOperationException()
+  {
+    var exception = Assert.Throws<InvalidOperationException>(() => Result<string>.Success(null!));
+
+    Assert.Contains("include a value", exception.Message, StringComparison.OrdinalIgnoreCase);
   }
 
   [Fact]
@@ -35,5 +53,15 @@ public sealed class ResultTests
 
     Assert.True(success.IsSuccess);
     Assert.Equal("OK", success.Value);
+  }
+
+  [Fact]
+  public void GenericFailure_CarriesActionableError()
+  {
+    var error = Error.Create("Academic.Invalid", "Academic is invalid.");
+    var failure = Result<int>.Failure(error);
+
+    Assert.True(failure.IsFailure);
+    Assert.Equal(error, failure.Error);
   }
 }

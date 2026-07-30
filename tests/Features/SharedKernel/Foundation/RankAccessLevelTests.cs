@@ -28,4 +28,14 @@ public sealed class RankAccessLevelTests
 
     Assert.Equal(AccessLevel.LOC, academic.AccessLevel);
   }
+
+  [Fact]
+  public void ToAccessLevel_WithUnknownRankValue_ThrowsArgumentOutOfRangeException()
+  {
+    var unknownRank = (Rank)99;
+
+    var exception = Assert.Throws<ArgumentOutOfRangeException>(() => unknownRank.ToAccessLevel());
+
+    Assert.Contains("Allowed values", exception.Message, StringComparison.OrdinalIgnoreCase);
+  }
 }

@@ -34,17 +34,17 @@ public sealed class Extension
       throw new ArgumentException("Extension number must be a whole numeric value.", nameof(number));
     }
 
+    if (number > 9_999_999_999m)
+    {
+      throw new BusinessRuleViolationException("Extension number cannot exceed 10 digits.");
+    }
+
     return new Extension(number);
   }
 
   public void AssignTo(string empNr)
   {
-    if (string.IsNullOrWhiteSpace(empNr))
-    {
-      throw new ArgumentException("Employee number is required.", nameof(empNr));
-    }
-
-    var normalizedEmpNr = empNr.Trim().ToUpperInvariant();
+    var normalizedEmpNr = SharedKernelNormalization.NormalizeEmpNr(empNr);
 
     if (AssignedEmpNr is not null && !string.Equals(AssignedEmpNr, normalizedEmpNr, StringComparison.OrdinalIgnoreCase))
     {
@@ -56,17 +56,12 @@ public sealed class Extension
 
   public void ReleaseFrom(string empNr)
   {
-    if (string.IsNullOrWhiteSpace(empNr))
-    {
-      throw new ArgumentException("Employee number is required.", nameof(empNr));
-    }
+    var normalizedEmpNr = SharedKernelNormalization.NormalizeEmpNr(empNr);
 
     if (AssignedEmpNr is null)
     {
       return;
     }
-
-    var normalizedEmpNr = empNr.Trim().ToUpperInvariant();
 
     if (!string.Equals(AssignedEmpNr, normalizedEmpNr, StringComparison.OrdinalIgnoreCase))
     {

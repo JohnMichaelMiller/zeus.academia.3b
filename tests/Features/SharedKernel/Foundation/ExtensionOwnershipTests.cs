@@ -6,7 +6,7 @@ namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation;
 public sealed class ExtensionOwnershipTests
 {
   [Fact]
-  public void AssignTo_WhenExtensionAlreadyAssignedToDifferentAcademic_ThrowsConflictException()
+  public void AssignTo_WhenAssignedToDifferentAcademic_ThrowsConflictException()
   {
     var extension = Extension.Create(1001);
     extension.AssignTo("EMP001");
@@ -17,7 +17,19 @@ public sealed class ExtensionOwnershipTests
   }
 
   [Fact]
-  public void ReleaseFrom_WhenRequesterIsNotOwner_ThrowsConflictException()
+  public void AssignTo_WhenAlreadyAssignedToSameAcademic_IsIdempotent()
+  {
+    var extension = Extension.Create(1001);
+    extension.AssignTo("EMP001");
+
+    extension.AssignTo("EMP001");
+
+    Assert.Equal("EMP001", extension.AssignedEmpNr);
+    Assert.False(extension.IsAvailable);
+  }
+
+  [Fact]
+  public void ReleaseFrom_WhenRequesterIsDifferentAcademic_ThrowsConflictException()
   {
     var extension = Extension.Create(1001);
     extension.AssignTo("EMP001");
@@ -37,5 +49,13 @@ public sealed class ExtensionOwnershipTests
 
     Assert.Null(extension.AssignedEmpNr);
     Assert.True(extension.IsAvailable);
+  }
+
+  [Fact]
+  public void Create_WithFractionalNumber_ThrowsArgumentException()
+  {
+    var exception = Assert.Throws<ArgumentException>(() => Extension.Create(1001.7m));
+
+    Assert.Contains("whole", exception.Message, StringComparison.OrdinalIgnoreCase);
   }
 }

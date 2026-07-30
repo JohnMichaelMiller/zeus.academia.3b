@@ -18,6 +18,8 @@ public sealed class SharedKernelDbContext(DbContextOptions<SharedKernelDbContext
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
+    ArgumentNullException.ThrowIfNull(modelBuilder);
+
     modelBuilder.ApplyConfiguration(new AcademicConfiguration());
     modelBuilder.ApplyConfiguration(new AcademicQualificationConfiguration());
     modelBuilder.ApplyConfiguration(new DegreeConfiguration());

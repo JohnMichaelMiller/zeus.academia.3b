@@ -34,7 +34,7 @@ public class Result
   public static Result Failure(Error error)
   {
     ArgumentNullException.ThrowIfNull(error);
-    return new Result(false, error);
+    return new(false, error);
   }
 }
 

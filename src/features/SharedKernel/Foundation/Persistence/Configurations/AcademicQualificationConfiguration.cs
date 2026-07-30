@@ -6,33 +6,33 @@ namespace Zeus.Academia.Features.SharedKernel.Foundation.Persistence.Configurati
 
 public sealed class AcademicQualificationConfiguration : IEntityTypeConfiguration<AcademicQualification>
 {
-  public void Configure(EntityTypeBuilder<AcademicQualification> builder)
-  {
-    builder.ToTable("AcademicQualifications");
+    public void Configure(EntityTypeBuilder<AcademicQualification> builder)
+    {
+        builder.ToTable("AcademicQualifications");
 
-    builder.HasKey(x => new { x.EmpNr, x.DegreeCode });
+        builder.HasKey(x => new { x.EmpNr, x.DegreeCode });
 
-    builder.Property(x => x.EmpNr)
-        .HasMaxLength(6)
-        .IsFixedLength()
-        .IsRequired();
+        builder.Property(x => x.EmpNr)
+            .HasMaxLength(SharedKernelFieldLengths.EmpNr)
+            .IsFixedLength()
+            .IsRequired();
 
-    builder.Property(x => x.DegreeCode)
-        .HasMaxLength(16)
-        .IsRequired();
+        builder.Property(x => x.DegreeCode)
+            .HasMaxLength(SharedKernelFieldLengths.Code)
+            .IsRequired();
 
-    builder.Property(x => x.UniversityCode)
-        .HasMaxLength(16)
-        .IsRequired();
+        builder.Property(x => x.UniversityCode)
+            .HasMaxLength(SharedKernelFieldLengths.Code)
+            .IsRequired();
 
-    builder.HasOne(x => x.Degree)
-        .WithMany()
-        .HasForeignKey(x => x.DegreeCode)
-        .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.Degree)
+            .WithMany()
+            .HasForeignKey(x => x.DegreeCode)
+            .OnDelete(DeleteBehavior.Restrict);
 
-    builder.HasOne(x => x.University)
-        .WithMany()
-        .HasForeignKey(x => x.UniversityCode)
-        .OnDelete(DeleteBehavior.Restrict);
-  }
+        builder.HasOne(x => x.University)
+            .WithMany()
+            .HasForeignKey(x => x.UniversityCode)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 }

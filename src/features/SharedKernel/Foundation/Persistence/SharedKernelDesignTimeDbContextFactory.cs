@@ -7,10 +7,19 @@ public sealed class SharedKernelDesignTimeDbContextFactory : IDesignTimeDbContex
 {
   public SharedKernelDbContext CreateDbContext(string[] args)
   {
-    var connection = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
+    _ = args;
+
+    var configuredConnection = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
+    var connection = configuredConnection;
 
     if (string.IsNullOrWhiteSpace(connection))
     {
+      if (!OperatingSystem.IsWindows())
+      {
+        throw new InvalidOperationException(
+            "ZEUS_SQLSERVER_CONNECTION is required on non-Windows hosts because LocalDB is unavailable.");
+      }
+
       connection = "Server=(localdb)\\MSSQLLocalDB;Database=ZeusAcademiaSharedKernelDesign;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
     }
 

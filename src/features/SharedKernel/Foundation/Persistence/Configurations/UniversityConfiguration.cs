@@ -13,7 +13,7 @@ public sealed class UniversityConfiguration : IEntityTypeConfiguration<Universit
     builder.HasKey(x => x.Code);
 
     builder.Property(x => x.Code)
-        .HasMaxLength(16)
+        .HasMaxLength(SharedKernelFieldLengths.Code)
         .IsRequired();
   }
 }

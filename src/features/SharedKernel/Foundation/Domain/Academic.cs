@@ -12,6 +12,7 @@ public sealed class Academic
   {
     EmpNr = string.Empty;
     EmpName = string.Empty;
+    Rank = Rank.L;
   }
 
   private Academic(string empNr, string empName, Rank rank)
@@ -33,9 +34,9 @@ public sealed class Academic
 
   public DateOnly? ContractEndDate { get; private set; }
 
-  public IReadOnlyCollection<AcademicQualification> Qualifications => _qualifications;
+  public IReadOnlyList<AcademicQualification> Qualifications => _qualifications.AsReadOnly();
 
-  public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents;
+  public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
   public static Academic Create(
       string empNr,
@@ -45,8 +46,8 @@ public sealed class Academic
       bool isTenured = false,
       DateOnly? contractEndDate = null)
   {
-    var normalizedEmpNr = NormalizeEmpNr(empNr);
-    var normalizedName = NormalizeEmpName(empName);
+    var normalizedEmpNr = SharedKernelNormalization.NormalizeEmpNr(empNr);
+    var normalizedName = SharedKernelNormalization.NormalizeEmpName(empName);
 
     if (qualifications.Count == 0)
     {
@@ -80,7 +81,7 @@ public sealed class Academic
 
   public void UpdateName(string empName)
   {
-    EmpName = NormalizeEmpName(empName);
+    EmpName = SharedKernelNormalization.NormalizeEmpName(empName);
   }
 
   public void SetTenured()
@@ -91,10 +92,7 @@ public sealed class Academic
 
   public void SetContract(DateOnly contractEndDate, DateOnly today)
   {
-    if (contractEndDate <= today)
-    {
-      throw new BusinessRuleViolationException("Contract end date must be in the future.");
-    }
+    SharedKernelNormalization.EnsureFutureContractDate(contractEndDate, today);
 
     IsTenured = false;
     ContractEndDate = contractEndDate;
@@ -108,6 +106,11 @@ public sealed class Academic
 
   public void ChangeRank(Rank newRank)
   {
+    if (Rank == newRank)
+    {
+      return;
+    }
+
     var previousRank = Rank;
     Rank = newRank;
     AddDomainEvent(new RankChangedDomainEvent(EmpNr, previousRank, newRank, DateTime.UtcNow));
@@ -119,7 +122,7 @@ public sealed class Academic
     ArgumentNullException.ThrowIfNull(university);
 
     var duplicate = _qualifications.Any(q =>
-        string.Equals(q.DegreeCode, degree.Code, StringComparison.OrdinalIgnoreCase));
+      string.Equals(q.DegreeCode, degree.Code, StringComparison.OrdinalIgnoreCase));
 
     if (duplicate)
     {
@@ -136,12 +139,14 @@ public sealed class Academic
       throw new ArgumentException("Degree code is required.", nameof(degreeCode));
     }
 
+    var normalizedDegreeCode = SharedKernelNormalization.NormalizeCode(degreeCode, nameof(degreeCode), "Degree code");
+
     var qualification = _qualifications.FirstOrDefault(q =>
-        string.Equals(q.DegreeCode, degreeCode, StringComparison.OrdinalIgnoreCase));
+      string.Equals(q.DegreeCode, normalizedDegreeCode, StringComparison.OrdinalIgnoreCase));
 
     if (qualification is null)
     {
-      throw new NotFoundException($"Academic {EmpNr} does not have degree {degreeCode}.");
+      throw new NotFoundException($"Academic {EmpNr} does not have degree {normalizedDegreeCode}.");
     }
 
     if (_qualifications.Count == 1)
@@ -155,40 +160,6 @@ public sealed class Academic
   public void ClearDomainEvents()
   {
     _domainEvents.Clear();
-  }
-
-  private static string NormalizeEmpNr(string empNr)
-  {
-    if (string.IsNullOrWhiteSpace(empNr))
-    {
-      throw new ArgumentException("Employee number is required.", nameof(empNr));
-    }
-
-    var normalized = empNr.Trim().ToUpperInvariant();
-
-    if (normalized.Length != 6)
-    {
-      throw new BusinessRuleViolationException("Employee number must be exactly 6 characters.");
-    }
-
-    return normalized;
-  }
-
-  private static string NormalizeEmpName(string empName)
-  {
-    if (string.IsNullOrWhiteSpace(empName))
-    {
-      throw new ArgumentException("Employee name is required.", nameof(empName));
-    }
-
-    var normalized = empName.Trim();
-
-    if (normalized.Length > 15)
-    {
-      throw new BusinessRuleViolationException("Employee name must be 15 characters or fewer.");
-    }
-
-    return normalized;
   }
 
   private void AddDomainEvent(IDomainEvent domainEvent)

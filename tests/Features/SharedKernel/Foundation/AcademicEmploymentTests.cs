@@ -6,10 +6,27 @@ namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation;
 public sealed class AcademicEmploymentTests
 {
   [Fact]
-  public void SetTenured_WhenContracted_ClearsContractEndDate()
+  public void Create_WithTenuredAndContractDate_ThrowsBusinessRuleViolationException()
+  {
+    var degree = Degree.Create("PHD");
+    var university = University.Create("MIT");
+
+    var exception = Assert.Throws<BusinessRuleViolationException>(() => Academic.Create(
+      empNr: "EMP001",
+      empName: "Alex Chen",
+      rank: Rank.P,
+      qualifications: [(degree, university)],
+      isTenured: true,
+      contractEndDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7))));
+
+    Assert.Contains("both tenured and contracted", exception.Message, StringComparison.OrdinalIgnoreCase);
+  }
+
+  [Fact]
+  public void SetTenured_WhenContractAlreadyExists_ClearsContractEndDate()
   {
     var academic = CreateAcademic();
-    academic.SetContract(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30)), DateOnly.FromDateTime(DateTime.UtcNow));
+    academic.SetContract(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)), DateOnly.FromDateTime(DateTime.UtcNow));
 
     academic.SetTenured();
 
@@ -18,16 +35,17 @@ public sealed class AcademicEmploymentTests
   }
 
   [Fact]
-  public void SetContract_WhenTenured_ClearsTenureAndSetsFutureDate()
+  public void SetContract_WithFutureDate_ClearsTenure()
   {
     var academic = CreateAcademic();
-    var contractDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10));
-    academic.SetTenured();
+    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    var futureContract = today.AddDays(30);
 
-    academic.SetContract(contractDate, DateOnly.FromDateTime(DateTime.UtcNow));
+    academic.SetTenured();
+    academic.SetContract(futureContract, today);
 
     Assert.False(academic.IsTenured);
-    Assert.Equal(contractDate, academic.ContractEndDate);
+    Assert.Equal(futureContract, academic.ContractEndDate);
   }
 
   [Fact]
@@ -35,28 +53,22 @@ public sealed class AcademicEmploymentTests
   {
     var academic = CreateAcademic();
 
-    var exception = Assert.Throws<BusinessRuleViolationException>(() =>
-        academic.SetContract(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)), DateOnly.FromDateTime(DateTime.UtcNow)));
+    var exception = Assert.Throws<BusinessRuleViolationException>(() => academic.SetContract(
+      DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
+      DateOnly.FromDateTime(DateTime.UtcNow)));
 
     Assert.Contains("future", exception.Message, StringComparison.OrdinalIgnoreCase);
   }
 
   [Fact]
-  public void Create_WithBothTenureAndContract_ThrowsBusinessRuleViolationException()
+  public void UpdateName_WithTooLongName_ThrowsBusinessRuleViolationException()
   {
-    var degree = Degree.Create("PHD");
-    var university = University.Create("MIT");
+    var academic = CreateAcademic();
+    var longName = new string('A', SharedKernelFieldLengths.EmpName + 1);
 
-    var exception = Assert.Throws<BusinessRuleViolationException>(() =>
-        Academic.Create(
-            "EMP001",
-            "A. Rivera",
-            Rank.P,
-            [(degree, university)],
-            isTenured: true,
-            contractEndDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(15))));
+    var exception = Assert.Throws<BusinessRuleViolationException>(() => academic.UpdateName(longName));
 
-    Assert.Contains("cannot be both tenured and contracted", exception.Message, StringComparison.OrdinalIgnoreCase);
+    Assert.Contains("15", exception.Message, StringComparison.OrdinalIgnoreCase);
   }
 
   private static Academic CreateAcademic()
