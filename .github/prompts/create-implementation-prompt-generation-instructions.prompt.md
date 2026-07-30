@@ -36,6 +36,8 @@ mode: agent
 
 # Generate Implementation Prompt Instruction File
 
+> Status: Deprecated alias. Use `.github/prompts/create-implementation-prompt-instructions.prompt.md` as the canonical prompt for ongoing updates.
+
 Create a comprehensive `.instructions.md` file that defines the requirements for creating **implementation prompts** for vertical slices in this repository.
 
 An implementation prompt is a prompt that specifies how a single slice should be implemented, which agents or humans own each part of the work, how the slice will be verified, and how a human can demonstrate the slice's value after delivery.

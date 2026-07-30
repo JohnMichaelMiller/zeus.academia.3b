@@ -54,9 +54,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                                                        | Inputs                                                     | Outputs                                           | Escalate when                                                            |
-| -------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
-| slice-coordinator          | confirm endpoint route, transaction boundary, and prerequisite readiness                | execution plan, current repo tree, reference-data slices   | approved implementation sequence and blocker list | any prerequisite slice is incomplete or lacks integration proof          |
+| Role                 | Responsibilities                                                                        | Inputs                                                     | Outputs                                           | Escalate when                                                            |
+| -------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
+| slice-coordinator    | confirm endpoint route, transaction boundary, and prerequisite readiness                | execution plan, current repo tree, reference-data slices   | approved implementation sequence and blocker list | any prerequisite slice is incomplete or lacks integration proof          |
 | backend-domain       | implement command, validator, handler, endpoint, mappings, and persistence workflow     | Shared Kernel, reference-data contracts, slice conventions | registration code path and response contract      | qualification or extension rules require changing Shared Kernel behavior |
 | testing-verification | verify valid registration, duplicate empNr, invalid references, and extension conflicts | implemented slice and prerequisite data                    | integration-first tests and evidence              | registration is not atomic or leaves partial data behind                 |
 
@@ -69,7 +69,7 @@ mode: agent
 2. Implement the registration contract and validator.
    Targets: RegisterAcademic command, request/response types, validator, and mapping helpers.
    Owner: backend-domain.
-   Validation before next step: empNr length, EmpName length, qualification minimum, and extension availability are all validated before persistence.
+   Validation before next step: empNr length, EmpName length, qualification minimum, and extension availability are all validated before persistence, and field limits stay aligned with the canonical persistence/domain constraint definitions.
 3. Implement the handler and endpoint atomically.
    Targets: handler, endpoint, persistence mapping, and transaction flow for academic creation, qualification creation, and extension linkage.
    Owner: backend-domain.
@@ -87,6 +87,7 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- Domain create/update and request-validation paths enforce the same persistence-backed field limits and normalization rules before persistence.
 - A valid registration request creates one academic record with a 6-character unique empNr and a name no longer than 15 characters.
 - Registration rejects payloads that do not include at least one degree and university pair.
 - Registration rejects invalid rank, degree, university, or extension references.
@@ -112,6 +113,7 @@ mode: agent
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] RegisterAcademic remains the first delivery gate for academic lifecycle work.
 - [ ] Validation covers empNr length, name length, qualification minimum, and reference-data existence.
+- [ ] Field-limit and normalization rules stay aligned between validators/domain logic and persistence mappings.
 - [ ] Persistence is atomic across academic, qualifications, and extension linkage.
 - [ ] Derived access level is persisted or exposed consistently from Rank.
 - [ ] Integration tests prove clean failure behavior for invalid and conflicting requests.

@@ -48,13 +48,16 @@ applyTo: "**"
 - MUST validate platform assumptions for runtime tooling:
   - Windows-only fallbacks (for example LocalDB) must be explicitly guarded.
   - On non-Windows, require explicit environment configuration instead of silent fallback.
+  - Design-time DbContext factories and verification scripts must use the same platform guard behavior as runtime verification (no unconditional LocalDB fallback on non-Windows hosts).
 - MUST run a focused self-review for common correctness regressions before opening PR:
   - Vertical slice layout and boundaries match [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md).
   - Placeholder scaffolding artifacts are removed or renamed before review; do not leave `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter files in committed slices.
   - C# file names match their primary type name and xUnit test files contain real test classes named for the behavior under test.
+  - C# source keeps one primary type per file; do not colocate unrelated primary types in the same `.cs` file.
   - Null argument validation for non-nullable API inputs.
   - Dependency package families remain version-compatible (for example xUnit core package major version aligned with its runner package major version).
   - No mutable collection escape through read-only interfaces.
+  - Backing `List<T>` collections are not exposed directly; read-only members return immutable/read-only wrappers (for example `AsReadOnly()`).
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
   - No duplicate project declarations in solution files; project name/path pairs must appear once with one GUID and one configuration block.
   - Any touched solution file must keep the required Visual Studio header as the first line with no leading blank line or stray BOM-only line.
@@ -65,6 +68,7 @@ applyTo: "**"
   - Result-style failure factories enforce non-null failure payloads (for example guard `Failure(Error error)` inputs against nulls in both non-generic and generic result types).
   - Shared foundational primitives (for example Result/Error base types) retain direct tests for both non-generic and generic invariants when touched.
   - Value-object parse/creation APIs reject lossy coercion (for example silently truncating fractional inputs) unless the behavior is explicitly required and tested.
+  - Domain creation/update paths enforce persistence-backed field limits (for example max length, precision, scale) at creation-time so invalid objects are rejected before persistence.
   - Integration tests that provision external resources (databases, containers, queues, files) perform best-effort cleanup in `finally` blocks.
   - Public/shared parse or mapping APIs retain direct acceptance tests when touched; do not remove only-path coverage without replacement.
   - Constrained-code parse/validation failures remain actionable by including allowed values (prefer constants over inline literals).

@@ -78,7 +78,7 @@ mode: agent
 4. Add reusable error/result plumbing and domain event contracts.
    Targets: Shared Kernel result types, error primitives, event interfaces, and common exceptions.
    Owner: backend-domain.
-   Validation before next step: later slices can consume common result and exception types without redefining them, and `Result<T>.Value` throws on failure access instead of exposing `default!`.
+   Validation before next step: later slices can consume common result and exception types without redefining them, `Result<T>.Value` throws on failure access instead of exposing `default!`, and C# files keep one primary type per file with filename-to-type alignment.
 5. Remove scaffolding leftovers and normalize file hygiene before final verification.
    Targets: any newly added source, test, project, and solution files.
    Owner: slice-coordinator.
@@ -86,7 +86,7 @@ mode: agent
 6. Verify invariants and persistence behavior.
    Targets: unit tests, mapping tests, and migration validation.
    Owner: testing-verification.
-   Validation before next step: all foundational tests pass, failures clearly identify which invariant broke, infrastructure/setup failures fail explicitly (no catch-and-return skip path), environment configuration is read once per value in setup helpers and verification scripts, any touched solution file has no duplicate project declarations, and any touched solution file keeps the Visual Studio header as line 1 with no BOM-only leading line.
+   Validation before next step: all foundational tests pass, failures clearly identify which invariant broke, infrastructure/setup failures fail explicitly (no catch-and-return skip path), environment configuration is read once per value in setup helpers and verification scripts, SQL Server setup paths use explicit platform guards (no unconditional LocalDB fallback on non-Windows hosts), any touched solution file has no duplicate project declarations, and any touched solution file keeps the Visual Studio header as line 1 with no BOM-only leading line.
 
 ## Verification and Acceptance Criteria
 
@@ -95,8 +95,11 @@ mode: agent
 - Dependency compatibility is validated for coupled tooling packages when touched (for example xUnit core and runner major versions align).
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - `Error.None` remains reserved for success only; failure results cannot use the empty success sentinel and must carry actionable details.
+- C# source keeps one primary type per file and file names stay aligned with the primary type.
 - Domain exceptions are split into dedicated files/types with aligned names as the exception set grows.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
+- Domain create/update paths enforce persistence-backed field limits and normalization (for example Degree/University max length parity with EF Core mappings) before persistence.
+- Read-only collection properties do not leak mutable backing lists (use read-only wrappers when backing storage is mutable).
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - Integration-test teardown failures are non-fatal to the primary assertion signal (cleanup errors are surfaced separately and do not mask the behavioral failure under test).
 - Creating or mutating an Academic cannot leave both IsTenured and ContractEndDate set at the same time; constraint names and test names must reflect this mutual-exclusion semantic unless strict XOR is explicitly required.
@@ -111,6 +114,7 @@ mode: agent
 - `Result<T>.Value` is accessible only for successful results and throws a clear exception for failure results.
 - Model verification checks primary key shape directly and does not require a redundant unique index on the same key columns.
 - SQL Server constraint verification fails with actionable diagnostics when connectivity/setup is unavailable; tests must not silently return.
+- Design-time SQL Server configuration matches cross-platform verification behavior (LocalDB fallback only under explicit Windows guard; non-Windows requires `ZEUS_SQLSERVER_CONNECTION`).
 - Newly created source and test files do not retain placeholder scaffolding; file names match the primary type or test behavior under review.
 - Support scripts and database-test helpers read each environment variable once and reuse the parsed value instead of duplicating lookups across branches.
 
@@ -134,7 +138,10 @@ mode: agent
 - [ ] Shared Kernel scope is still limited to reusable domain and persistence foundations.
 - [ ] Aggregate invariants and derived properties are enforced in code.
 - [ ] Result failure paths use actionable errors and do not rely on `Error.None` for failures.
+- [ ] C# source keeps one primary type per file with filename-to-type alignment.
 - [ ] Exception types are organized into dedicated files/types with aligned names.
+- [ ] Domain create/update rules enforce persistence-backed field limits before persistence (including shared max-length constraints).
+- [ ] Read-only collection members do not expose mutable backing lists.
 - [ ] Database constraints back up the critical uniqueness rules.
 - [ ] Result, error, event, and exception primitives are reusable by later slices.
 - [ ] Verification evidence exists for invariant and mapping behavior.
@@ -142,4 +149,5 @@ mode: agent
 - [ ] Any repo-layout deviation from the plan is documented before dependent slice work begins.
 - [ ] No unique index duplicates a primary key column set unless explicitly justified and documented.
 - [ ] Environment/setup failures in persistence verification fail explicitly; no silent pass path remains.
+- [ ] SQL Server setup uses explicit platform guards and does not rely on unconditional LocalDB fallback on non-Windows hosts.
 - [ ] Newly created files were checked for leftover scaffolding placeholders before review.

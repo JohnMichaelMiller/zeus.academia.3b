@@ -196,10 +196,13 @@ The section MUST cover, when applicable:
 - test coverage expectations
 - dependency compatibility for coupled tooling packages (for example xUnit core/runner major-version alignment)
 - integration-test resource lifecycle requirements (external resources must include deterministic teardown)
+- C# file/type organization hygiene (one primary type per file and file names aligned with their primary type)
 - result-wrapper invariants for success/failure access patterns (for example, `Result<T>.Value` must not be consumable on failure)
 - result failure-factory null guards (for example `Failure(Error error)` cannot accept null error payloads)
 - result semantics that reserve `Error.None` for success only, so failed results must carry actionable error details rather than an empty success sentinel
 - non-lossy parse/create behavior for constrained value objects (reject silent truncation or coercion unless explicitly required)
+- persistence-backed domain field parity (domain create/update paths enforce the same max-length, precision, scale, and normalization constraints required by persistence)
+- immutable read-only collection exposure (do not expose mutable backing lists through `IReadOnlyCollection`; require read-only wrappers such as `AsReadOnly()` when applicable)
 - database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
 - named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
 - ownership-safe association mutations (for example, releasing an extension must validate it belongs to the target academic; assignment must not overwrite an existing different assignment)
@@ -210,6 +213,7 @@ The section MUST cover, when applicable:
 - scaffold cleanup and naming hygiene (no leftover placeholder starter files; file names must match their primary type or test behavior)
 - solution-file encoding hygiene when `.sln` is touched (no BOM-only line or blank line ahead of the required Visual Studio header)
 - environment/setup helper hygiene when scripts or infrastructure-backed tests are touched (read each environment variable once and reuse the parsed value or helper result)
+- cross-platform SQL Server setup behavior for scripts/factories (LocalDB fallback allowed only with explicit Windows guard; on non-Windows require `ZEUS_SQLSERVER_CONNECTION` with actionable failure messaging)
 
 Bad:
 
@@ -232,6 +236,7 @@ Specify how the slice will be verified:
 - residual-risk callouts if verification is partial
 - behavior when environment prerequisites are missing (tests MUST fail explicitly with actionable diagnostics; no early return/skipped-by-default pattern)
 - teardown robustness for infrastructure-backed tests (cleanup must be best-effort and must not mask primary assertion failures if teardown encounters transient errors)
+- platform guard consistency for infrastructure helpers (design-time factories, scripts, and tests must share the same non-Windows behavior for SQL Server configuration)
 
 The prompt MUST distinguish between required verification and optional follow-up checks.
 
@@ -297,6 +302,10 @@ End the prompt with a checklist that verifies prompt quality before use.
 - [ ] Schema-changing prompts require migration artifacts and metadata hygiene for EF Core work.
 - [ ] Model metadata checks use the EF Core model directly rather than a design-time service lookup in normal tests.
 - [ ] Domain exception types are organized into dedicated files/types with aligned names.
+- [ ] Prompted C# changes keep one primary type per file and preserve filename-to-type alignment.
+- [ ] Prompted domain create/update flows enforce persistence-backed field limits before persistence (max length, precision, scale, normalization).
+- [ ] Prompted read-only collection exposure prevents mutable backing-list escape.
+- [ ] Prompted SQL Server setup behavior forbids unconditional LocalDB fallback on non-Windows hosts.
 
 ## Anti-Patterns
 

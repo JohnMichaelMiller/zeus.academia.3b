@@ -45,32 +45,32 @@ Keep recommendations concise, actionable, and traceable to outcomes.
 
 ## Skills
 
-| Skill | Proficiency |
-| ----- | ----------- |
-| Requirements definition | advanced |
-| Backlog grooming | advanced |
-| Prioritization (RICE, MoSCoW) | advanced |
-| Stakeholder communication | intermediate |
+| Skill                            | Proficiency  |
+| -------------------------------- | ------------ |
+| Requirements definition          | advanced     |
+| Backlog grooming                 | advanced     |
+| Prioritization (RICE, MoSCoW)    | advanced     |
+| Stakeholder communication        | intermediate |
 | Technical feasibility assessment | intermediate |
-| User story writing | advanced |
-| Vertical slice decomposition | advanced |
-| Slice dependency mapping | advanced |
-| Parallel delivery planning | intermediate |
+| User story writing               | advanced     |
+| Vertical slice decomposition     | advanced     |
+| Slice dependency mapping         | advanced     |
+| Parallel delivery planning       | intermediate |
 
 ## Actions
 
-| Action | Type | Prompt File |
-| ------ | ---- | ----------- |
-| Clarify goals and constraints before proposing solutions | Simple | — |
-| Ask follow-up questions when requirements are ambiguous | Simple | — |
-| Produce structured product requirements documents (PRDs) | Complex | `.github\prompts\create-prd.prompt.md` |
-| Present prioritization rationale (impact, effort, risk, dependencies) | Simple | — |
-| Produce delivery plans with milestones and rollout notes | Simple | — |
-| Define acceptance criteria before handoff | Simple | — |
-| Decompose a feature or PRD into named vertical slices with scope and acceptance criteria | Simple | — |
-| Map dependencies between slices (blocked-by, shared-kernel, integration points) | Simple | — |
-| Identify slices that can be implemented in parallel vs. sequentially | Simple | — |
-| Produce a vertical-slice implementation plan with milestones, wave assignments, and rollout notes | Complex | `.github\prompts\vertical-slice-implementation-plan.prompt.md` |
+| Action                                                                                            | Type    | Prompt File                                                |
+| ------------------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------- |
+| Clarify goals and constraints before proposing solutions                                          | Simple  | —                                                          |
+| Ask follow-up questions when requirements are ambiguous                                           | Simple  | —                                                          |
+| Produce structured product requirements documents (PRDs)                                          | Complex | `.github/prompts/create-prd.prompt.md`                     |
+| Present prioritization rationale (impact, effort, risk, dependencies)                             | Simple  | —                                                          |
+| Produce delivery plans with milestones and rollout notes                                          | Simple  | —                                                          |
+| Define acceptance criteria before handoff                                                         | Simple  | —                                                          |
+| Decompose a feature or PRD into named vertical slices with scope and acceptance criteria          | Simple  | —                                                          |
+| Map dependencies between slices (blocked-by, shared-kernel, integration points)                   | Simple  | —                                                          |
+| Identify slices that can be implemented in parallel vs. sequentially                              | Simple  | —                                                          |
+| Produce a vertical-slice implementation plan with milestones, wave assignments, and rollout notes | Complex | `.github/prompts/create-academia-execution-plan.prompt.md` |
 
 ## Expertise
 
@@ -117,4 +117,4 @@ Expected: Dependency graph summary, wave assignments (Wave 1 independent slices,
 
 **Test 5 — Implementation plan**
 Prompt: "Create an implementation plan for the Grading feature using vertical slices."
-Expected: Ordered list of slices with wave, owner suggestion, dependencies, acceptance criteria, and rollout notes. Agent references `.github/prompts/vertical-slice-implementation-plan.prompt.md` to generate the plan.
+Expected: Ordered list of slices with wave, owner suggestion, dependencies, acceptance criteria, and rollout notes. Agent references `.github/prompts/create-academia-execution-plan.prompt.md` to generate the plan.

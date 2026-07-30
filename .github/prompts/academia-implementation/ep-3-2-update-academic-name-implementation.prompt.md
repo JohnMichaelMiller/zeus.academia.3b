@@ -52,9 +52,9 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                       | Inputs                                | Outputs                | Escalate when                                                            |
-| -------------------------- | ------------------------------------------------------ | ------------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
-| slice-coordinator          | confirm route, identifier, and update flow             | execution plan and current tree       | approved command scope | current repo uses a different canonical identifier than the plan assumes |
+| Role                 | Responsibilities                                       | Inputs                                | Outputs                | Escalate when                                                            |
+| -------------------- | ------------------------------------------------------ | ------------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
+| slice-coordinator    | confirm route, identifier, and update flow             | execution plan and current tree       | approved command scope | current repo uses a different canonical identifier than the plan assumes |
 | backend-domain       | implement rename command, validator, handler, endpoint | registration model and existing rules | rename code path       | renaming requires cross-slice side effects not called for in the plan    |
 | testing-verification | verify length rule, persistence, and query visibility  | implemented slice                     | tests and evidence     | updated name is not visible through read models after save               |
 
@@ -67,7 +67,7 @@ mode: agent
 2. Implement rename behavior.
    Targets: command, validator, handler, endpoint, and mappings.
    Owner: backend-domain.
-   Validation before next step: names longer than 15 characters are rejected and valid updates persist.
+   Validation before next step: names longer than 15 characters are rejected, valid updates persist, and domain/validator checks remain aligned with persistence-backed name-length constraints.
 3. Verify downstream visibility.
    Targets: integration tests for valid update, invalid name, and follow-up read-model assertions.
    Owner: testing-verification.
@@ -81,6 +81,7 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- Domain create/update and validator logic enforce the same persistence-backed name-length and normalization rules before persistence.
 - Valid name updates persist successfully for an existing academic.
 - Names longer than 15 characters are rejected.
 - Missing academics return the repo-standard not-found behavior.
@@ -104,6 +105,7 @@ mode: agent
 - [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] Name-length validation matches registration.
+- [ ] Name-length and normalization rules stay aligned between domain/validator logic and persistence mappings.
 - [ ] Rename behavior does not alter unrelated academic fields.
 - [ ] Read models reflect the persisted update.
 - [ ] Success and failure paths are tested.

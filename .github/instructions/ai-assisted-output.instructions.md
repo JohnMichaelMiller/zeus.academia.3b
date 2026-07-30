@@ -26,7 +26,7 @@ applyTo: "**/*"
 
 This repository requires clear provenance and reliable logging for all AI-assisted outputs. Provenance and logging protect code quality, enable audits, and help teammates understand how artifacts were produced (by whom, with what model, and from which conversation). This policy defines the required metadata, logging workflow, quality gates, and Copilot integration behaviors to make provenance automatic, consistent, and verifiable.
 
-**For GitHub Copilot Users**: See [`.github/instructions/copilot-instructions.md`](.github/instructions/copilot-instructions.md) for comprehensive Copilot-specific guidance including model identification, conversation format, and quality checklists.
+**For GitHub Copilot Users**: See [GitHub Copilot Implementation Requirements](#github-copilot-implementation-requirements) in this file for model identification, conversation format, and quality checklists.
 
 ## Table of Contents
 

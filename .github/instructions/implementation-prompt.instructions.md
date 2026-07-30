@@ -146,8 +146,11 @@ Required coverage:
 - User-visible outcome or business rule satisfied
 - Dependency compatibility checks for coupled tooling packages (for example xUnit core/runner major-version alignment)
 - Test resource lifecycle rules for integration tests that provision external resources (must include teardown strategy)
+- C# file/type organization hygiene (one primary type per file and file names aligned to their primary type)
 - Ownership-safe aggregate mutation rules for linked entities (for example, release operations must verify current ownership and assignment operations must not overwrite a different existing link)
 - No lossy value coercion in domain parse/create APIs unless explicitly required and tested
+- Persistence-backed domain field parity (domain create/update paths enforce persistence max-length, precision, scale, and normalization constraints before persistence)
+- Immutable read-only collection exposure (do not expose mutable backing lists through `IReadOnlyCollection`; require read-only wrappers such as `AsReadOnly()` when applicable)
 - Shared result/failure factories guard non-null failure payload invariants in both generic and non-generic forms
 - Result semantics reserve `Error.None` for success only; failed results must carry actionable details and cannot be constructed with an empty success sentinel.
 - EF Core schema changes require migration artifacts and metadata hygiene (for example, migration plus snapshot/Designer files when the project uses migrations) unless the prompt explicitly waives them and explains the tradeoff.
@@ -159,6 +162,7 @@ Required coverage:
 - Scaffold cleanup and naming hygiene when new files are introduced: no leftover `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter artifacts; file names must match the primary type or test behavior.
 - Script and setup-helper hygiene when verification touches infrastructure configuration: environment variables are read once per value and reused through a local variable or helper instead of duplicated lookups.
 - Teardown failure isolation for integration tests: cleanup runs as best-effort in `finally` and teardown exceptions must not replace the primary assertion failure signal.
+- Cross-platform SQL Server setup behavior for scripts/factories: LocalDB fallback is allowed only behind explicit Windows checks; on non-Windows hosts require `ZEUS_SQLSERVER_CONNECTION` and fail with actionable diagnostics.
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
 
@@ -319,6 +323,10 @@ Example for a single slice:
 - [ ] Verification evidence is captured
 - [ ] Schema-changing work names the required migration artifact and how it will be verified
 - [ ] Deferred durable invariants are either temporarily safeguarded now or tracked with an explicit owning follow-up slice and risk note
+- [ ] C# changes keep one primary type per file and preserve filename-to-type alignment
+- [ ] Domain create/update rules enforce persistence-backed field limits before persistence
+- [ ] Read-only collection members do not leak mutable backing lists
+- [ ] SQL Server setup paths avoid unconditional LocalDB fallback on non-Windows hosts
 - [ ] Showcase steps demonstrate business value
 ```
 
@@ -350,6 +358,7 @@ Before using an implementation prompt, verify:
 - [ ] Verification steps include evidence capture
 - [ ] Showcase steps are human-followable and prove business value
 - [ ] The prompt states what to do when an agent is blocked or outputs conflict
+- [ ] C# file/type organization, domain field-limit parity, immutable read-only exposure, and cross-platform SQL setup guards are explicit when applicable
 
 ## Maintenance
 

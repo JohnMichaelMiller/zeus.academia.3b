@@ -50,6 +50,7 @@ If no conflicts: state "Context validated. No conflicts detected."
 
 ## Validation Steps
 
+0. Full-scan mode override: for this context-audit prompt, load all instruction, prompt, and agent files even if normal workflows use selective loading.
 1. Load all instruction, prompt, and agent files
 2. Cross-reference directives for contradictions
 3. Check terminology consistency across files

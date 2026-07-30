@@ -53,6 +53,7 @@ Foundational C# best practices for clean, maintainable, type-safe code using mod
 - MUST use file-scoped namespaces (C# 10+)
 - MUST organize members: fields → constructors → properties → methods
 - MUST match namespace to folder structure
+- MUST keep collection encapsulation boundaries intact by returning read-only wrappers for mutable backing collections (for example `AsReadOnly()` for `List<T>` fields exposed as read-only members)
 
 **Template:**
 
@@ -227,6 +228,7 @@ Use explicit state guards for success/failure wrappers so invalid states fail lo
 - WHEN adding EF Core migrations, keep the migration plus the standard metadata artifacts required by the project tooling (for example snapshot/Designer files) in the same change unless the work explicitly waives them
 - MUST keep domain exception types organized so file names and type names stay aligned; prefer one primary exception type per file when the exception set grows
 - MUST verify persistence rules through the EF Core model and migration output rather than relying on ad-hoc assumptions or provider-agnostic shortcuts
+- MUST enforce persistence-backed field constraints (max length, precision, scale, required normalization) in domain creation/update APIs so invalid values are rejected before persistence
 
 ## Parsing and Normalization Safety
 
