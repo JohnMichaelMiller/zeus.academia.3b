@@ -11,6 +11,7 @@ The third iteration of the Zeus Academia experiment
 - [Academia Execution Plan](.github/models/workflows/academia-execution-plan.md) ([Log](ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md))
 - [Academia Slice Implementation Prompts](.github/prompts/academia-implementation/README.md) ([Log](ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md))
 - [Implementation Prompt Standards](.github/instructions/implementation-prompt.instructions.md) ([Log](ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md))
+- [Shared Kernel Foundation](src/features/SharedKernel/Foundation/Zeus.Academia.Features.SharedKernel.Foundation.csproj) and [Shared Kernel Tests](tests/Features/SharedKernel/Foundation/Zeus.Academia.Tests.Features.SharedKernel.Foundation.csproj) - Shared Kernel domain primitives, result types, EF mappings, and verification tests for Phase 0
 - [Implementation Prompt Instruction Prompt](.github/prompts/create-implementation-prompt-instructions.prompt.md) ([Log](ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md))
 - [Create Academia Execution Plan Prompt](.github/prompts/create-academia-execution-plan.prompt.md) ([Log](ai-logs/2026/04/20/2026-04-20-create-academia-execution-plan-prompt/conversation.md))
 - [Custom Agents Instruction Prompt](.github/prompts/create-custom-agents-instructions.prompt.md) ([Log](ai-logs/2026/02/25/2026-02-25-custom-agents-instructions-prompt/conversation.md))
