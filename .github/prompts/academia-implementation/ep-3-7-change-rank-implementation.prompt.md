@@ -53,11 +53,12 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                                                 | Inputs                                              | Outputs                   | Escalate when                                                              |
-| -------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------- |
-| slice-coordinator          | confirm event needs and route placement                                          | execution plan, report dependencies, current routes | approved command contract | report dependencies require a broader event model than currently available |
-| backend-domain       | implement command, validator, handler, endpoint, and any rank-change event       | Shared Kernel rules, ManageRanks data               | rank-change code path     | handler would need to assign access level directly rather than deriving it |
-| testing-verification | verify valid rank change, invalid rank rejection, and access-level recalculation | implemented slice                                   | tests and evidence        | profile or report seed data still shows stale access levels                |
+| Role                 | Responsibilities                                                                 | Inputs                                                   | Outputs                         | Escalate when                                                                                           |
+| -------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm event needs and route placement                                          | execution plan, report dependencies, current routes      | approved command contract       | report dependencies require a broader event model than currently available                              |
+| backend-domain       | implement command, validator, handler, endpoint, and any rank-change event       | Shared Kernel rules, ManageRanks data                    | rank-change code path           | handler would need to assign access level directly rather than deriving it                              |
+| data-persistence     | validate persisted rank assumptions and any durable rule dependencies            | ManageRanks canonical rank definition, persistence rules | persistence compatibility notes | the slice would introduce its own rank-code literals or drift from ManageRanks-backed persistence rules |
+| testing-verification | verify valid rank change, invalid rank rejection, and access-level recalculation | implemented slice                                        | tests and evidence              | profile or report seed data still shows stale access levels                                             |
 
 ## Ordered Implementation Steps
 
@@ -68,8 +69,12 @@ mode: agent
 2. Implement change-rank behavior.
    Targets: command, validator, handler, endpoint, mappings, and optional RankChanged event.
    Owner: backend-domain.
-   Validation before next step: only valid rank codes are accepted and access level is recalculated from the aggregate rule.
-3. Verify read-model consistency.
+   Validation before next step: only valid rank codes from the canonical ManageRanks source are accepted, failures identify the `Code` property explicitly, and access level is recalculated from the aggregate rule.
+3. Confirm persistence and shared-code compatibility.
+   Targets: shared rank lookup/mapping code, any persistence assumptions reused from ManageRanks, and read-path handling for stored rank values.
+   Owner: data-persistence.
+   Validation before next step: the slice reuses canonical rank definitions and does not introduce duplicated rank literals or drift from persisted rules.
+4. Verify read-model consistency.
    Targets: tests for valid change, invalid rank, missing academic, and profile/read-model assertions.
    Owner: testing-verification.
    Validation before next step: changed rank and derived access level are immediately visible.
@@ -82,6 +87,8 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- Guard failures for invalid rank input identify the `Code` property rather than the enclosing command object.
+- Rank validation, mapping, and error messaging reuse the canonical ManageRanks rank definition instead of repeating P, SL, and L literals in multiple places.
 - Only valid rank codes from ManageRanks can be applied.
 - Successful rank changes update the academic's effective access level automatically.
 - Missing academics or invalid rank codes fail cleanly.
@@ -104,6 +111,8 @@ mode: agent
 - [ ] If test packages changed, compatibility is verified (for example xUnit core and runner major versions align).
 - [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
+- [ ] Invalid-rank guard failures point to `Code` rather than the enclosing command object.
+- [ ] Rank literals are not redefined when a canonical ManageRanks source already exists.
 - [ ] Valid-rank lookup is enforced.
 - [ ] AccessLevel remains derived, not manually assigned.
 - [ ] Missing-record and invalid-rank cases are tested.

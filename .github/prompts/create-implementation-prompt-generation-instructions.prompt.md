@@ -185,7 +185,7 @@ Require acceptance criteria to be:
 
 The instruction file MUST distinguish good behavioral acceptance criteria from bad task-based criteria.
 
-It MUST also require acceptance criteria to cover scaffold cleanup and naming hygiene for newly created files, solution-file header and encoding hygiene when `.sln` files change, and environment/setup helper hygiene when scripts or infra-backed tests read environment variables.
+It MUST also require acceptance criteria to cover scaffold cleanup and naming hygiene for newly created files, solution-file header and encoding hygiene when `.sln` files change, environment/setup helper hygiene when scripts or infra-backed tests read environment variables, precise parameter/property names in thrown argument exceptions or equivalent guard failures, and single-source reuse for constrained code or enum rules across validators, mappings, messages, and EF Core constraints.
 
 ### 9. Verification Requirements
 

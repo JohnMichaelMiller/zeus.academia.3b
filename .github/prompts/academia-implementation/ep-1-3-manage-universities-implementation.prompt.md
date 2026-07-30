@@ -54,11 +54,12 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                           | Inputs                                           | Outputs                                      | Escalate when                                             |
-| -------------------------- | ------------------------------------------ | ------------------------------------------------ | -------------------------------------------- | --------------------------------------------------------- |
-| slice-coordinator          | confirm catalog ownership and placement    | execution plan, repo tree, existing fixtures     | approved artifact map                        | multiple university catalogs already exist                |
-| backend-domain       | implement add and list university behavior | Shared Kernel university type, slice conventions | commands, queries, handlers, DTOs, endpoints | code or fixtures imply conflicting university identifiers |
-| testing-verification | verify uniqueness and list behavior        | implemented slice                                | tests and evidence                           | duplicate handling or list output is unstable             |
+| Role                 | Responsibilities                                            | Inputs                                                  | Outputs                                      | Escalate when                                                                                                                 |
+| -------------------- | ----------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm catalog ownership and placement                     | execution plan, repo tree, existing fixtures            | approved artifact map                        | multiple university catalogs already exist                                                                                    |
+| backend-domain       | implement add and list university behavior                  | Shared Kernel university type, slice conventions        | commands, queries, handlers, DTOs, endpoints | code or fixtures imply conflicting university identifiers                                                                     |
+| data-persistence     | implement code normalization and durable uniqueness backing | canonical university-code definition, persistence rules | EF Core mapping, constraint decisions        | the slice would duplicate university-code normalization or uniqueness rules across validator, mapping, and persistence layers |
+| testing-verification | verify uniqueness and list behavior                         | implemented slice                                       | tests and evidence                           | duplicate handling or list output is unstable                                                                                 |
 
 ## Ordered Implementation Steps
 
@@ -69,15 +70,19 @@ mode: agent
 2. Implement add-university behavior.
    Targets: AddUniversity command, validator, handler, response, endpoint, and mapping files.
    Owner: backend-domain.
-   Validation before next step: valid university codes persist and duplicates fail clearly.
-3. Implement list-universities behavior.
+   Validation before next step: valid university codes persist, code-specific failures identify the `Code` property explicitly, and duplicates fail clearly.
+3. Implement persistence-backed code normalization and uniqueness rules.
+   Targets: persistence configuration, any schema or model-constraint artifacts, and the canonical university-code normalization source reused by validators and mappings.
+   Owner: data-persistence.
+   Validation before next step: code trimming, casing, uniqueness, and any durable constraints derive from one canonical definition instead of being reimplemented separately across layers.
+4. Implement list-universities behavior.
    Targets: ListUniversities query, handler, response contract, and endpoint.
    Owner: backend-domain.
    Validation before next step: query returns stable reference data for registration and qualification flows.
-4. Verify the slice.
+5. Verify the slice.
    Targets: validator tests, handler tests, integration tests.
    Owner: testing-verification.
-   Validation before next step: add and list flows pass with clear failure coverage.
+   Validation before next step: add and list flows pass with clear failure coverage, and canonical code rules stay aligned across validator, mapping, and persistence behavior.
 
 ## Verification and Acceptance Criteria
 
@@ -87,8 +92,10 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- Guard failures for invalid or malformed university input identify the `Code` property rather than the enclosing command object.
 - Adding a university code creates one canonical reference-data record.
 - Duplicate university codes are rejected without partial persistence.
+- University-code normalization, uniqueness, and error messaging derive from one canonical source rather than being redefined independently in validators, mappings, and persistence rules.
 - Listing universities returns stable data that downstream slices can resolve reliably.
 - Validation, handler logic, and persistence behavior agree on duplicate handling.
 - Automated tests cover add success, duplicate rejection, and list-query behavior.
@@ -110,6 +117,8 @@ mode: agent
 - [ ] If test packages changed, compatibility is verified (for example xUnit core and runner major versions align).
 - [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
+- [ ] University-code guard failures point to `Code` rather than the enclosing command object.
+- [ ] University-code normalization and uniqueness rules are defined once and reused by validators, mappings, messages, and persistence constraints.
 - [ ] ManageUniversities remains reference-data only.
 - [ ] University code uniqueness is enforced.
 - [ ] Query behavior is stable for downstream lookups.
