@@ -183,7 +183,11 @@ The section MUST cover, when applicable:
 - authorization or role restrictions
 - user-visible feedback
 - test coverage expectations
+- dependency compatibility for coupled tooling packages (for example xUnit core/runner major-version alignment)
+- integration-test resource lifecycle requirements (external resources must include deterministic teardown)
 - result-wrapper invariants for success/failure access patterns (for example, `Result<T>.Value` must not be consumable on failure)
+- result failure-factory null guards (for example `Failure(Error error)` cannot accept null error payloads)
+- non-lossy parse/create behavior for constrained value objects (reject silent truncation or coercion unless explicitly required)
 - database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
 - named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
 - solution-file integrity when `.sln` is touched (no duplicate project name/path entries and no duplicate configuration blocks for equivalent projects)

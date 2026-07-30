@@ -56,6 +56,12 @@ var builder = new SqlConnectionStringBuilder(connectionString);
 builder.InitialCatalog = $"ZeusTests_{Guid.NewGuid():N}";
 ```
 
+## Integration Resource Lifecycle
+
+- Tests that create external resources (SQL databases, containers, queues, files, temp schemas) MUST clean them up in a `finally` block.
+- SQL Server tests that use per-test database names MUST run best-effort `EnsureDeletedAsync()` teardown even when assertions fail.
+- Cleanup failures SHOULD surface as warnings when possible, but must not hide the original assertion failure.
+
 ## File Organization
 
 - `tests/Zeus.Academia.UnitTests/` - Unit tests

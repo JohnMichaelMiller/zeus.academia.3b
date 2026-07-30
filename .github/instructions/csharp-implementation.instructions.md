@@ -216,7 +216,18 @@ Use explicit state guards for success/failure wrappers so invalid states fail lo
 - MUST prevent value consumption from failed results (`Value` access throws on failure)
 - MUST prevent null success values for reference-type payloads
 - MUST validate failure payloads so "empty error" failures are not representable
+- MUST guard failure factory inputs (for example `Result.Failure(Error error)` and `Result<T>.Failure(Error error)`) against `null` before constructing failures
 - MUST NOT expose `default!` as a consumable failure value
+
+## Parsing and Normalization Safety
+
+When implementing value objects or parse/create methods, normalize input without silently changing meaning.
+
+**Rules:**
+
+- MUST reject lossy numeric conversions (for example truncating fractional values) unless explicitly required by the domain
+- MUST throw actionable exceptions for invalid precision/format instead of coercing to a different value
+- SHOULD include allowed ranges or formats in failure messages when constraints are strict
 
 **Template:**
 

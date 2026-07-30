@@ -80,6 +80,12 @@ mode: agent
 
 ## Verification and Acceptance Criteria
 
+### Review-Prevention Guardrails
+
+- Dependency compatibility is validated for coupled tooling packages when touched (for example xUnit core and runner major versions align).
+- Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
+- Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
+- Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - A valid registration request creates one academic record with a 6-character unique empNr and a name no longer than 15 characters.
 - Registration rejects payloads that do not include at least one degree and university pair.
 - Registration rejects invalid rank, degree, university, or extension references.
@@ -99,6 +105,10 @@ mode: agent
 
 ## Completion Checklist
 
+- [ ] Review-prevention guardrails were evaluated and marked N/A where not applicable.
+- [ ] If test packages changed, compatibility is verified (for example xUnit core and runner major versions align).
+- [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
+- [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] RegisterAcademic remains the first delivery gate for academic lifecycle work.
 - [ ] Validation covers empNr length, name length, qualification minimum, and reference-data existence.
 - [ ] Persistence is atomic across academic, qualifications, and extension linkage.

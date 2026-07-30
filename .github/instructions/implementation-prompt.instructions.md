@@ -133,6 +133,10 @@ Required coverage:
 - Integration points or contracts affected
 - Tests, checks, or inspections to run
 - User-visible outcome or business rule satisfied
+- Dependency compatibility checks for coupled tooling packages (for example xUnit core/runner major-version alignment)
+- Test resource lifecycle rules for integration tests that provision external resources (must include teardown strategy)
+- No lossy value coercion in domain parse/create APIs unless explicitly required and tested
+- Shared result/failure factories guard non-null failure payload invariants in both generic and non-generic forms
 - Solution hygiene when `.sln` files change: no duplicate project name/path entries, no duplicate GUID configuration blocks.
 - Solution-file format hygiene when `.sln` files change: the `Microsoft Visual Studio Solution File` header remains on line 1 with no leading blank line.
 - Foundational primitive coverage when shared base types are touched (for example `Result` and `Result<T>`): direct tests for non-generic and generic success/failure invariants.

@@ -79,6 +79,12 @@ mode: agent
 
 ## Verification and Acceptance Criteria
 
+### Review-Prevention Guardrails
+
+- Dependency compatibility is validated for coupled tooling packages when touched (for example xUnit core and runner major versions align).
+- Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
+- Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
+- Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - Adding a new degree code persists one canonical reference-data record.
 - Adding a duplicate degree code fails without creating a second record.
 - Degree-code uniqueness is protected in both application behavior and persistence.
@@ -100,6 +106,10 @@ mode: agent
 
 ## Completion Checklist
 
+- [ ] Review-prevention guardrails were evaluated and marked N/A where not applicable.
+- [ ] If test packages changed, compatibility is verified (for example xUnit core and runner major versions align).
+- [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
+- [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] ManageDegrees stays limited to degree reference-data behavior.
 - [ ] Degree code uniqueness is enforced.
 - [ ] Required migration files are present when this slice introduces or changes reference-data uniqueness schema.

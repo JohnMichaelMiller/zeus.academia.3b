@@ -74,6 +74,12 @@ mode: agent
 
 ## Verification and Acceptance Criteria
 
+### Review-Prevention Guardrails
+
+- Dependency compatibility is validated for coupled tooling packages when touched (for example xUnit core and runner major versions align).
+- Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
+- Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
+- Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - Existing qualification records can be updated to a new valid university.
 - Missing qualification targets fail cleanly.
 - Invalid university references are rejected.
@@ -92,6 +98,10 @@ mode: agent
 
 ## Completion Checklist
 
+- [ ] Review-prevention guardrails were evaluated and marked N/A where not applicable.
+- [ ] If test packages changed, compatibility is verified (for example xUnit core and runner major versions align).
+- [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
+- [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] Existing-record targeting is explicit.
 - [ ] University references are validated.
 - [ ] Updated data is visible after success.

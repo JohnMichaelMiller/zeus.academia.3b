@@ -75,6 +75,12 @@ mode: agent
 
 ## Verification and Acceptance Criteria
 
+### Review-Prevention Guardrails
+
+- Dependency compatibility is validated for coupled tooling packages when touched (for example xUnit core and runner major versions align).
+- Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
+- Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
+- Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - Only valid rank codes from ManageRanks can be applied.
 - Successful rank changes update the academic's effective access level automatically.
 - Missing academics or invalid rank codes fail cleanly.
@@ -93,6 +99,10 @@ mode: agent
 
 ## Completion Checklist
 
+- [ ] Review-prevention guardrails were evaluated and marked N/A where not applicable.
+- [ ] If test packages changed, compatibility is verified (for example xUnit core and runner major versions align).
+- [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
+- [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] Valid-rank lookup is enforced.
 - [ ] AccessLevel remains derived, not manually assigned.
 - [ ] Missing-record and invalid-rank cases are tested.

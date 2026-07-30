@@ -231,9 +231,11 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 - [ ] Branch updated with latest main (rebase or merge)
 - [ ] All commits signed (if repository requires)
 - [ ] Commit messages use conventional format: `<type>(<scope>): <subject>`
+- [ ] Package reference compatibility validated for related tooling families (for example xUnit core/runner major versions aligned)
 - [ ] AI-generated files include complete metadata
 - [ ] Slice changes comply with [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) and keep use-case artifacts co-located under the feature-domain tree
 - [ ] Tests added/updated for all functional changes
+- [ ] Integration tests that create external resources include deterministic best-effort cleanup (`finally` teardown)
 - [ ] No secrets, credentials, or PII in diff
 - [ ] Linting passes (`eslint`, `pylint`, `clippy`, etc.)
 - [ ] Type checking passes (TypeScript, mypy, etc.)

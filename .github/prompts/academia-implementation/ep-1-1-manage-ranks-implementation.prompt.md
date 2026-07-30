@@ -80,6 +80,12 @@ mode: agent
 
 ## Verification and Acceptance Criteria
 
+### Review-Prevention Guardrails
+
+- Dependency compatibility is validated for coupled tooling packages when touched (for example xUnit core and runner major versions align).
+- Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
+- Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
+- Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - Adding a rank accepts only the codes P, SL, and L.
 - Attempting to add a duplicate rank code fails without creating a second record.
 - Listing ranks returns the canonical codes in a stable form that downstream slices can resolve.
@@ -99,6 +105,10 @@ mode: agent
 
 ## Completion Checklist
 
+- [ ] Review-prevention guardrails were evaluated and marked N/A where not applicable.
+- [ ] If test packages changed, compatibility is verified (for example xUnit core and runner major versions align).
+- [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
+- [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] ManageRanks stays limited to rank reference-data behavior.
 - [ ] Rank validation is restricted to P, SL, and L.
 - [ ] Duplicate codes are blocked at the application and persistence levels as appropriate.

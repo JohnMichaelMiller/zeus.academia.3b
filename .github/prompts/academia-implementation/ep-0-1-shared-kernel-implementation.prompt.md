@@ -85,6 +85,12 @@ mode: agent
 
 ## Verification and Acceptance Criteria
 
+### Review-Prevention Guardrails
+
+- Dependency compatibility is validated for coupled tooling packages when touched (for example xUnit core and runner major versions align).
+- Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
+- Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
+- Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - Creating or mutating an Academic cannot leave both IsTenured and ContractEndDate set at the same time; constraint names and test names must reflect this mutual-exclusion semantic unless strict XOR is explicitly required.
 - Rank values map only as P -> INT, SL -> NAT, and L -> LOC, and AccessLevel is never assigned directly.
 - Shared Kernel types compile with nullable reference types enabled and are reusable by later slices.
@@ -108,6 +114,10 @@ mode: agent
 
 ## Completion Checklist
 
+- [ ] Review-prevention guardrails were evaluated and marked N/A where not applicable.
+- [ ] If test packages changed, compatibility is verified (for example xUnit core and runner major versions align).
+- [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
+- [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] Shared Kernel scope is still limited to reusable domain and persistence foundations.
 - [ ] Aggregate invariants and derived properties are enforced in code.
 - [ ] Database constraints back up the critical uniqueness rules.

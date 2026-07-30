@@ -51,6 +51,7 @@ applyTo: "**"
 - MUST run a focused self-review for common correctness regressions before opening PR:
   - Vertical slice layout and boundaries match [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md).
   - Null argument validation for non-nullable API inputs.
+  - Dependency package families remain version-compatible (for example xUnit core package major version aligned with its runner package major version).
   - No mutable collection escape through read-only interfaces.
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
   - No duplicate project declarations in solution files; project name/path pairs must appear once with one GUID and one configuration block.
@@ -58,7 +59,10 @@ applyTo: "**"
   - Database constraint names must match predicate semantics; reserve "Xor" naming for strict exactly-one rules and use explicit mutual-exclusion naming when both-false is allowed.
   - Method and type naming remains compliant with language conventions (for example PascalCase in C#).
   - Exception and failure messages never include secrets (connection strings, credentials, tokens, keys).
+  - Result-style failure factories enforce non-null failure payloads (for example guard `Failure(Error error)` inputs against nulls in both non-generic and generic result types).
   - Shared foundational primitives (for example Result/Error base types) retain direct tests for both non-generic and generic invariants when touched.
+  - Value-object parse/creation APIs reject lossy coercion (for example silently truncating fractional inputs) unless the behavior is explicitly required and tested.
+  - Integration tests that provision external resources (databases, containers, queues, files) perform best-effort cleanup in `finally` blocks.
   - Public/shared parse or mapping APIs retain direct acceptance tests when touched; do not remove only-path coverage without replacement.
   - Constrained-code parse/validation failures remain actionable by including allowed values (prefer constants over inline literals).
   - Validation messages must derive allowed values from a single source of truth rather than duplicating hard-coded literals across exception messages.
