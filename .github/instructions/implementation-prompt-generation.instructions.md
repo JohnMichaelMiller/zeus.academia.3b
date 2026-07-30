@@ -197,11 +197,13 @@ The section MUST cover, when applicable:
 - dependency compatibility for coupled tooling packages (for example xUnit core/runner major-version alignment)
 - integration-test resource lifecycle requirements (external resources must include deterministic teardown)
 - C# file/type organization hygiene (one primary type per file and file names aligned with their primary type)
+- exception argument-name accuracy for guard clauses and mapping failures (for example, property-specific failures use the property name rather than the enclosing command object)
 - result-wrapper invariants for success/failure access patterns (for example, `Result<T>.Value` must not be consumable on failure)
 - result failure-factory null guards (for example `Failure(Error error)` cannot accept null error payloads)
 - result semantics that reserve `Error.None` for success only, so failed results must carry actionable error details rather than an empty success sentinel
 - non-lossy parse/create behavior for constrained value objects (reject silent truncation or coercion unless explicitly required)
 - persistence-backed domain field parity (domain create/update paths enforce the same max-length, precision, scale, and normalization constraints required by persistence)
+- canonical-definition reuse for constrained codes, enums, and persisted allowed-value rules (validators, mappings, error messages, and EF Core check constraints must derive from one source of truth instead of repeating literals across layers)
 - immutable read-only collection exposure (do not expose mutable backing lists through `IReadOnlyCollection`; require read-only wrappers such as `AsReadOnly()` when applicable)
 - database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
 - named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
@@ -237,6 +239,7 @@ Specify how the slice will be verified:
 - behavior when environment prerequisites are missing (tests MUST fail explicitly with actionable diagnostics; no early return/skipped-by-default pattern)
 - teardown robustness for infrastructure-backed tests (cleanup must be best-effort and must not mask primary assertion failures if teardown encounters transient errors)
 - platform guard consistency for infrastructure helpers (design-time factories, scripts, and tests must share the same non-Windows behavior for SQL Server configuration)
+- argument/parameter-name accuracy for thrown guard exceptions when mappings or validation helpers reject a specific property value
 
 The prompt MUST distinguish between required verification and optional follow-up checks.
 

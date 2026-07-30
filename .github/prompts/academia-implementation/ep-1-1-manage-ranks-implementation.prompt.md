@@ -54,11 +54,12 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                       | Responsibilities                                              | Inputs                                      | Outputs                                           | Escalate when                                                      |
-| -------------------------- | ------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------ |
-| slice-coordinator          | confirm whether rank records are seeded, API-managed, or both | execution plan, current data setup          | approved slice boundary and file targets          | repo already stores rank reference data in a conflicting location  |
-| backend-domain       | build add and list rank behavior with validation              | shared kernel rank model, slice conventions | commands, queries, handlers, responses, endpoints | code tries to bypass the canonical rank codes P, SL, L             |
-| testing-verification | verify uniqueness, allowed codes, and queryability            | implemented slice                           | tests and evidence                                | validator and persistence behavior disagree on allowed rank values |
+| Role                 | Responsibilities                                              | Inputs                                       | Outputs                                           | Escalate when                                                                                |
+| -------------------- | ------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm whether rank records are seeded, API-managed, or both | execution plan, current data setup           | approved slice boundary and file targets          | repo already stores rank reference data in a conflicting location                            |
+| backend-domain       | build add and list rank behavior with validation              | shared kernel rank model, slice conventions  | commands, queries, handlers, responses, endpoints | code tries to bypass the canonical rank codes P, SL, L                                       |
+| data-persistence     | implement rank persistence mapping and durable constraints    | canonical rank definition, persistence rules | EF Core mapping, durable constraint decisions     | a database rule would duplicate rank literals instead of deriving from the canonical mapping |
+| testing-verification | verify uniqueness, allowed codes, and queryability            | implemented slice                            | tests and evidence                                | validator and persistence behavior disagree on allowed rank values                           |
 
 ## Ordered Implementation Steps
 
@@ -69,15 +70,19 @@ mode: agent
 2. Implement add-rank command behavior.
    Targets: AddRank command, validator, handler, response, endpoint, and mapping helpers within the ManageRanks slice folder.
    Owner: backend-domain.
-   Validation before next step: only P, SL, and L are accepted and duplicates are rejected deterministically.
-3. Implement rank listing query behavior.
+   Validation before next step: only P, SL, and L are accepted, failures point to the `Code` property explicitly, and duplicates are rejected deterministically.
+3. Implement persistence mapping and durable allowed-code enforcement.
+   Targets: persistence configuration, any schema or model-constraint artifacts, and the canonical rank-code source used by validators and mappings.
+   Owner: data-persistence.
+   Validation before next step: any allowed-code rule derives from the shared rank mapping or enum source rather than hard-coded SQL or duplicated literal lists.
+4. Implement rank listing query behavior.
    Targets: ListRanks query, handler, response contract, and endpoint.
    Owner: backend-domain.
    Validation before next step: returned data exposes stable rank codes and their access-level mapping.
-4. Add tests and verification evidence.
+5. Add tests and verification evidence.
    Targets: validator tests, handler tests, integration tests for uniqueness and list behavior.
    Owner: testing-verification.
-   Validation before next step: add and list flows both pass with valid and invalid inputs.
+   Validation before next step: add and list flows both pass with valid and invalid inputs, file/type alignment is preserved, and persistence rules match the canonical rank definition.
 
 ## Verification and Acceptance Criteria
 
@@ -87,6 +92,9 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- C# source keeps one primary type per file and file names stay aligned with the primary type.
+- Guard failures for invalid rank input identify the `Code` property rather than the enclosing command object.
+- Validators, mapping helpers, error messages, and any EF Core check constraints derive allowed rank codes from one canonical source instead of repeating literals.
 - Adding a rank accepts only the codes P, SL, and L.
 - Attempting to add a duplicate rank code fails without creating a second record.
 - Listing ranks returns the canonical codes in a stable form that downstream slices can resolve.
@@ -110,6 +118,9 @@ mode: agent
 - [ ] If test packages changed, compatibility is verified (for example xUnit core and runner major versions align).
 - [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
+- [ ] New C# files keep one primary type per file and filenames match the primary type.
+- [ ] Invalid-rank guard failures point to `Code` rather than the enclosing command object.
+- [ ] Allowed rank codes are defined once and reused by validators, mappings, messages, and persistence constraints.
 - [ ] ManageRanks stays limited to rank reference-data behavior.
 - [ ] Rank validation is restricted to P, SL, and L.
 - [ ] Duplicate codes are blocked at the application and persistence levels as appropriate.

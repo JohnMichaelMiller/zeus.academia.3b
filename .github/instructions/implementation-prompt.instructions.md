@@ -147,9 +147,11 @@ Required coverage:
 - Dependency compatibility checks for coupled tooling packages (for example xUnit core/runner major-version alignment)
 - Test resource lifecycle rules for integration tests that provision external resources (must include teardown strategy)
 - C# file/type organization hygiene (one primary type per file and file names aligned to their primary type)
+- Exception argument-name accuracy for guard clauses and mapping failures (for example, property-specific failures use the property name rather than the enclosing command object)
 - Ownership-safe aggregate mutation rules for linked entities (for example, release operations must verify current ownership and assignment operations must not overwrite a different existing link)
 - No lossy value coercion in domain parse/create APIs unless explicitly required and tested
 - Persistence-backed domain field parity (domain create/update paths enforce persistence max-length, precision, scale, and normalization constraints before persistence)
+- Canonical-definition reuse for constrained codes, enums, and persisted allowed-value rules (validators, mappings, error messages, and EF Core check constraints must derive from one source of truth instead of repeating literals across layers)
 - Immutable read-only collection exposure (do not expose mutable backing lists through `IReadOnlyCollection`; require read-only wrappers such as `AsReadOnly()` when applicable)
 - Shared result/failure factories guard non-null failure payload invariants in both generic and non-generic forms
 - Result semantics reserve `Error.None` for success only; failed results must carry actionable details and cannot be constructed with an empty success sentinel.
@@ -165,6 +167,8 @@ Required coverage:
 - Cross-platform SQL Server setup behavior for scripts/factories: LocalDB fallback is allowed only behind explicit Windows checks; on non-Windows hosts require `ZEUS_SQLSERVER_CONNECTION` and fail with actionable diagnostics.
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
+
+When a slice persists a constrained code set or enum-backed rule, the prompt must identify the canonical definition and require validators, mapping helpers, exception messages, and EF Core constraints to derive from it rather than hard-coding separate literal lists.
 
 For every named database constraint in acceptance criteria, the constraint name must reflect the exact predicate semantics. Do not label a rule as XOR unless the predicate enforces strict exactly-one semantics.
 
@@ -217,6 +221,8 @@ If the slice changes schema, verification must also confirm that a committed mig
 For model metadata assertions, the verification section should require direct inspection of the EF Core model and avoid a normal test dependency on `IDesignTimeModel` service resolution.
 
 Verification should also call out reviewer-facing hygiene when the slice produces durable artifacts or tests. At minimum, require durable README entries to link back to the artifact log when traceability applies, and require test names to describe the actual scenario and expectation rather than a nearby but different failure mode.
+
+When a slice adds or changes guard clauses, verification must include a quick audit that thrown `ArgumentException` or equivalent parameter names identify the offending property or argument precisely rather than a containing object.
 
 When a slice adds project, source, or test files, verification must include a final scaffold audit so starter placeholders are removed or renamed before review.
 

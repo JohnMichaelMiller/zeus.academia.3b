@@ -52,11 +52,12 @@ mode: agent
 
 ## Assigned Agents and Role Boundaries
 
-| Role                 | Responsibilities                                               | Inputs                                       | Outputs                                      | Escalate when                                                    |
-| -------------------- | -------------------------------------------------------------- | -------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
-| slice-coordinator    | confirm degree storage, seed expectations, and route placement | execution plan, current repo tree            | approved targets and blocker notes           | current codebase already contains an incompatible degree catalog |
-| backend-domain       | implement add and list degree behavior                         | Shared Kernel degree type, slice conventions | commands, queries, handlers, DTOs, endpoints | degree code rules are unclear or clash with seeded data          |
-| testing-verification | verify uniqueness and list behavior                            | implemented slice                            | tests and evidence                           | persistence allows duplicates or queries return unstable values  |
+| Role                 | Responsibilities                                               | Inputs                                              | Outputs                                      | Escalate when                                                                                                             |
+| -------------------- | -------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm degree storage, seed expectations, and route placement | execution plan, current repo tree                   | approved targets and blocker notes           | current codebase already contains an incompatible degree catalog                                                          |
+| backend-domain       | implement add and list degree behavior                         | Shared Kernel degree type, slice conventions        | commands, queries, handlers, DTOs, endpoints | degree code rules are unclear or clash with seeded data                                                                   |
+| data-persistence     | implement code normalization and durable uniqueness backing    | canonical degree-code definition, persistence rules | EF Core mapping, constraint decisions        | the slice would duplicate degree-code normalization or uniqueness rules across validator, mapping, and persistence layers |
+| testing-verification | verify uniqueness and list behavior                            | implemented slice                                   | tests and evidence                           | persistence allows duplicates or queries return unstable values                                                           |
 
 ## Ordered Implementation Steps
 
@@ -67,15 +68,19 @@ mode: agent
 2. Implement add-degree behavior.
    Targets: AddDegree command, validator, handler, response, endpoint, and any mappings.
    Owner: backend-domain.
-   Validation before next step: duplicate degree codes are rejected and valid codes persist successfully.
-3. Implement list-degree behavior.
+   Validation before next step: duplicate degree codes are rejected, failures identify the `Code` property explicitly when code-specific validation fails, and valid codes persist successfully.
+3. Implement persistence-backed code normalization and uniqueness rules.
+   Targets: persistence configuration, any schema or model-constraint artifacts, and the canonical degree-code normalization source reused by validators and mappings.
+   Owner: data-persistence.
+   Validation before next step: code trimming, casing, uniqueness, and any durable constraints derive from one canonical definition instead of being reimplemented separately across layers.
+4. Implement list-degree behavior.
    Targets: ListDegrees query, handler, response contract, and endpoint.
    Owner: backend-domain.
    Validation before next step: query returns stable degree records suitable for registration lookups.
-4. Verify the slice end to end.
+5. Verify the slice end to end.
    Targets: validator tests, handler tests, integration tests for add/list flows, and the committed migration artifact in the confirmed persistence root when this slice introduces or changes duplicate-code protection.
    Owner: testing-verification.
-   Validation before next step: tests cover valid add, duplicate rejection, and list-query results.
+   Validation before next step: tests cover valid add, duplicate rejection, list-query results, and canonical code rules staying aligned across validator, mapping, and persistence behavior.
 
 ## Verification and Acceptance Criteria
 
@@ -85,8 +90,10 @@ mode: agent
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
+- Guard failures for invalid or malformed degree input identify the `Code` property rather than the enclosing command object.
 - Adding a new degree code persists one canonical reference-data record.
 - Adding a duplicate degree code fails without creating a second record.
+- Degree-code normalization, uniqueness, and error messaging derive from one canonical source rather than being redefined independently in validators, mappings, and persistence rules.
 - Degree-code uniqueness is protected in both application behavior and persistence.
 - If this slice introduces or changes the uniqueness schema, a committed migration artifact exists in the confirmed persistence root.
 - Listing degrees returns stable records that downstream registration and qualification slices can resolve.
@@ -110,6 +117,8 @@ mode: agent
 - [ ] If test packages changed, compatibility is verified (for example xUnit core and runner major versions align).
 - [ ] If value-object parsing or creation changed, lossy coercion is rejected unless explicitly required and tested.
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
+- [ ] Degree-code guard failures point to `Code` rather than the enclosing command object.
+- [ ] Degree-code normalization and uniqueness rules are defined once and reused by validators, mappings, messages, and persistence constraints.
 - [ ] ManageDegrees stays limited to degree reference-data behavior.
 - [ ] Degree code uniqueness is enforced.
 - [ ] Required migration files are present when this slice introduces or changes reference-data uniqueness schema.

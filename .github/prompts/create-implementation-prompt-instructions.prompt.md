@@ -162,6 +162,8 @@ Also require reviewer-facing hygiene coverage when applicable:
 - scaffold cleanup and file naming after new files are created
 - solution-file header and encoding hygiene when `.sln` files are touched
 - single-source environment lookup in setup helpers and verification scripts
+- precise parameter/property names in thrown argument exceptions or equivalent guard failures
+- single-source reuse for constrained code or enum rules across validators, mappings, messages, and EF Core constraints
 - result semantics that reserve `Error.None` for success only and prevent empty-error failures
 - EF Core migration hygiene including migration artifact and metadata expectations for schema-changing work
 - direct EF Core model inspection in metadata tests rather than using `IDesignTimeModel` in normal tests
