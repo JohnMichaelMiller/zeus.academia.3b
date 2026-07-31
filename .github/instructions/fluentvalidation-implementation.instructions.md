@@ -481,6 +481,25 @@ RuleFor(x => x.Email)
         .WithMessage("Email already exists");
 ```
 
+## Required String Validation Semantics
+
+When a string field treats whitespace-only values as missing input, do not rely on `NotEmpty()` alone.
+Use an explicit whitespace-aware required rule first, then run format or allowed-values rules.
+
+```csharp
+RuleFor(x => x.Code)
+    .Cascade(CascadeMode.Stop)
+    .Must(code => !string.IsNullOrWhiteSpace(code))
+        .WithMessage("Code is required.")
+    .Must(code => RankCatalog.TryParseCode(code, out _))
+        .WithMessage($"Code must be one of: {RankCatalog.AllowedCodesDisplay}.");
+```
+
+Testing expectation:
+
+- Include `null`, `""`, and `"  "` inputs in validator tests when required-message semantics matter.
+- Assert that whitespace-only input produces the required-field message, not a downstream format or allowed-values message.
+
 ## Validation Checklist
 
 - [ ] One validator per command/query
@@ -492,6 +511,8 @@ RuleFor(x => x.Email)
 - [ ] Collection validation with `RuleForEach()`
 - [ ] Extracted common rules to shared methods
 - [ ] Performance considered for regex and async validators
+- [ ] Required string fields that treat whitespace as missing input use explicit `IsNullOrWhiteSpace`-equivalent checks before downstream rules
+- [ ] Validator tests cover `null`, empty, and whitespace-only required-field inputs where applicable
 
 ## Anti-Patterns
 
@@ -515,6 +536,9 @@ RuleFor(x => x.Email)
 
 ❌ Generic error messages
 ✅ Specific, actionable error messages
+
+❌ Using `NotEmpty()` alone when whitespace should trigger the required-field message
+✅ Use a whitespace-aware required rule first, then downstream format/allowed-values rules
 
 ❌ Validators with mutable state
 ✅ Stateless validators (dependencies via DI only)

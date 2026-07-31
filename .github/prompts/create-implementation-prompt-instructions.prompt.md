@@ -164,6 +164,8 @@ Also require reviewer-facing hygiene coverage when applicable:
 - single-source environment lookup in setup helpers and verification scripts
 - precise parameter/property names in thrown argument exceptions or equivalent guard failures
 - single-source reuse for constrained code or enum rules across validators, mappings, messages, and EF Core constraints
+- immutable read-only exposure prevention for mutable backing collections, including array-backed catalogs
+- required string-validator semantics that treat whitespace-only input as missing when business intent requires it, with required-message coverage before downstream rules
 - result semantics that reserve `Error.None` for success only and prevent empty-error failures
 - EF Core migration hygiene including migration artifact and metadata expectations for schema-changing work
 - direct EF Core model inspection in metadata tests rather than using `IDesignTimeModel` in normal tests

@@ -152,7 +152,8 @@ Required coverage:
 - No lossy value coercion in domain parse/create APIs unless explicitly required and tested
 - Persistence-backed domain field parity (domain create/update paths enforce persistence max-length, precision, scale, and normalization constraints before persistence)
 - Canonical-definition reuse for constrained codes, enums, and persisted allowed-value rules (validators, mappings, error messages, and EF Core check constraints must derive from one source of truth instead of repeating literals across layers)
-- Immutable read-only collection exposure (do not expose mutable backing lists through `IReadOnlyCollection`; require read-only wrappers such as `AsReadOnly()` when applicable)
+- Immutable read-only collection exposure (do not expose mutable backing collections through `IReadOnlyCollection`; include array-backed catalogs and require defensive copies or read-only wrappers such as `AsReadOnly()` when applicable)
+- Required-text validator semantics for string fields (when whitespace should be treated as missing input, reject null/empty/whitespace with the required-message rule before membership/format checks; do not rely on `NotEmpty()` alone)
 - Shared result/failure factories guard non-null failure payload invariants in both generic and non-generic forms
 - Result semantics reserve `Error.None` for success only; failed results must carry actionable details and cannot be constructed with an empty success sentinel.
 - EF Core schema changes require migration artifacts and metadata hygiene (for example, migration plus snapshot/Designer files when the project uses migrations) unless the prompt explicitly waives them and explains the tradeoff.
@@ -223,6 +224,8 @@ For model metadata assertions, the verification section should require direct in
 Verification should also call out reviewer-facing hygiene when the slice produces durable artifacts or tests. At minimum, require durable README entries to link back to the artifact log when traceability applies, and require test names to describe the actual scenario and expectation rather than a nearby but different failure mode.
 
 When a slice adds or changes guard clauses, verification must include a quick audit that thrown `ArgumentException` or equivalent parameter names identify the offending property or argument precisely rather than a containing object.
+
+When a slice adds or updates string validators, verification must include explicit null, empty, and whitespace-only test cases for required fields so required-message intent is preserved ahead of downstream format or allowed-values checks.
 
 When a slice adds project, source, or test files, verification must include a final scaffold audit so starter placeholders are removed or renamed before review.
 

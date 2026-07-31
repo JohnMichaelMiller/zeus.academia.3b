@@ -204,7 +204,8 @@ The section MUST cover, when applicable:
 - non-lossy parse/create behavior for constrained value objects (reject silent truncation or coercion unless explicitly required)
 - persistence-backed domain field parity (domain create/update paths enforce the same max-length, precision, scale, and normalization constraints required by persistence)
 - canonical-definition reuse for constrained codes, enums, and persisted allowed-value rules (validators, mappings, error messages, and EF Core check constraints must derive from one source of truth instead of repeating literals across layers)
-- immutable read-only collection exposure (do not expose mutable backing lists through `IReadOnlyCollection`; require read-only wrappers such as `AsReadOnly()` when applicable)
+- immutable read-only collection exposure (do not expose mutable backing collections through `IReadOnlyCollection`; include array-backed catalogs and require defensive copies or read-only wrappers such as `AsReadOnly()` when applicable)
+- required-text validator semantics for string fields (when whitespace should be treated as missing input, reject null/empty/whitespace with the required-message rule before membership/format checks; do not rely on `NotEmpty()` alone)
 - database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
 - named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
 - ownership-safe association mutations (for example, releasing an extension must validate it belongs to the target academic; assignment must not overwrite an existing different assignment)
@@ -240,6 +241,7 @@ Specify how the slice will be verified:
 - teardown robustness for infrastructure-backed tests (cleanup must be best-effort and must not mask primary assertion failures if teardown encounters transient errors)
 - platform guard consistency for infrastructure helpers (design-time factories, scripts, and tests must share the same non-Windows behavior for SQL Server configuration)
 - argument/parameter-name accuracy for thrown guard exceptions when mappings or validation helpers reject a specific property value
+- validator error-message intent for required string inputs (required-message assertions include whitespace-only inputs and run before downstream allowed-values/format rules)
 
 The prompt MUST distinguish between required verification and optional follow-up checks.
 
@@ -307,7 +309,8 @@ End the prompt with a checklist that verifies prompt quality before use.
 - [ ] Domain exception types are organized into dedicated files/types with aligned names.
 - [ ] Prompted C# changes keep one primary type per file and preserve filename-to-type alignment.
 - [ ] Prompted domain create/update flows enforce persistence-backed field limits before persistence (max length, precision, scale, normalization).
-- [ ] Prompted read-only collection exposure prevents mutable backing-list escape.
+- [ ] Prompted read-only collection exposure prevents mutable backing-list or backing-array escape.
+- [ ] Prompted required string validation covers null/empty/whitespace and preserves the required-message path before format/allowed-values checks.
 - [ ] Prompted SQL Server setup behavior forbids unconditional LocalDB fallback on non-Windows hosts.
 
 ## Anti-Patterns

@@ -70,7 +70,7 @@ mode: agent
 2. Implement add-rank command behavior.
    Targets: AddRank command, validator, handler, response, endpoint, and mapping helpers within the ManageRanks slice folder.
    Owner: backend-domain.
-   Validation before next step: only P, SL, and L are accepted, failures point to the `Code` property explicitly, and duplicates are rejected deterministically.
+   Validation before next step: only P, SL, and L are accepted, failures point to the `Code` property explicitly, whitespace-only `Code` values trigger the required-field message path before allowed-values checks, and duplicates are rejected deterministically.
 3. Implement persistence mapping and durable allowed-code enforcement.
    Targets: persistence configuration, any schema or model-constraint artifacts, and the canonical rank-code source used by validators and mappings.
    Owner: data-persistence.
@@ -94,6 +94,7 @@ mode: agent
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - C# source keeps one primary type per file and file names stay aligned with the primary type.
 - Guard failures for invalid rank input identify the `Code` property rather than the enclosing command object.
+- Required-string validation for `Code` treats null/empty/whitespace as missing input and preserves the required-field error message before allowed-values validation.
 - Validators, mapping helpers, error messages, and any EF Core check constraints derive allowed rank codes from one canonical source instead of repeating literals.
 - Adding a rank accepts only the codes P, SL, and L.
 - Attempting to add a duplicate rank code fails without creating a second record.
@@ -120,6 +121,7 @@ mode: agent
 - [ ] If integration tests create external resources, teardown is enforced with best-effort `finally` cleanup.
 - [ ] New C# files keep one primary type per file and filenames match the primary type.
 - [ ] Invalid-rank guard failures point to `Code` rather than the enclosing command object.
+- [ ] Required `Code` validation treats null/empty/whitespace as missing input and keeps required-field messaging ahead of allowed-values checks.
 - [ ] Allowed rank codes are defined once and reused by validators, mappings, messages, and persistence constraints.
 - [ ] ManageRanks stays limited to rank reference-data behavior.
 - [ ] Rank validation is restricted to P, SL, and L.

@@ -99,7 +99,7 @@ mode: agent
 - Domain exceptions are split into dedicated files/types with aligned names as the exception set grows.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Domain create/update paths enforce persistence-backed field limits and normalization (for example Degree/University max length parity with EF Core mappings) before persistence.
-- Read-only collection properties do not leak mutable backing lists (use read-only wrappers when backing storage is mutable).
+- Read-only collection properties do not leak mutable backing collections, including array-backed catalogs (use defensive copies or read-only wrappers when backing storage is mutable).
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - Integration-test teardown failures are non-fatal to the primary assertion signal (cleanup errors are surfaced separately and do not mask the behavioral failure under test).
 - Creating or mutating an Academic cannot leave both IsTenured and ContractEndDate set at the same time; constraint names and test names must reflect this mutual-exclusion semantic unless strict XOR is explicitly required.
@@ -141,7 +141,7 @@ mode: agent
 - [ ] C# source keeps one primary type per file with filename-to-type alignment.
 - [ ] Exception types are organized into dedicated files/types with aligned names.
 - [ ] Domain create/update rules enforce persistence-backed field limits before persistence (including shared max-length constraints).
-- [ ] Read-only collection members do not expose mutable backing lists.
+- [ ] Read-only collection members do not expose mutable backing lists or backing arrays.
 - [ ] Database constraints back up the critical uniqueness rules.
 - [ ] Result, error, event, and exception primitives are reusable by later slices.
 - [ ] Verification evidence exists for invariant and mapping behavior.
