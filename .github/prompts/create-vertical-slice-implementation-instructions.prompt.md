@@ -299,7 +299,7 @@ Describe how slices self-register:
 
 - One test class per handler: `Create{{feature_name}}HandlerTests`.
 - Test file path mirrors source: `tests/features/{{feature_name}}/Create{{feature_name}}/`.
-- Use an in-memory `AppDbContext` or SQL Server test container — never mock `DbContext`.
+- Use a SQL Server-backed test environment (for example SQL Server LocalDB or a SQL Server test container) — never mock `DbContext` and never substitute SQLite in-memory providers for this repository.
 - Validate the full slice (command → handler → db round-trip) in integration tests; unit-test validators separately.
 - Add UI tests under `src/features/{{feature_name}}/Create{{feature_name}}/__tests__/` and sibling use-case folders.
 - Test component rendering, store actions, and API error handling with Vitest.

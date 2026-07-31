@@ -70,8 +70,22 @@ public sealed class SharedKernelDbContextModelTests
 
   private static SharedKernelDbContext CreateContext()
   {
+    var connectionString = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
+
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+      if (OperatingSystem.IsWindows())
+      {
+        connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=ZeusAcademiaSharedKernelDesign;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
+      }
+      else
+      {
+        throw new InvalidOperationException("ZEUS_SQLSERVER_CONNECTION is required on non-Windows hosts because SQL Server LocalDB is unavailable.");
+      }
+    }
+
     var options = new DbContextOptionsBuilder<SharedKernelDbContext>()
-        .UseSqlite("Data Source=:memory:")
+        .UseSqlServer(connectionString)
         .Options;
 
     return new SharedKernelDbContext(options);

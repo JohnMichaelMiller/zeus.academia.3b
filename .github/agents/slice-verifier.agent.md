@@ -96,8 +96,9 @@ Senior QA and release-verification engineer with strong experience validating ba
   - `dotnet test tests/Features/SharedKernel/Foundation/Zeus.Academia.Tests.Features.SharedKernel.Foundation.csproj --filter "FullyQualifiedName~Zeus.Academia.Tests.Features.SharedKernel.Foundation.Persistence"`
   - or run `powershell -NoProfile -ExecutionPolicy Bypass -File eng/verify-shared-kernel-sqlserver.ps1`.
 - The environment variable `ZEUS_SQLSERVER_CONNECTION` should be used when provided.
-- If `ZEUS_SQLSERVER_CONNECTION` is absent, LocalDB `(localdb)\\MSSQLLocalDB` is the expected fallback.
+- If `ZEUS_SQLSERVER_CONNECTION` is absent, SQL Server LocalDB `(localdb)\\MSSQLLocalDB` is the expected fallback on Windows.
 - On non-Windows hosts, require `ZEUS_SQLSERVER_CONNECTION` instead of assuming LocalDB.
+- Use SQL Server-backed verification only; do not substitute SQLite or other in-memory providers.
 - Do not mark persistence constraints as verified unless SQL Server checks were executed or explicitly blocked.
 
 ## Behavior Tests
