@@ -194,6 +194,8 @@ The section MUST cover, when applicable:
 - authorization or role restrictions
 - user-visible feedback
 - test coverage expectations
+- persisted field limits at public domain APIs (factories/mutators enforce max length, precision/scale, and normalization before persistence)
+- normalization ownership boundaries (do not couple unrelated domain concepts by calling one concept's normalization helper from another)
 - dependency compatibility for coupled tooling packages (for example xUnit core/runner major-version alignment)
 - integration-test resource lifecycle requirements (external resources must include deterministic teardown)
 - C# file/type organization hygiene (one primary type per file and file names aligned with their primary type)
@@ -203,6 +205,8 @@ The section MUST cover, when applicable:
 - result semantics that reserve `Error.None` for success only, so failed results must carry actionable error details rather than an empty success sentinel
 - non-lossy parse/create behavior for constrained value objects (reject silent truncation or coercion unless explicitly required)
 - persistence-backed domain field parity (domain create/update paths enforce the same max-length, precision, scale, and normalization constraints required by persistence)
+- persisted identifier guard coverage at public APIs (for example `empNr` is validated for shared max-length and normalization in public create/assign/release methods, not only at EF persistence boundaries)
+- normalization decoupling between unrelated concepts (for example, `University` normalization must not depend on `Degree.Normalize`; use local or neutral shared helpers)
 - canonical-definition reuse for constrained codes, enums, and persisted allowed-value rules (validators, mappings, error messages, and EF Core check constraints must derive from one source of truth instead of repeating literals across layers)
 - immutable read-only collection exposure (do not expose mutable backing collections through `IReadOnlyCollection`; include array-backed catalogs and require defensive copies or read-only wrappers such as `AsReadOnly()` when applicable)
 - array-backed or static catalog exposure safety (public `IReadOnlyList<T>` over an array is insufficient; require wrappers or immutable snapshots that cannot be cast back to the backing array)

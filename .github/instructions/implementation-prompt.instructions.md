@@ -151,6 +151,8 @@ Required coverage:
 - Ownership-safe aggregate mutation rules for linked entities (for example, release operations must verify current ownership and assignment operations must not overwrite a different existing link)
 - No lossy value coercion in domain parse/create APIs unless explicitly required and tested
 - Persistence-backed domain field parity (domain create/update paths enforce persistence max-length, precision, scale, and normalization constraints before persistence)
+- Persisted identifier guards at public APIs (factories/mutators that accept persisted identifiers such as `empNr` enforce shared max-length constraints and normalization before state mutation)
+- Normalization ownership boundaries (unrelated domain concepts must not depend on each other's normalization helpers; use local normalization or a neutral shared helper)
 - Canonical-definition reuse for constrained codes, enums, and persisted allowed-value rules (validators, mappings, error messages, and EF Core check constraints must derive from one source of truth instead of repeating literals across layers)
 - Immutable read-only collection exposure (do not expose mutable backing collections through `IReadOnlyCollection`; include array-backed catalogs and require defensive copies or read-only wrappers such as `AsReadOnly()` when applicable)
 - Array-backed or static catalogs exposed publicly must use wrappers or immutable snapshots that cannot be cast back to the mutable backing array; `IReadOnlyList<T>` alone is not sufficient when the backing storage is an array.
@@ -177,6 +179,10 @@ When a slice persists a constrained code set or enum-backed rule, the prompt mus
 For every named database constraint in acceptance criteria, the constraint name must reflect the exact predicate semantics. Do not label a rule as XOR unless the predicate enforces strict exactly-one semantics.
 
 For any persistence-backed field constraint such as max length, precision, scale, uniqueness, or required normalization, the prompt must say where the canonical rule lives and how drift is prevented. Prefer shared domain constants or a single canonical definition reused by factories, validators, and EF Core mappings rather than repeating raw values across layers.
+
+When public domain APIs accept persisted identifiers or codes, the prompt must call out explicit over-limit and normalization tests at the domain boundary so invalid values are rejected before persistence (for example, overlong `empNr` in assignment and qualification creation paths).
+
+When normalization is shared, the prompt must identify a neutral shared helper or explicit local ownership. Do not couple unrelated domain types by invoking one concept's normalization function from another concept.
 
 Use a short enforcement matrix when the slice includes durable invariants, schema changes, or persistence-backed rules:
 
@@ -231,6 +237,10 @@ Verification should also call out reviewer-facing hygiene when the slice produce
 When a slice adds or changes guard clauses, verification must include a quick audit that thrown `ArgumentException` or equivalent parameter names identify the offending property or argument precisely rather than a containing object.
 
 When a slice adds or updates string validators, verification must include explicit null, empty, and whitespace-only test cases for required fields so required-message intent is preserved ahead of downstream format or allowed-values checks.
+
+When a slice adds or changes public create/assign/release domain methods that accept persisted identifiers, verification must include overlong-input tests proving shared max-length constraints are enforced before persistence.
+
+When a slice introduces normalization helpers, verification must include an architecture check that unrelated concepts are not coupled through helper reuse unless a neutral shared normalization utility is intentionally introduced.
 
 When a slice adds handler-level conflict translation, verification must include at least one test proving the intended conflict path and one inspection or test path proving unrelated `DbUpdateException` cases are not misreported as duplicate/business conflicts.
 

@@ -166,6 +166,8 @@ Also require reviewer-facing hygiene coverage when applicable:
 - single-source reuse for constrained code or enum rules across validators, mappings, messages, and EF Core constraints
 - immutable read-only exposure prevention for mutable backing collections, including array-backed catalogs
 - required string-validator semantics that treat whitespace-only input as missing when business intent requires it, with required-message coverage before downstream rules
+- persisted-identifier guard coverage at public domain APIs (for example create/assign/release paths enforce shared max-length + normalization before persistence and include overlong-input tests)
+- normalization ownership boundaries that prevent cross-concept coupling (for example one domain concept must not depend on another concept's normalization helper unless a neutral shared utility is introduced)
 - result semantics that reserve `Error.None` for success only and prevent empty-error failures
 - EF Core migration hygiene including migration artifact and metadata expectations for schema-changing work
 - direct EF Core model inspection in metadata tests rather than using `IDesignTimeModel` in normal tests

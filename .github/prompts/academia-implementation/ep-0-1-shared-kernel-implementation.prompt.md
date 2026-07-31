@@ -70,7 +70,7 @@ mode: agent
 2. Implement the domain model and invariant methods.
    Targets: Shared Kernel aggregate and value-object files, especially Academic employment guards and Rank to AccessLevel derivation.
    Owner: backend-domain.
-   Validation before next step: the aggregate enforces the employment mutual-exclusion rule (never both tenured and contracted), AccessLevel is derived only from Rank, extension assignment cannot overwrite a different existing assignment, and extension release cannot clear an extension owned by a different academic.
+   Validation before next step: the aggregate enforces the employment mutual-exclusion rule (never both tenured and contracted), AccessLevel is derived only from Rank, extension assignment cannot overwrite a different existing assignment, extension release cannot clear an extension owned by a different academic, and public domain APIs that accept `empNr` enforce `SharedKernelFieldLengths.EmpNr` after normalization (including qualification create and extension assign/release paths).
 3. Implement persistence mappings and hard database constraints.
    Targets: EF Core entity configurations, indexes, and base migration updates for empNr uniqueness and extension uniqueness.
    Owner: data-persistence.
@@ -99,6 +99,8 @@ mode: agent
 - Domain exceptions are split into dedicated files/types with aligned names as the exception set grows.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
 - Domain create/update paths enforce persistence-backed field limits and normalization (for example Degree/University max length parity with EF Core mappings) before persistence.
+- Public domain APIs that accept persisted identifiers reject overlong normalized values before persistence (for example `AcademicQualification.Create`, `Extension.AssignTo`, and `Extension.ReleaseFrom` enforce `SharedKernelFieldLengths.EmpNr`).
+- Normalization helpers are owned by the same concept or by a neutral shared utility; unrelated concepts do not depend on each other's normalization methods (for example `University` does not call `Degree.Normalize`).
 - Read-only collection properties do not leak mutable backing collections, including array-backed catalogs (use defensive copies or read-only wrappers when backing storage is mutable).
 - Integration tests that provision external resources include deterministic best-effort cleanup in `finally` blocks.
 - Integration-test teardown failures are non-fatal to the primary assertion signal (cleanup errors are surfaced separately and do not mask the behavioral failure under test).
@@ -141,6 +143,8 @@ mode: agent
 - [ ] C# source keeps one primary type per file with filename-to-type alignment.
 - [ ] Exception types are organized into dedicated files/types with aligned names.
 - [ ] Domain create/update rules enforce persistence-backed field limits before persistence (including shared max-length constraints).
+- [ ] Public domain create/assign/release APIs reject overlong normalized persisted identifiers before persistence (including `empNr` paths).
+- [ ] Normalization logic does not introduce cross-concept coupling between unrelated domain types.
 - [ ] Read-only collection members do not expose mutable backing lists or backing arrays.
 - [ ] Database constraints back up the critical uniqueness rules.
 - [ ] Result, error, event, and exception primitives are reusable by later slices.
