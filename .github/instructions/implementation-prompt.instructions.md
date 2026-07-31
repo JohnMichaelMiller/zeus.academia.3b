@@ -153,12 +153,15 @@ Required coverage:
 - Persistence-backed domain field parity (domain create/update paths enforce persistence max-length, precision, scale, and normalization constraints before persistence)
 - Canonical-definition reuse for constrained codes, enums, and persisted allowed-value rules (validators, mappings, error messages, and EF Core check constraints must derive from one source of truth instead of repeating literals across layers)
 - Immutable read-only collection exposure (do not expose mutable backing collections through `IReadOnlyCollection`; include array-backed catalogs and require defensive copies or read-only wrappers such as `AsReadOnly()` when applicable)
+- Array-backed or static catalogs exposed publicly must use wrappers or immutable snapshots that cannot be cast back to the mutable backing array; `IReadOnlyList<T>` alone is not sufficient when the backing storage is an array.
 - Required-text validator semantics for string fields (when whitespace should be treated as missing input, reject null/empty/whitespace with the required-message rule before membership/format checks; do not rely on `NotEmpty()` alone)
 - Shared result/failure factories guard non-null failure payload invariants in both generic and non-generic forms
 - Result semantics reserve `Error.None` for success only; failed results must carry actionable details and cannot be constructed with an empty success sentinel.
 - EF Core schema changes require migration artifacts and metadata hygiene (for example, migration plus snapshot/Designer files when the project uses migrations) unless the prompt explicitly waives them and explains the tradeoff.
+- Persistence-exception translation must stay specific to the contract being returned; duplicate/conflict responses require proof of that exact conflict after the failed save or provider-specific handling narrow enough to avoid masking unrelated write failures.
 - Model metadata verification should inspect `context.Model` directly instead of relying on `context.GetService<IDesignTimeModel>()` in normal tests.
 - Exception types should be split into dedicated files/types with names that stay aligned as the exception set grows.
+- Slice language and delivered surface must stay aligned: if a prompt or PR claims CRUD, get-by-id, admin seeding, or other concrete operations, the ordered steps and acceptance criteria must name and verify each operation explicitly; otherwise narrow the wording to the implemented subset.
 - Solution hygiene when `.sln` files change: no duplicate project name/path entries, no duplicate GUID configuration blocks.
 - Solution-file format hygiene when `.sln` files change: the `Microsoft Visual Studio Solution File` header remains on line 1 with no leading blank line.
 - Foundational primitive coverage when shared base types are touched (for example `Result` and `Result<T>`): direct tests for non-generic and generic success/failure invariants.
@@ -191,6 +194,8 @@ If the current slice leaves a persistence gap open until a later slice, the prom
 - waive the safeguard for now and record the accepted gap, why it is acceptable, the owning follow-up slice, and the condition that removes the waiver
 
 When a slice changes schema, constraints, indexes, or EF Core model shape, the prompt must explicitly say whether a committed migration artifact is required. If it is required, name the expected persistence root, the migration artifact to create or update, and the evidence that proves the migration is part of the slice deliverable.
+
+When a command handler plans to translate persistence exceptions into business-level failures, the prompt must identify the exact contract allowed for translation, the evidence required to distinguish that case from unrelated persistence failures, and the verification expected for both the translated and rethrown paths.
 
 When persisted data can drift outside domain expectations, read-path failure handling must be named explicitly. Treat invalid stored values as a persistence or data-corruption concern, not as an ordinary business-rule validation path, unless the prompt explicitly justifies a different contract.
 
@@ -226,6 +231,10 @@ Verification should also call out reviewer-facing hygiene when the slice produce
 When a slice adds or changes guard clauses, verification must include a quick audit that thrown `ArgumentException` or equivalent parameter names identify the offending property or argument precisely rather than a containing object.
 
 When a slice adds or updates string validators, verification must include explicit null, empty, and whitespace-only test cases for required fields so required-message intent is preserved ahead of downstream format or allowed-values checks.
+
+When a slice adds handler-level conflict translation, verification must include at least one test proving the intended conflict path and one inspection or test path proving unrelated `DbUpdateException` cases are not misreported as duplicate/business conflicts.
+
+When a slice introduces or widens public catalogs of supported values, verification must include a check that the exposed member cannot mutate the shared backing state through array casts or other direct collection mutation.
 
 When a slice adds project, source, or test files, verification must include a final scaffold audit so starter placeholders are removed or renamed before review.
 

@@ -33,7 +33,7 @@ mode: agent
 
 - Slice: ManageRanks
 - Business outcome: provide the canonical rank reference data required by registration, rank changes, and reporting.
-- Out of scope: academic creation, employment-state mutations, and downstream reports.
+- Out of scope: update/delete rank administration, get-by-id rank retrieval, academic creation, employment-state mutations, and downstream reports.
 
 ## Context Files to Review First
 
@@ -66,15 +66,15 @@ mode: agent
 1. Confirm how rank data is stored and exposed.
    Targets: src/features/ReferenceData/ManageRanks/ or current equivalent, persistence registration, seed data path.
    Owner: slice-coordinator.
-   Validation before next step: one canonical approach is selected for add/list behavior and existing seed data conflicts are resolved.
+   Validation before next step: one canonical approach is selected for add/list behavior, the slice language is narrowed to add/list-only unless more handlers are explicitly in scope, and existing seed data conflicts are resolved.
 2. Implement add-rank command behavior.
    Targets: AddRank command, validator, handler, response, endpoint, and mapping helpers within the ManageRanks slice folder.
    Owner: backend-domain.
-   Validation before next step: only P, SL, and L are accepted, failures point to the `Code` property explicitly, whitespace-only `Code` values trigger the required-field message path before allowed-values checks, and duplicates are rejected deterministically.
+   Validation before next step: only P, SL, and L are accepted, failures point to the `Code` property explicitly, whitespace-only `Code` values trigger the required-field message path before allowed-values checks, duplicates are rejected deterministically, and persistence exception handling translates only proven duplicate-code conflicts instead of masking unrelated `DbUpdateException` failures.
 3. Implement persistence mapping and durable allowed-code enforcement.
    Targets: persistence configuration, any schema or model-constraint artifacts, and the canonical rank-code source used by validators and mappings.
    Owner: data-persistence.
-   Validation before next step: any allowed-code rule derives from the shared rank mapping or enum source rather than hard-coded SQL or duplicated literal lists.
+   Validation before next step: any allowed-code rule derives from the shared rank mapping or enum source rather than hard-coded SQL or duplicated literal lists, public supported-rank catalogs cannot expose mutable backing arrays, and any schema-changing model update ships with the required migration artifacts plus updated snapshot metadata.
 4. Implement rank listing query behavior.
    Targets: ListRanks query, handler, response contract, and endpoint.
    Owner: backend-domain.
@@ -96,11 +96,15 @@ mode: agent
 - Guard failures for invalid rank input identify the `Code` property rather than the enclosing command object.
 - Required-string validation for `Code` treats null/empty/whitespace as missing input and preserves the required-field error message before allowed-values validation.
 - Validators, mapping helpers, error messages, and any EF Core check constraints derive allowed rank codes from one canonical source instead of repeating literals.
+- Public supported-rank catalogs and code lists expose immutable/read-only views that cannot be cast back to mutate shared array state.
 - Adding a rank accepts only the codes P, SL, and L.
 - Attempting to add a duplicate rank code fails without creating a second record.
+- Duplicate/conflict results are returned only for proven duplicate-code cases; unrelated persistence failures are surfaced instead of being mislabeled as duplicate-rank errors.
 - Listing ranks returns the canonical codes in a stable form that downstream slices can resolve.
 - The slice exposes or documents the mapping from rank to access level so registration and reports do not redefine it.
+- If the EF Core model now includes persisted rank records, the slice deliverable includes the committed migration artifacts and updated model snapshot needed to provision the `Ranks` table in migration-based environments.
 - Automated tests cover valid add, invalid code, duplicate code, and list-query behavior.
+- Prompt, PR, and showcase wording stay aligned with the delivered add/list-only surface unless update/delete/get-by-id are explicitly added.
 
 ## Human Showcase Steps
 
@@ -123,9 +127,13 @@ mode: agent
 - [ ] Invalid-rank guard failures point to `Code` rather than the enclosing command object.
 - [ ] Required `Code` validation treats null/empty/whitespace as missing input and keeps required-field messaging ahead of allowed-values checks.
 - [ ] Allowed rank codes are defined once and reused by validators, mappings, messages, and persistence constraints.
+- [ ] Public supported-rank collections cannot mutate shared backing arrays through casts or direct collection access.
 - [ ] ManageRanks stays limited to rank reference-data behavior.
 - [ ] Rank validation is restricted to P, SL, and L.
 - [ ] Duplicate codes are blocked at the application and persistence levels as appropriate.
+- [ ] Duplicate-code error translation is narrow and does not mislabel unrelated persistence failures.
 - [ ] List behavior returns stable rank data for downstream slices.
+- [ ] Any schema-changing rank model update includes migration artifacts and updated snapshot metadata.
+- [ ] Prompt and PR wording do not claim CRUD or other unimplemented operations.
 - [ ] Verification covers add and list success and failure paths.
 - [ ] Any chosen seed strategy is documented for later environments.

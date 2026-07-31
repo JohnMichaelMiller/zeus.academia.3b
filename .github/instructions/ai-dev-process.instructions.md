@@ -57,8 +57,11 @@ applyTo: "**"
   - Null argument validation for non-nullable API inputs.
   - Dependency package families remain version-compatible (for example xUnit core package major version aligned with its runner package major version).
   - No mutable collection escape through read-only interfaces.
+  - Array-backed catalogs and static arrays are not exposed directly through `IReadOnlyList<T>` or similar interfaces; return immutable snapshots or read-only wrappers that cannot be down-cast and mutated.
   - Backing `List<T>` collections are not exposed directly; read-only members return immutable/read-only wrappers (for example `AsReadOnly()`).
+  - Database exception translation is narrow and evidence-based; do not collapse every `DbUpdateException` into a duplicate/conflict result unless a targeted post-failure existence check proves that specific conflict.
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
+  - Any EF Core model, configuration, or `DbSet` addition that changes schema ships with the matching migration artifacts and updated model snapshot unless the change is explicitly documented as mapping-only.
   - No duplicate project declarations in solution files; project name/path pairs must appear once with one GUID and one configuration block.
   - Any touched solution file must keep the required Visual Studio header as the first line with no leading blank line or stray BOM-only line.
   - Test/setup helpers and verification scripts read environment configuration once per value and reuse the parsed result instead of duplicating environment-variable lookups across branches.
@@ -74,6 +77,7 @@ applyTo: "**"
   - Constrained-code parse/validation failures remain actionable by including allowed values (prefer constants over inline literals).
   - Validation messages must derive allowed values from a single source of truth rather than duplicating hard-coded literals across exception messages.
   - Database-backed tests must use unique test-scoped database names and safe connection-string handling; never use a provided connection string verbatim against a shared or non-test database.
+  - PR titles, descriptions, and slice prompts describe only the operations actually implemented; do not claim CRUD, get-by-id, or other endpoint coverage unless those handlers and routes are present in the diff.
 
 **Prohibited Without Review:**
 

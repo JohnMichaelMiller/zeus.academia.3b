@@ -205,13 +205,16 @@ The section MUST cover, when applicable:
 - persistence-backed domain field parity (domain create/update paths enforce the same max-length, precision, scale, and normalization constraints required by persistence)
 - canonical-definition reuse for constrained codes, enums, and persisted allowed-value rules (validators, mappings, error messages, and EF Core check constraints must derive from one source of truth instead of repeating literals across layers)
 - immutable read-only collection exposure (do not expose mutable backing collections through `IReadOnlyCollection`; include array-backed catalogs and require defensive copies or read-only wrappers such as `AsReadOnly()` when applicable)
+- array-backed or static catalog exposure safety (public `IReadOnlyList<T>` over an array is insufficient; require wrappers or immutable snapshots that cannot be cast back to the backing array)
 - required-text validator semantics for string fields (when whitespace should be treated as missing input, reject null/empty/whitespace with the required-message rule before membership/format checks; do not rely on `NotEmpty()` alone)
 - database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
 - named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
 - ownership-safe association mutations (for example, releasing an extension must validate it belongs to the target academic; assignment must not overwrite an existing different assignment)
 - EF Core migration hygiene when schema changes are part of the slice (required migration artifacts, model snapshot, and metadata files must be part of the deliverable unless explicitly waived)
+- persistence-exception translation specificity (only translate `DbUpdateException` or equivalent persistence failures into business conflicts when the exact conflict is proven or provider handling is narrow enough to avoid masking unrelated failures)
 - model metadata testing that inspects `context.Model` directly rather than relying on `IDesignTimeModel` from the service provider in normal tests
 - exception organization hygiene (domain exceptions should be split into dedicated files/types so file names and type names stay aligned as the exception set grows)
+- scope-to-surface alignment for prompts and PR language (claims like CRUD, get-by-id, or admin seeding must map to explicit steps, endpoints, handlers, and verification; otherwise the prompt must describe the narrower implemented scope)
 - solution-file integrity when `.sln` is touched (no duplicate project name/path entries and no duplicate configuration blocks for equivalent projects)
 - scaffold cleanup and naming hygiene (no leftover placeholder starter files; file names must match their primary type or test behavior)
 - solution-file encoding hygiene when `.sln` is touched (no BOM-only line or blank line ahead of the required Visual Studio header)
@@ -242,6 +245,8 @@ Specify how the slice will be verified:
 - platform guard consistency for infrastructure helpers (design-time factories, scripts, and tests must share the same non-Windows behavior for SQL Server configuration)
 - argument/parameter-name accuracy for thrown guard exceptions when mappings or validation helpers reject a specific property value
 - validator error-message intent for required string inputs (required-message assertions include whitespace-only inputs and run before downstream allowed-values/format rules)
+- persistence-exception translation checks (verify the intended conflict translation path and verify unrelated persistence failures are not reported as duplicate/business conflicts)
+- public catalog immutability checks when supported-value lists are exposed from shared helpers or domain extensions
 
 The prompt MUST distinguish between required verification and optional follow-up checks.
 
