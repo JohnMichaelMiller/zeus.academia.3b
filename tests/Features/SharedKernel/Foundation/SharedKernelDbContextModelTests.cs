@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 using Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
 
 namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation;
@@ -66,6 +67,22 @@ public sealed class SharedKernelDbContextModelTests
 
     Assert.NotNull(primaryKey);
     Assert.Equal(["EmpNr", "DegreeCode"], primaryKey!.Properties.Select(p => p.Name).ToArray());
+  }
+
+  [Fact]
+  public void ManagedRank_HasCanonicalCodeConstraints()
+  {
+    using var context = CreateContext();
+
+    var createScript = context.Database.GenerateCreateScript();
+
+    Assert.Contains("CK_Ranks_CodeAllowed", createScript, StringComparison.Ordinal);
+    Assert.Contains("CK_Ranks_AccessLevelMatchesCode", createScript, StringComparison.Ordinal);
+
+    foreach (var code in RankExtensions.SupportedRankCodes)
+    {
+      Assert.Contains($"'{code}'", createScript, StringComparison.Ordinal);
+    }
   }
 
   private static SharedKernelDbContext CreateContext()

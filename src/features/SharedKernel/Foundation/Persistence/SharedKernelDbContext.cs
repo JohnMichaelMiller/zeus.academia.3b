@@ -6,6 +6,8 @@ namespace Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
 
 public sealed class SharedKernelDbContext(DbContextOptions<SharedKernelDbContext> options) : DbContext(options)
 {
+  public DbSet<ManagedRank> Ranks => Set<ManagedRank>();
+
   public DbSet<Academic> Academics => Set<Academic>();
 
   public DbSet<AcademicQualification> AcademicQualifications => Set<AcademicQualification>();
@@ -23,6 +25,7 @@ public sealed class SharedKernelDbContext(DbContextOptions<SharedKernelDbContext
     modelBuilder.ApplyConfiguration(new AcademicConfiguration());
     modelBuilder.ApplyConfiguration(new AcademicQualificationConfiguration());
     modelBuilder.ApplyConfiguration(new DegreeConfiguration());
+    modelBuilder.ApplyConfiguration(new ManagedRankConfiguration());
     modelBuilder.ApplyConfiguration(new UniversityConfiguration());
     modelBuilder.ApplyConfiguration(new ExtensionConfiguration());
 
