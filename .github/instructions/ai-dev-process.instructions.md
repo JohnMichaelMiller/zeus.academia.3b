@@ -46,9 +46,9 @@ applyTo: "**"
   - If documentation or agent guidance references a file, that file must be committed in the same change.
   - If guidance references an editor task (for example a VS Code task), the corresponding task file must exist in the repository; otherwise reference a committed script command instead.
 - MUST validate platform assumptions for runtime tooling:
-  - Windows-only fallbacks (for example LocalDB) must be explicitly guarded.
+  - SQL Server local-development fallbacks (for example SQL Server LocalDB) must be explicitly guarded.
   - On non-Windows, require explicit environment configuration instead of silent fallback.
-  - Design-time DbContext factories and verification scripts must use the same platform guard behavior as runtime verification (no unconditional LocalDB fallback on non-Windows hosts).
+  - Design-time DbContext factories and verification scripts must use the same SQL Server-specific platform guard behavior as runtime verification (no unconditional LocalDB fallback on non-Windows hosts).
 - MUST run a focused self-review for common correctness regressions before opening PR:
   - Vertical slice layout and boundaries match [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md).
   - Placeholder scaffolding artifacts are removed or renamed before review; do not leave `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter files in committed slices.

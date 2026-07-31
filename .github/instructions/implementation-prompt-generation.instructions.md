@@ -219,7 +219,7 @@ The section MUST cover, when applicable:
 - scaffold cleanup and naming hygiene (no leftover placeholder starter files; file names must match their primary type or test behavior)
 - solution-file encoding hygiene when `.sln` is touched (no BOM-only line or blank line ahead of the required Visual Studio header)
 - environment/setup helper hygiene when scripts or infrastructure-backed tests are touched (read each environment variable once and reuse the parsed value or helper result)
-- cross-platform SQL Server setup behavior for scripts/factories (LocalDB fallback allowed only with explicit Windows guard; on non-Windows require `ZEUS_SQLSERVER_CONNECTION` with actionable failure messaging)
+- cross-platform SQL Server setup behavior for scripts/factories (SQL Server LocalDB fallback allowed only with explicit Windows guard; on non-Windows require `ZEUS_SQLSERVER_CONNECTION` with actionable failure messaging)
 
 Bad:
 

@@ -384,7 +384,7 @@ public sealed class SendEnrollmentConfirmationHandler(IEmailService email)
 ## 8. Testing Conventions
 
 - Mirror the source layout in tests: `tests/features/Enrollment/CreateEnrollment/CreateEnrollmentHandlerTests.cs`.
-- Never mock `DbContext`; use `SqliteInMemory` or a real test container.
+- Never mock `DbContext`; use a real SQL Server-backed test environment or a SQL Server test container.
 - Cover the full use-case path from request through persistence.
 - Test validators separately for failure-path detail.
 - Place UI tests under the same use-case folder, for example `src/features/Enrollment/CreateEnrollment/__tests__/CreateEnrollmentForm.spec.ts`.

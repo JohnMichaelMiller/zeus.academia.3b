@@ -71,7 +71,7 @@ applyTo: "**"
 
 - **Target**: Modern browsers (Chrome/Edge/Firefox/Safari, latest 2 versions)
 - **Deploy**: Azure Static Web Apps (frontend), Azure App Service (backend)
-- **Database**: Azure SQL Database or Cosmos DB
+- **Database**: Azure SQL Database (SQL Server)
 - **Auth/Dependencies**: Azure AD B2C (OAuth 2.0/OIDC), Azure Storage (files)
 
 ## Constraints

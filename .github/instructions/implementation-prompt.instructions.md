@@ -168,7 +168,7 @@ Required coverage:
 - Scaffold cleanup and naming hygiene when new files are introduced: no leftover `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter artifacts; file names must match the primary type or test behavior.
 - Script and setup-helper hygiene when verification touches infrastructure configuration: environment variables are read once per value and reused through a local variable or helper instead of duplicated lookups.
 - Teardown failure isolation for integration tests: cleanup runs as best-effort in `finally` and teardown exceptions must not replace the primary assertion failure signal.
-- Cross-platform SQL Server setup behavior for scripts/factories: LocalDB fallback is allowed only behind explicit Windows checks; on non-Windows hosts require `ZEUS_SQLSERVER_CONNECTION` and fail with actionable diagnostics.
+- Cross-platform SQL Server setup behavior for scripts/factories: SQL Server LocalDB fallback is allowed only behind explicit Windows checks; on non-Windows hosts require `ZEUS_SQLSERVER_CONNECTION` and fail with actionable diagnostics.
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
 
@@ -199,7 +199,7 @@ When a command handler plans to translate persistence exceptions into business-l
 
 When persisted data can drift outside domain expectations, read-path failure handling must be named explicitly. Treat invalid stored values as a persistence or data-corruption concern, not as an ordinary business-rule validation path, unless the prompt explicitly justifies a different contract.
 
-When the slice depends on provider-specific EF Core behavior, such as SQL Server decimal precision, filtered indexes, collations, computed columns, or constraint translation, the prompt must require verification against the target provider or generated migration output. SQLite-only checks are not sufficient unless the prompt explicitly states that provider parity is out of scope.
+- When the slice depends on provider-specific EF Core behavior, such as SQL Server decimal precision, filtered indexes, collations, computed columns, or constraint translation, the prompt must require verification against the target provider or generated migration output. Non-SQL Server provider checks are not sufficient unless the prompt explicitly states that provider parity is out of scope.
 
 Do not let a schema-changing prompt stop at "migration support" or "schema evidence." The prompt must distinguish mapping-only persistence work from schema-changing persistence work.
 
