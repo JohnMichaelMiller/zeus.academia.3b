@@ -15,6 +15,7 @@ The third iteration of the Zeus Academia experiment
 - [Academia Slice Implementation Prompts](.github/prompts/academia/README.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-implementation-prompts/conversation.md))
 - [Academia Slice Execution Plan](.github/prompts/academia/execution-plan.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
 - [Backend Slice Implementer Agent Profile](.github/agents/backend-slice-implementer.agent.md) ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
+- [ManageDegrees reference-data slice](src/features/ReferenceData/ManageDegrees/Zeus.Academia.Features.ReferenceData.ManageDegrees.csproj) ([Tests](tests/Features/ReferenceData/ManageDegrees/Zeus.Academia.Tests.Features.ReferenceData.ManageDegrees.csproj)) - canonical degree codes for registration and qualification workflows.
 - [Blog Author Agent Profile](.github/agents/blog-author.agent.md) ([Log](ai-logs/2026/04/20/2026-04-20-blog-author-agent-conversion/conversation.md))
 - [Academia Execution Plan](.github/models/workflows/academia-execution-plan.md) ([Log](ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md))
 - [Academia Slice Implementation Prompts](.github/prompts/academia-implementation/README.md) ([Log](ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md))
