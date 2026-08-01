@@ -216,8 +216,10 @@ The section MUST cover, when applicable:
 - named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
 - ownership-safe association mutations (for example, releasing an extension must validate it belongs to the target academic; assignment must not overwrite an existing different assignment)
 - EF Core migration hygiene when schema changes are part of the slice (required migration artifacts, model snapshot, and metadata files must be part of the deliverable unless explicitly waived)
+- EF Core migration artifact completeness when schema changes are part of the slice (never commit snapshot-only metadata; require migration class, Designer metadata, and snapshot as one coherent set unless explicitly waived as mapping-only)
 - persistence-exception translation specificity (only translate `DbUpdateException` or equivalent persistence failures into business conflicts when the exact conflict is proven or provider handling is narrow enough to avoid masking unrelated failures)
 - model metadata testing that inspects `context.Model` directly rather than relying on `IDesignTimeModel` from the service provider in normal tests
+- migration metadata integrity checks that fail verification when snapshot, migration class, and Designer files are not committed together for schema-changing work
 - exception organization hygiene (domain exceptions should be split into dedicated files/types so file names and type names stay aligned as the exception set grows)
 - scope-to-surface alignment for prompts and PR language (claims like CRUD, get-by-id, or admin seeding must map to explicit steps, endpoints, handlers, and verification; otherwise the prompt must describe the narrower implemented scope)
 - solution-file integrity when `.sln` is touched (no duplicate project name/path entries and no duplicate configuration blocks for equivalent projects)

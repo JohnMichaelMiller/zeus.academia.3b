@@ -72,7 +72,7 @@ mode: agent
 3. Implement persistence-backed code normalization and uniqueness rules.
    Targets: persistence configuration, any schema or model-constraint artifacts, and the canonical degree-code normalization source reused by validators and mappings.
    Owner: data-persistence.
-   Validation before next step: code trimming, casing, uniqueness, and any durable constraints derive from one canonical definition instead of being reimplemented separately across layers.
+   Validation before next step: code trimming, casing, uniqueness, and any durable constraints derive from one canonical definition instead of being reimplemented separately across layers, and any schema-changing migration output is committed as a complete set (migration class + Designer metadata + snapshot), never as snapshot-only metadata.
 4. Implement list-degree behavior.
    Targets: ListDegrees query, handler, response contract, and endpoint.
    Owner: backend-domain.
@@ -95,7 +95,7 @@ mode: agent
 - Adding a duplicate degree code fails without creating a second record.
 - Degree-code normalization, uniqueness, and error messaging derive from one canonical source rather than being redefined independently in validators, mappings, and persistence rules.
 - Degree-code uniqueness is protected in both application behavior and persistence.
-- If this slice introduces or changes the uniqueness schema, a committed migration artifact exists in the confirmed persistence root.
+- If this slice introduces or changes the uniqueness schema, the confirmed persistence root contains a complete migration artifact set (migration class, Designer metadata, and snapshot), and snapshot-only commits are treated as review blockers.
 - Listing degrees returns stable records that downstream registration and qualification slices can resolve.
 - Validation and persistence rules agree on what constitutes a valid degree payload.
 - Automated tests cover the success path, duplicate path, and list-query behavior.
@@ -121,7 +121,7 @@ mode: agent
 - [ ] Degree-code normalization and uniqueness rules are defined once and reused by validators, mappings, messages, and persistence constraints.
 - [ ] ManageDegrees stays limited to degree reference-data behavior.
 - [ ] Degree code uniqueness is enforced.
-- [ ] Required migration files are present when this slice introduces or changes reference-data uniqueness schema.
+- [ ] Required migration files are present as a complete set when this slice introduces or changes reference-data uniqueness schema (migration class + Designer + snapshot; no standalone snapshot).
 - [ ] Constraint-validation tests assert stable signals (exception type, constraint name, or SQL state), not provider-specific full error-message text.
 - [ ] List behavior is stable and reusable by dependent slices.
 - [ ] Tests cover add and list success and failure cases.

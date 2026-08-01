@@ -63,6 +63,7 @@ applyTo: "**"
   - Database exception translation is narrow and evidence-based; do not collapse every `DbUpdateException` into a duplicate/conflict result unless a targeted post-failure existence check proves that specific conflict.
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
   - Any EF Core model, configuration, or `DbSet` addition that changes schema ships with the matching migration artifacts and updated model snapshot unless the change is explicitly documented as mapping-only.
+  - Do not commit a standalone EF Core model snapshot; when migrations are in scope, include the migration class plus its Designer metadata alongside the snapshot (or omit all migration artifacts when explicitly waived as mapping-only).
   - No duplicate project declarations in solution files; project name/path pairs must appear once with one GUID and one configuration block.
   - Any touched solution file must keep the required Visual Studio header as the first line with no leading blank line or stray BOM-only line.
   - Test/setup helpers and verification scripts read environment configuration once per value and reuse the parsed result instead of duplicating environment-variable lookups across branches.

@@ -171,6 +171,7 @@ Also require reviewer-facing hygiene coverage when applicable:
 - result semantics that reserve `Error.None` for success only and prevent empty-error failures
 - constructor visibility that prevents bypassing factory-enforced invariants (types validated via `Create`/`TryCreate` keep constructors non-public)
 - EF Core migration hygiene including migration artifact and metadata expectations for schema-changing work
+- EF Core migration artifact completeness for schema-changing work (do not allow standalone snapshot commits; require migration class, Designer metadata, and snapshot together unless explicitly waived as mapping-only)
 - direct EF Core model inspection in metadata tests rather than using `IDesignTimeModel` in normal tests
 - exception organization that keeps file/type names aligned as the exception set grows
 
@@ -184,6 +185,8 @@ Require the instruction file to define a verification section for implementation
 - human review checks
 - commands, tests, or inspection steps when available
 - evidence to capture for completed work
+
+Require verification to fail when migration metadata is incomplete for schema-changing slices (for example, a model snapshot is committed without its corresponding migration class and Designer file).
 
 Require the generated instruction file to say that verification includes a final scaffold audit when a slice creates new project, source, or test files.
 
@@ -226,6 +229,7 @@ Require a short anti-pattern section covering failures such as:
 - prompts that leave result/failure semantics ambiguous or allow `Error.None` on failures
 - prompts that define factory-validated types with public constructors that bypass invariant checks
 - prompts that describe schema changes without naming the migration artifact and metadata expectations
+- prompts that commit EF Core snapshot metadata without the matching migration class and Designer file
 - prompts that rely on `IDesignTimeModel` in normal model tests instead of inspecting `context.Model` directly
 
 ### 11. Validation Checklist

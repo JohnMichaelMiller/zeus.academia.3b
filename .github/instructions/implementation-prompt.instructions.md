@@ -161,6 +161,7 @@ Required coverage:
 - Result semantics reserve `Error.None` for success only; failed results must carry actionable details and cannot be constructed with an empty success sentinel.
 - Factory-enforced invariant paths retain constructor visibility guards (types that rely on `Create`/`TryCreate` or equivalent do not expose public constructors that bypass validation)
 - EF Core schema changes require migration artifacts and metadata hygiene (for example, migration plus snapshot/Designer files when the project uses migrations) unless the prompt explicitly waives them and explains the tradeoff.
+- EF Core migration metadata must be internally consistent: never add or keep a model snapshot by itself; schema-changing slices must include the migration class, Designer metadata, and snapshot together (unless the prompt explicitly waives migrations as mapping-only work).
 - Persistence-exception translation must stay specific to the contract being returned; duplicate/conflict responses require proof of that exact conflict after the failed save or provider-specific handling narrow enough to avoid masking unrelated write failures.
 - Model metadata verification should inspect `context.Model` directly instead of relying on `context.GetService<IDesignTimeModel>()` in normal tests.
 - Exception types should be split into dedicated files/types with names that stay aligned as the exception set grows.
@@ -230,6 +231,8 @@ Implementation prompts must separate implementation from verification. The verif
 If the prompt claims persistence foundations, database constraints, or migration support, verification must include schema evidence. Passing unit tests or mapping tests alone is insufficient when the rule is supposed to be durable at the database level.
 
 If the slice changes schema, verification must also confirm that a committed migration artifact exists in the diff unless the prompt explicitly waives migrations and explains why. For EF Core migrations, the verification path should call out the expected migration artifact, snapshot/Designer metadata, and provider-specific validation evidence.
+
+When migration-based persistence is used, verification must explicitly fail the slice if migration metadata is incomplete (for example a snapshot exists without a corresponding migration class and Designer file, or vice versa).
 
 For model metadata assertions, the verification section should require direct inspection of the EF Core model and avoid a normal test dependency on `IDesignTimeModel` service resolution.
 

@@ -74,7 +74,7 @@ mode: agent
 3. Implement persistence mapping and durable allowed-code enforcement.
    Targets: persistence configuration, any schema or model-constraint artifacts, and the canonical rank-code source used by validators and mappings.
    Owner: data-persistence.
-   Validation before next step: any allowed-code rule derives from the shared rank mapping or enum source rather than hard-coded SQL or duplicated literal lists, public supported-rank catalogs cannot expose mutable backing arrays, and any schema-changing model update ships with the required migration artifacts plus updated snapshot metadata.
+   Validation before next step: any allowed-code rule derives from the shared rank mapping or enum source rather than hard-coded SQL or duplicated literal lists, public supported-rank catalogs cannot expose mutable backing arrays, and any schema-changing model update ships with a complete migration set (migration class + Designer metadata + snapshot), never snapshot-only metadata.
 4. Implement rank listing query behavior.
    Targets: ListRanks query, handler, response contract, and endpoint.
    Owner: backend-domain.
@@ -102,7 +102,7 @@ mode: agent
 - Duplicate/conflict results are returned only for proven duplicate-code cases; unrelated persistence failures are surfaced instead of being mislabeled as duplicate-rank errors.
 - Listing ranks returns the canonical codes in a stable form that downstream slices can resolve.
 - The slice exposes or documents the mapping from rank to access level so registration and reports do not redefine it.
-- If the EF Core model now includes persisted rank records, the slice deliverable includes the committed migration artifacts and updated model snapshot needed to provision the `Ranks` table in migration-based environments.
+- If the EF Core model now includes persisted rank records, the slice deliverable includes a complete committed migration set (migration class, Designer metadata, and snapshot) needed to provision the `Ranks` table in migration-based environments; snapshot-only changes are review blockers.
 - Automated tests cover valid add, invalid code, duplicate code, and list-query behavior.
 - Prompt, PR, and showcase wording stay aligned with the delivered add/list-only surface unless update/delete/get-by-id are explicitly added.
 
@@ -133,7 +133,7 @@ mode: agent
 - [ ] Duplicate codes are blocked at the application and persistence levels as appropriate.
 - [ ] Duplicate-code error translation is narrow and does not mislabel unrelated persistence failures.
 - [ ] List behavior returns stable rank data for downstream slices.
-- [ ] Any schema-changing rank model update includes migration artifacts and updated snapshot metadata.
+- [ ] Any schema-changing rank model update includes a complete migration artifact set (migration class + Designer + snapshot) with no standalone snapshot files.
 - [ ] Prompt and PR wording do not claim CRUD or other unimplemented operations.
 - [ ] Verification covers add and list success and failure paths.
 - [ ] Any chosen seed strategy is documented for later environments.
