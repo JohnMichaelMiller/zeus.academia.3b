@@ -36,6 +36,14 @@ public sealed class Extension
       throw new ArgumentException("Extension number must be a whole number.", nameof(number));
     }
 
+    if (number < int.MinValue || number > int.MaxValue)
+    {
+      throw new ArgumentOutOfRangeException(
+        nameof(number),
+        number,
+        $"Extension number must be between {int.MinValue} and {int.MaxValue}.");
+    }
+
     return Create((int)number);
   }
 
