@@ -6,7 +6,7 @@ namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation;
 public sealed class ExtensionOwnershipTests
 {
   [Fact]
-  public void AssignTo_WhenAssignedToDifferentAcademic_ThrowsConflictException()
+  public void AssignTo_DifferentAcademicAfterAssignment_ThrowsConflictException()
   {
     var extension = Extension.Create(1001);
     extension.AssignTo("EMP001");
@@ -17,7 +17,7 @@ public sealed class ExtensionOwnershipTests
   }
 
   [Fact]
-  public void AssignTo_WhenAlreadyAssignedToSameAcademic_IsIdempotent()
+  public void AssignTo_SameAcademic_IsIdempotent()
   {
     var extension = Extension.Create(1001);
     extension.AssignTo("EMP001");
@@ -29,7 +29,7 @@ public sealed class ExtensionOwnershipTests
   }
 
   [Fact]
-  public void ReleaseFrom_WhenRequesterIsDifferentAcademic_ThrowsConflictException()
+  public void ReleaseFrom_DifferentAcademic_ThrowsConflictException()
   {
     var extension = Extension.Create(1001);
     extension.AssignTo("EMP001");
@@ -40,7 +40,7 @@ public sealed class ExtensionOwnershipTests
   }
 
   [Fact]
-  public void ReleaseFrom_WhenOwnerMatches_ClearsAssignment()
+  public void ReleaseFrom_CurrentOwner_ClearsAssignment()
   {
     var extension = Extension.Create(1001);
     extension.AssignTo("EMP001");
@@ -52,10 +52,21 @@ public sealed class ExtensionOwnershipTests
   }
 
   [Fact]
-  public void Create_WithFractionalNumber_ThrowsArgumentException()
+  public void Create_FractionalNumber_ThrowsArgumentException()
   {
     var exception = Assert.Throws<ArgumentException>(() => Extension.Create(1001.7m));
 
     Assert.Contains("whole", exception.Message, StringComparison.OrdinalIgnoreCase);
+  }
+
+  [Fact]
+  public void AssignTo_WithOverlongEmpNr_ThrowsBusinessRuleViolationException()
+  {
+    var extension = Extension.Create(1001);
+    var overlongEmpNr = new string('E', SharedKernelFieldLengths.EmpNr + 1);
+
+    var exception = Assert.Throws<BusinessRuleViolationException>(() => extension.AssignTo(overlongEmpNr));
+
+    Assert.Contains(SharedKernelFieldLengths.EmpNr.ToString(), exception.Message, StringComparison.OrdinalIgnoreCase);
   }
 }

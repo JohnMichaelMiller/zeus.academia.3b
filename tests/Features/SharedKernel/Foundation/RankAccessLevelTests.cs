@@ -8,19 +8,19 @@ public sealed class RankAccessLevelTests
   [InlineData(Rank.P, AccessLevel.INT)]
   [InlineData(Rank.SL, AccessLevel.NAT)]
   [InlineData(Rank.L, AccessLevel.LOC)]
-  public void ToAccessLevel_MapsRankToExpectedAccessLevel(Rank rank, AccessLevel expectedAccessLevel)
+  public void ToAccessLevel_MapsKnownRanks(Rank rank, AccessLevel expectedAccessLevel)
   {
-    var actual = rank.ToAccessLevel();
+    var mappedLevel = rank.ToAccessLevel();
 
-    Assert.Equal(expectedAccessLevel, actual);
+    Assert.Equal(expectedAccessLevel, mappedLevel);
   }
 
   [Fact]
-  public void Academic_AccessLevel_IsDerivedFromRankOnly()
+  public void Academic_AccessLevel_TracksCurrentRank()
   {
     var degree = Degree.Create("MCS");
     var university = University.Create("UCSD");
-    var academic = Academic.Create("EMP001", "B. Singh", Rank.SL, [(degree, university)]);
+    var academic = Academic.Create("EMP001", "Bea Singh", Rank.SL, [(degree, university)]);
 
     Assert.Equal(AccessLevel.NAT, academic.AccessLevel);
 
@@ -30,11 +30,11 @@ public sealed class RankAccessLevelTests
   }
 
   [Fact]
-  public void ToAccessLevel_WithUnknownRankValue_ThrowsArgumentOutOfRangeException()
+  public void ToAccessLevel_UnknownRank_ThrowsAndListsAllowedValues()
   {
-    var unknownRank = (Rank)99;
+    var unsupportedRank = (Rank)99;
 
-    var exception = Assert.Throws<ArgumentOutOfRangeException>(() => unknownRank.ToAccessLevel());
+    var exception = Assert.Throws<ArgumentOutOfRangeException>(() => unsupportedRank.ToAccessLevel());
 
     Assert.Contains("Allowed values", exception.Message, StringComparison.OrdinalIgnoreCase);
   }

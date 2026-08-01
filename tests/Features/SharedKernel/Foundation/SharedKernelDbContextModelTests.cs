@@ -70,13 +70,13 @@ public sealed class SharedKernelDbContextModelTests
 
   private static SharedKernelDbContext CreateContext()
   {
-    var connectionString = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
+    var configuredConnection = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
 
-    if (string.IsNullOrWhiteSpace(connectionString))
+    if (string.IsNullOrWhiteSpace(configuredConnection))
     {
       if (OperatingSystem.IsWindows())
       {
-        connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=ZeusAcademiaSharedKernelDesign;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
+        configuredConnection = "Server=(localdb)\\MSSQLLocalDB;Database=ZeusAcademiaSharedKernelDesign;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
       }
       else
       {
@@ -85,7 +85,7 @@ public sealed class SharedKernelDbContextModelTests
     }
 
     var options = new DbContextOptionsBuilder<SharedKernelDbContext>()
-        .UseSqlServer(connectionString)
+    .UseSqlServer(configuredConnection)
         .Options;
 
     return new SharedKernelDbContext(options);

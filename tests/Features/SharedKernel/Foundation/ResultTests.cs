@@ -5,7 +5,7 @@ namespace Zeus.Academia.Tests.Features.SharedKernel.Foundation;
 public sealed class ResultTests
 {
   [Fact]
-  public void Success_HasErrorNoneAndIsSuccess()
+  public void Success_HasExpectedState()
   {
     var result = Result.Success();
 
@@ -60,6 +60,17 @@ public sealed class ResultTests
   {
     var error = Error.Create("Academic.Invalid", "Academic is invalid.");
     var failure = Result<int>.Failure(error);
+
+    Assert.True(failure.IsFailure);
+    Assert.Equal(error, failure.Error);
+  }
+
+  [Fact]
+  public void NonGenericFailure_CarriesActionableError()
+  {
+    var error = Error.Create("Academic.Conflict", "Conflict detected.");
+
+    var failure = Result.Failure(error);
 
     Assert.True(failure.IsFailure);
     Assert.Equal(error, failure.Error);
