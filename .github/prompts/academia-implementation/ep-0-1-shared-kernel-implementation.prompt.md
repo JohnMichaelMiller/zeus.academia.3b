@@ -78,7 +78,7 @@ mode: agent
 4. Add reusable error/result plumbing and domain event contracts.
    Targets: Shared Kernel result types, error primitives, event interfaces, and common exceptions.
    Owner: backend-domain.
-   Validation before next step: later slices can consume common result and exception types without redefining them, `Result<T>.Value` throws on failure access instead of exposing `default!`, and C# files keep one primary type per file with filename-to-type alignment.
+   Validation before next step: later slices can consume common result and exception types without redefining them, `Result<T>.Value` throws on failure access instead of exposing `default!`, factory-validated primitives do not expose public constructors that bypass invariant checks, and C# files keep one primary type per file with filename-to-type alignment.
 5. Remove scaffolding leftovers and normalize file hygiene before final verification.
    Targets: any newly added source, test, project, and solution files.
    Owner: slice-coordinator.
@@ -95,6 +95,7 @@ mode: agent
 - Dependency compatibility is validated for coupled tooling packages when touched (for example xUnit core and runner major versions align).
 - Result-style failure factories guard non-null failure payloads in both generic and non-generic wrappers when touched.
 - `Error.None` remains reserved for success only; failure results cannot use the empty success sentinel and must carry actionable details.
+- Factory-validated shared primitives (for example `Error`) keep constructors non-public so callers cannot bypass `Create`/`TryCreate` invariant validation.
 - C# source keeps one primary type per file and file names stay aligned with the primary type.
 - Domain exceptions are split into dedicated files/types with aligned names as the exception set grows.
 - Value-object parse/create APIs reject lossy coercion unless explicitly required and covered by tests.
@@ -140,6 +141,7 @@ mode: agent
 - [ ] Shared Kernel scope is still limited to reusable domain and persistence foundations.
 - [ ] Aggregate invariants and derived properties are enforced in code.
 - [ ] Result failure paths use actionable errors and do not rely on `Error.None` for failures.
+- [ ] Factory-validated shared primitives keep constructors non-public so validation cannot be bypassed.
 - [ ] C# source keeps one primary type per file with filename-to-type alignment.
 - [ ] Exception types are organized into dedicated files/types with aligned names.
 - [ ] Domain create/update rules enforce persistence-backed field limits before persistence (including shared max-length constraints).

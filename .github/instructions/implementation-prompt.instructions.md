@@ -159,6 +159,7 @@ Required coverage:
 - Required-text validator semantics for string fields (when whitespace should be treated as missing input, reject null/empty/whitespace with the required-message rule before membership/format checks; do not rely on `NotEmpty()` alone)
 - Shared result/failure factories guard non-null failure payload invariants in both generic and non-generic forms
 - Result semantics reserve `Error.None` for success only; failed results must carry actionable details and cannot be constructed with an empty success sentinel.
+- Factory-enforced invariant paths retain constructor visibility guards (types that rely on `Create`/`TryCreate` or equivalent do not expose public constructors that bypass validation)
 - EF Core schema changes require migration artifacts and metadata hygiene (for example, migration plus snapshot/Designer files when the project uses migrations) unless the prompt explicitly waives them and explains the tradeoff.
 - Persistence-exception translation must stay specific to the contract being returned; duplicate/conflict responses require proof of that exact conflict after the failed save or provider-specific handling narrow enough to avoid masking unrelated write failures.
 - Model metadata verification should inspect `context.Model` directly instead of relying on `context.GetService<IDesignTimeModel>()` in normal tests.
@@ -371,6 +372,7 @@ Do not author implementation prompts that:
 - stop at implementation instructions and omit verification or showcase paths
 - suggest schema changes without naming the migration artifact or metadata hygiene expectations
 - define result/failure contracts that allow `Error.None` on failures or allow failure access to `Value` without explicit guards
+- define factory-validated types with public constructors that bypass `Create`/`TryCreate` invariant checks
 - rely on `IDesignTimeModel` in normal model tests instead of inspecting the EF Core model directly
 
 ## Validation Checklist

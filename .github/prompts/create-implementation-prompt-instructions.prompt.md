@@ -169,6 +169,7 @@ Also require reviewer-facing hygiene coverage when applicable:
 - persisted-identifier guard coverage at public domain APIs (for example create/assign/release paths enforce shared max-length + normalization before persistence and include overlong-input tests)
 - normalization ownership boundaries that prevent cross-concept coupling (for example one domain concept must not depend on another concept's normalization helper unless a neutral shared utility is introduced)
 - result semantics that reserve `Error.None` for success only and prevent empty-error failures
+- constructor visibility that prevents bypassing factory-enforced invariants (types validated via `Create`/`TryCreate` keep constructors non-public)
 - EF Core migration hygiene including migration artifact and metadata expectations for schema-changing work
 - direct EF Core model inspection in metadata tests rather than using `IDesignTimeModel` in normal tests
 - exception organization that keeps file/type names aligned as the exception set grows
@@ -223,6 +224,7 @@ Require a short anti-pattern section covering failures such as:
 - showcase steps that only describe code internals instead of user value
 - prompts that span multiple unrelated slices
 - prompts that leave result/failure semantics ambiguous or allow `Error.None` on failures
+- prompts that define factory-validated types with public constructors that bypass invariant checks
 - prompts that describe schema changes without naming the migration artifact and metadata expectations
 - prompts that rely on `IDesignTimeModel` in normal model tests instead of inspecting `context.Model` directly
 

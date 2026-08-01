@@ -220,6 +220,7 @@ Use explicit state guards for success/failure wrappers so invalid states fail lo
 - MUST reserve `Error.None` for successful results only; failed results must carry actionable error details instead of using the success sentinel
 - MUST guard failure factory inputs (for example `Result.Failure(Error error)` and `Result<T>.Failure(Error error)`) against `null` before constructing failures
 - MUST NOT expose `default!` as a consumable failure value
+- Types that rely on `Create`/`TryCreate` (or equivalent) for invariant validation MUST keep constructors non-public so callers cannot bypass factory validation paths
 
 ## Persistence and Exception Hygiene
 

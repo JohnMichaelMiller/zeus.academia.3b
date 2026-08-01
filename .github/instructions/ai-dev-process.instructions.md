@@ -54,6 +54,7 @@ applyTo: "**"
   - Placeholder scaffolding artifacts are removed or renamed before review; do not leave `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter files in committed slices.
   - C# file names match their primary type name and xUnit test files contain real test classes named for the behavior under test.
   - C# source keeps one primary type per file; do not colocate unrelated primary types in the same `.cs` file.
+  - Types that enforce invariants through `Create`/`TryCreate` (or equivalent factory methods) do not expose public constructors that can bypass those checks; constructor visibility must enforce the intended guardrails.
   - Null argument validation for non-nullable API inputs.
   - Dependency package families remain version-compatible (for example xUnit core package major version aligned with its runner package major version).
   - No mutable collection escape through read-only interfaces.

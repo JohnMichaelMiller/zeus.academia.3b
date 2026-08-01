@@ -203,6 +203,7 @@ The section MUST cover, when applicable:
 - result-wrapper invariants for success/failure access patterns (for example, `Result<T>.Value` must not be consumable on failure)
 - result failure-factory null guards (for example `Failure(Error error)` cannot accept null error payloads)
 - result semantics that reserve `Error.None` for success only, so failed results must carry actionable error details rather than an empty success sentinel
+- constructor accessibility for factory-enforced invariants (types that enforce validation in `Create`/`TryCreate` or equivalent must keep constructors non-public so callers cannot bypass guardrails)
 - non-lossy parse/create behavior for constrained value objects (reject silent truncation or coercion unless explicitly required)
 - persistence-backed domain field parity (domain create/update paths enforce the same max-length, precision, scale, and normalization constraints required by persistence)
 - persisted identifier guard coverage at public APIs (for example `empNr` is validated for shared max-length and normalization in public create/assign/release methods, not only at EF persistence boundaries)
@@ -313,6 +314,7 @@ End the prompt with a checklist that verifies prompt quality before use.
 - [ ] Verification instructions require explicit failure for missing infrastructure prerequisites (no silent pass/early return).
 - [ ] Shared result contracts include invariant access rules for success/failure payloads.
 - [ ] Result semantics explicitly reserve `Error.None` for success and forbid empty-error failures.
+- [ ] Prompted factory-enforced invariants keep constructors non-public so validation cannot be bypassed.
 - [ ] Schema-changing prompts require migration artifacts and metadata hygiene for EF Core work.
 - [ ] Model metadata checks use the EF Core model directly rather than a design-time service lookup in normal tests.
 - [ ] Domain exception types are organized into dedicated files/types with aligned names.
