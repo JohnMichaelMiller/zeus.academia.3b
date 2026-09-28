@@ -29,6 +29,24 @@ applyTo: "**"
 - Each persistence-bearing feature uses an explicitly named feature-local DbContext and owns migrations for its tables; no two DbContexts may own migrations for the same table.
 - A feature-local DbContext may map a Shared Kernel entity and reuse its configuration semantics without reusing `SharedKernelDbContext` or introducing a duplicate domain entity.
 
+## Canonical Rule Owners
+
+Each rule family has one canonical file. Other instruction files, prompts, and agents link to it rather than restating it; fix wording drift in the canonical file only.
+
+| Rule family | Canonical file |
+| --- | --- |
+| Persistence ownership, migrations, host composition | [vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) §1 |
+| Invariant ownership, `Try*`, fixed-length identifiers, format vs. existence | [csharp-implementation.instructions.md](csharp-implementation.instructions.md) |
+| Endpoint status mapping, configuration safety | [aspnetcore-implementation.instructions.md](aspnetcore-implementation.instructions.md) |
+| Validator rules and validator test gate | [fluentvalidation-implementation.instructions.md](fluentvalidation-implementation.instructions.md) |
+| Route tests, SQL Server integration tests | [xunit-implementation.instructions.md](xunit-implementation.instructions.md) |
+| Slice prompt Contract Sheet and traceability | [implementation-prompt.instructions.md](implementation-prompt.instructions.md) |
+| Provenance metadata | [ai-assisted-output.instructions.md](ai-assisted-output.instructions.md) |
+
+## Mechanical Verification Gate
+
+Before handoff or PR, run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` for every changed feature. A failing check is a blocker; do not rely on the self-review list below as a substitute. When a new recurring review finding can be detected mechanically, add a check to the script instead of another checklist bullet.
+
 ## AI Code Generation
 
 **When to Use:**
@@ -71,6 +89,9 @@ applyTo: "**"
   - Any EF Core model, configuration, or `DbSet` addition that changes schema ships with the matching migration artifacts and updated model snapshot unless the change is explicitly documented as mapping-only.
   - Do not commit a standalone EF Core model snapshot; when migrations are in scope, include the migration class plus its Designer metadata alongside the snapshot (or omit all migration artifacts when explicitly waived as mapping-only).
   - If a slice introduces or changes route groups, verify the application host maps them explicitly before review; do not rely on implicit discovery.
+  - If `Program.cs` uses a feature namespace, the host `.csproj` references that feature project and the full solution builds.
+  - The checked-in `appsettings.json` contains no LocalDB or developer connection string.
+  - Every acceptance criterion in the slice prompt appears in the handoff traceability table with an implementing file and a test; an omitted request field or criterion is a blocker, not a follow-up.
   - If the application host calls `Database.MigrateAsync()` for a feature DbContext, ensure the feature includes matching migration artifacts or the migration owner is explicitly documented.
   - For every host-migrated feature DbContext, run `dotnet ef migrations list` and verify it discovers at least one migration; generate migration SQL and confirm it contains the expected tables and constraints. Treat “No migrations were found” or failed fresh-database application as a blocking defect.
   - When a canonical domain helper normalizes input before validation, run length/shape checks on the normalized value rather than the raw string.

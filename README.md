@@ -65,6 +65,11 @@ All Phase 1 slices follow the [canonical downstream consumer pattern](src/models
 - Run the Shared Kernel verification script with:
   - `powershell -NoProfile -ExecutionPolicy Bypass -File eng/verify-shared-kernel-sqlserver.ps1`
 
+## Slice Verification Gate
+
+- Run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` (for example `Academics/RegisterAcademic`) before handoff or PR. It fails on missing host project references, LocalDB in `appsettings.json`, `SharedKernelDbContext` use in feature slices, incomplete migrations, missing validator or route tests, InMemory-only persistence tests, placeholder `Try*` outputs, and inconsistent provenance timestamps, then builds the solution and runs the feature tests.
+- Options: `-SkipBuild`, `-SkipTests`, `-RunEfChecks` (runs `dotnet ef migrations list` per context), `-BaseRef` (default `origin/main`).
+
 ## AI-Assisted Artifacts
 
 ### Phase 0 Documentation (Complete)
@@ -79,6 +84,11 @@ All Phase 1 slices follow the [canonical downstream consumer pattern](src/models
 ### Phase 1 Feature Slice
 
 - [ProvisionExtension pool lifecycle slice](src/features/Extensions/ProvisionExtension/) - Adds extension provisioning and deprovisioning commands, route contract, validation, and persistence tests for duplicate protection and assignment guardrails ([Log](ai-logs/2026/08/26/2026-08-26-provision-extension-implementation/conversation.md))
+
+### Review-Prevention Tooling
+
+- [Slice verification script](eng/verify-slice.ps1) - Mechanical pre-handoff checks derived from PR 46 Copilot review findings ([Log](ai-logs/2026/09/28/2026-09-28-pr46-review-instruction-hardening/conversation.md))
+- [RegisterAcademic implementation prompt](.github/prompts/academia-implementation/ep-2-1-register-academic-implementation.prompt.md) - Regenerated with a Contract Sheet and traceability gate ([Log](ai-logs/2026/09/28/2026-09-28-pr46-review-instruction-hardening/conversation.md))
 
 ### Phase 0 Planning & Coordination
 

@@ -100,6 +100,7 @@ Verification specialist for multi-surface vertical slices. Advanced in proving d
 - Do not rewrite broad application behavior to make tests pass.
 - Do not hide flaky, failing, or missing verification behind summary language.
 - Do not treat partial evidence as full sign-off.
+- Do not sign off while `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` fails; every new validator needs a `<Validator>Tests.cs`, and every declared endpoint status needs a route-level test.
 
 ## Behavior Tests
 

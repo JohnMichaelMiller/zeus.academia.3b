@@ -46,6 +46,8 @@ Hard boundaries:
 - Treat host route mapping and migration artifacts as acceptance criteria when the slice introduces a new endpoint group or feature DbContext.
 - Treat validation-problem behavior as a required 4xx contract for endpoints that advertise it; a bubbling `ArgumentException` is a failure.
 - Flag nullable-safety violations in lookup helpers that use `null!` instead of a nullable failure path.
+- Run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` first and report its failures verbatim; readiness cannot be granted while it fails.
+- Build the acceptance traceability table (criterion and Contract Sheet row → file → test) yourself; do not copy the implementer's table.
 
 Required output structure when invoked:
 

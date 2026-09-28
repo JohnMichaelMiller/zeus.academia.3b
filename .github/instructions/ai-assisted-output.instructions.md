@@ -448,6 +448,7 @@ Before committing AI-assisted content, verify:
 - [ ] Operator identification with full name or username
 - [ ] Exact prompt text captured verbatim
 - [ ] Timestamps present for start and end times
+- [ ] Timestamps are real and consistent: `ended` is later than `started`, `ended - started >= total_duration`, and task durations sum to `total_duration` (no copied placeholder timestamps)
 - [ ] Task durations recorded and total calculated
 - [ ] Conversation log saved under `ai-logs/` structure
 - [ ] Summary file created: `ai-logs/yyyy/mm/dd/<chat-id>/summary.md`
