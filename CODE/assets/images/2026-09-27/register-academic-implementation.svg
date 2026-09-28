@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">RegisterAcademic vertical slice</title>
+  <desc id="description">Reference data flows through domain rules into atomic academic registration and verification.</desc>
+  <rect width="1200" height="630" fill="#102a43"/>
+  <path d="M0 500 C220 410 350 560 560 460 S930 350 1200 450 V630 H0Z" fill="#1f7a8c" opacity=".9"/>
+  <g fill="none" stroke="#f4f1de" stroke-width="4">
+    <rect x="100" y="180" width="230" height="110" rx="10"/>
+    <rect x="485" y="180" width="230" height="110" rx="10"/>
+    <rect x="870" y="180" width="230" height="110" rx="10"/>
+    <path d="M330 235h155M715 235h155"/>
+    <path d="m455 220 30 15-30 15M840 220l30 15-30 15"/>
+  </g>
+  <g fill="#f4f1de" font-family="Segoe UI, sans-serif" text-anchor="middle">
+    <text x="600" y="95" font-size="42" font-weight="700">RegisterAcademic</text>
+    <text x="215" y="230" font-size="25">Reference data</text>
+    <text x="215" y="266" font-size="21">rank, degree, university</text>
+    <text x="600" y="230" font-size="25">Domain rules</text>
+    <text x="600" y="266" font-size="21">identity and invariants</text>
+    <text x="985" y="230" font-size="25">Verified result</text>
+    <text x="985" y="266" font-size="21">atomic persistence</text>
+    <text x="600" y="555" font-size="24">A vertical slice with a clear handoff from plan to proof</text>
+  </g>
+</svg>

@@ -80,6 +80,10 @@ All Phase 1 slices follow the [canonical downstream consumer pattern](src/models
 
 - [ProvisionExtension pool lifecycle slice](src/features/Extensions/ProvisionExtension/) - Adds extension provisioning and deprovisioning commands, route contract, validation, and persistence tests for duplicate protection and assignment guardrails ([Log](ai-logs/2026/08/26/2026-08-26-provision-extension-implementation/conversation.md))
 
+### Publication Artifacts
+
+- [Executing the RegisterAcademic slice with an AI implementation prompt](CODE/2026-09-27-register-academic-implementation.blog.md) - Explains prompt execution, SQL Server-backed verification, and the human showcase flow ([Log](ai-logs/2026/09/27/2026-09-27-register-academic-blog-post/conversation.md))
+
 ### Phase 0 Planning & Coordination
 
 - [Academia Slice Execution Plan](.github/prompts/academia/execution-plan.md) - Phases 0-2 delivery sequence and dependencies ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
