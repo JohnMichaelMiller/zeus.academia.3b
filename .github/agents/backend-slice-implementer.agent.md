@@ -47,6 +47,9 @@ Hard boundaries:
 - If a canonical helper normalizes input, validate length/shape against the normalized value, not the raw input string.
 - Before adding numeric/date/enum validation, locate the domain factory or value object that owns the invariant. Delegate to it from validators and handlers; do not add a duplicate command-local normalization algorithm. Escalate when no canonical owner exists or changing it would affect multiple slices.
 - Do not rely on `null!` for lookup helpers; model failure paths with nullable outputs and explicit caller checks.
+- Implement exactly the slice prompt's Contract Sheet; if a field, reference contract, or error mapping is missing or contradicts the ORM model, escalate instead of guessing or dropping it.
+- Write through the feature-local DbContext only; never inject `SharedKernelDbContext` into a feature handler.
+- Before handoff, run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` until it passes and include the acceptance traceability table (criterion → file → test) in Verification Results.
 
 Required output structure when invoked:
 

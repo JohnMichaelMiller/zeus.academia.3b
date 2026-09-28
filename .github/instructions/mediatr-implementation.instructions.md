@@ -44,6 +44,8 @@ tags: [mediatr, cqrs, backend, csharp, commands, queries]
 - **Registration requirement**: A request with validation must actually be registered in the application pipeline; a validator file or handler-only check does not satisfy runtime validation
 - **No duplicate enforcement**: A request should not validate the same invariant in both the handler and a validator when one source of truth is enough
 - A validator may invoke a canonical domain factory for early feedback, while the handler invokes that same factory before state mutation. Neither layer may maintain a second implementation of the invariant.
+- **Persistence ownership**: Handlers write through their feature-local DbContext only; injecting `SharedKernelDbContext` or another feature's DbContext into a handler is prohibited.
+- **Validator is not the invariant owner**: Rules a validator checks for early feedback must also hold when the handler is invoked directly; enforce them in the aggregate factory.
 - **Naming**: Clear, action-based command names, question-based query names
 
 ## File Organization

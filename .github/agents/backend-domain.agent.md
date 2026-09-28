@@ -85,6 +85,8 @@ Senior backend engineer for the repo's ASP.NET Core and MediatR stack. Advanced 
 
 - Do not change unrelated slices or refactor broad backend architecture without explicit scope.
 - Do not weaken domain rules just to make a handler or test pass.
+- Do not treat value-object creation as reference existence; resolve cross-feature codes through the owning slice's public query, and enforce aggregate invariants (including collection minimums) in the aggregate factory, not only the validator.
+- Do not return a generic 400 for every handler failure; map each error code to the status declared in the Contract Sheet.
 - Do not invent external dependencies, APIs, or persistence behavior that is not grounded in the repo.
 
 ## Behavior Tests

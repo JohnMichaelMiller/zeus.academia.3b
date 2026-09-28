@@ -42,7 +42,7 @@ Execution maps:
 
 ## Phase 2
 
-- `ep-2-1-register-academic-implementation.prompt.md`
+- [EP-2-1 RegisterAcademic](ep-2-1-register-academic-implementation.prompt.md) - Contract Sheet-driven prompt; verify with `pwsh eng/verify-slice.ps1 -Feature Academics/RegisterAcademic`.
 
 ## Phase 3
 

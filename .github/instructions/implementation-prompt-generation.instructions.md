@@ -154,6 +154,8 @@ Define:
 - dependencies on shared kernel, contracts, or prerequisite slices
 - interfaces or entry points touched by the slice
 
+The Slice Boundary MUST be followed by a **Contract Sheet** as defined in [implementation-prompt.instructions.md](implementation-prompt.instructions.md#contract-sheet). Populate it from the ORM model and execution plan; every business-outcome noun (for example "one available extension") must appear as a request field or a documented derived value.
+
 ### 3. Required Context
 
 List the files, workflows, standards, and existing code paths the executor must review before making changes.
@@ -322,6 +324,8 @@ End the prompt with a checklist that verifies prompt quality before use.
 ## Prompt Validation Checklist
 
 - [ ] The prompt targets exactly one slice.
+- [ ] The Contract Sheet is complete and consistent with the ORM model (exact lengths, references, error-to-status mapping, persistence owner, host composition, test matrix).
+- [ ] Verification requires `eng/verify-slice.ps1` and an acceptance traceability table.
 - [ ] Required repo instructions are listed in pre-work.
 - [ ] Custom agents are named by role, not implied.
 - [ ] Missing custom agents are called out explicitly.

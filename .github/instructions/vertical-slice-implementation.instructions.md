@@ -29,7 +29,8 @@ Standards for implementing feature domains as collections of self-contained use-
 
 ### Composition and Persistence Boundary
 
-- A persistence-bearing feature may own a feature-local DbContext and migration set. Shared Kernel domain entities and reusable mapping semantics may be referenced by that context; do not require the feature to reuse `SharedKernelDbContext`.
+- A persistence-bearing feature MUST own a feature-local DbContext. Shared Kernel domain entities and reusable mapping semantics may be referenced by that context, but feature handlers MUST NOT inject or write through `SharedKernelDbContext`. When the feature writes to tables whose migrations another context owns (per `src/models/workflows/migration-ownership-matrix.md`), map them with `ToTable(..., t => t.ExcludeFromMigrations())` so the feature context is mapping-only for those tables and ownership stays single.
+- Changing a Shared Kernel `IEntityTypeConfiguration` (column names, lengths, keys, constraints) is a cross-slice schema change: list every DbContext that applies the configuration and ship a complete migration set for each, or escalate before editing it.
 - Every persistence-bearing slice must explicitly name its DbContext, table ownership, migration owner, migration artifact root, and the host or deployment command that applies its migrations.
 - Runtime connection-string resolution is owned by the application host. Feature-local DbContext registration must consume the host-resolved value and must not independently read environment/configuration sources or select a LocalDB fallback.
 - No two DbContexts may own migrations for the same table. Shared Kernel does not own feature-slice migrations unless the architecture explicitly assigns a table to it.
@@ -42,6 +43,8 @@ Standards for implementing feature domains as collections of self-contained use-
 - Unreachable catch blocks that describe impossible failures are not acceptable when the real validation path is already present.
 - Any new feature DbContext, model, or schema change must ship with the required migration artifact or an explicit mapping-only waiver; startup `Database.MigrateAsync()` alone does not satisfy readiness without the migration in the repository.
 - Runtime completion gate: every feature route aggregator or `Map...Endpoints()` method must be invoked from the application host or composition root before the slice is considered complete.
+- Host compile gate: every feature namespace used by `Program.cs` has a matching `<ProjectReference>` in the host `.csproj`, and `dotnet build zeus.academia.3b.sln` succeeds before handoff.
+- Reference-existence gate: a well-formed code is not a valid reference. Every cross-feature code (rank, degree, university, extension) must be resolved through the owning slice's public query, and tests must submit a well-formed but unknown code.
 - Validation pipeline gate: if a command/query declares validation behavior, the validator must be registered in DI or the MediatR pipeline and verified as active before completion.
 - Migration ownership gate: any schema change to a feature-local DbContext must include the migration artifacts and host evidence showing migration execution, not just code in the DbContext.
 - Migration readiness gate: when the host invokes `Database.MigrateAsync()` for a feature DbContext, the owning project must contain a migration class, matching Designer metadata, and model snapshot under its named migration root. Verification must run `dotnet ef migrations list`, generate a migration script, and apply the migration to a fresh SQL Server database; a passing model test, build, or unit test alone is insufficient.
@@ -52,6 +55,8 @@ Standards for implementing feature domains as collections of self-contained use-
 
 Before a slice is considered ready for review or merge, verify all of the following:
 
+- [ ] `eng/verify-slice.ps1 -Feature <Domain>/<Feature>` passes.
+- [ ] Every feature namespace used by the host has a `<ProjectReference>` and the solution builds.
 - [ ] Every new `Map...Endpoints()` or endpoint group is called from `Program.cs` or the composition root.
 - [ ] Startup or integration verification confirms the route is reachable at runtime.
 - [ ] Validation is registered and active for any request that advertises validation responses.
@@ -399,6 +404,7 @@ Prohibited:
 - Use-case specific validators or handlers
 - Business rules that belong to one use-case
 - Anything that imports a feature-domain private namespace
+- Silent schema edits: a change to a Shared Kernel entity configuration requires migrations for every DbContext that applies it
 
 Promote a concept to the shared kernel only after it appears in at least three independent use-cases.
 

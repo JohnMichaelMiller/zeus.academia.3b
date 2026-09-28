@@ -63,6 +63,8 @@ Every implementation prompt must explicitly require the implementation team to d
 - verify that a feature-local DbContext or migration path is explicitly owned and invoked from the host when startup applies migrations
 - include a verification step for `Produces*` response contracts when the route advertises validation or conflict responses
 - when a feature owns reference data needed by downstream slices, name its public query/response contract and prohibit direct consumer access to that feature's DbContext or persistence entity
+- run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` and report its output; a failing check blocks handoff
+- produce an acceptance traceability table (criterion → implementing file → test name); any criterion without a test is not done
 
 If the slice adds a Minimal API or route aggregation file, the acceptance criteria must include the startup mapping call and a verification step proving the path is reachable.
 
@@ -125,13 +127,28 @@ Each implementation prompt must use this section order:
 1. Slice summary and business value
 2. Context files and repository evidence to inspect first
 3. Prerequisites and dependency checks
-4. Assigned agents and role boundaries
-5. Ordered implementation steps
-6. Verification workflow and acceptance criteria
-7. Human showcase steps
-8. Completion checklist
+4. Contract Sheet
+5. Assigned agents and role boundaries
+6. Ordered implementation steps
+7. Verification workflow and acceptance criteria
+8. Human showcase steps
+9. Completion checklist
 
 Keep the section order stable so humans and agents can scan prompts quickly.
+
+## Contract Sheet
+
+The Contract Sheet is the precise, tabular specification the implementation must match. Derive every value from the ORM model, execution plan, or an existing slice; never from prose paraphrase. Anything the Contract Sheet omits is out of scope, so omissions are prompt defects.
+
+Required tables (write `N/A` with a reason when a table does not apply):
+
+1. **Request and response fields**: name, type, required, exact length or range (min and max), normalization, canonical owner (constant/factory).
+2. **Reference resolution**: reference field → owning slice → public query/contract → not-found error code → inactive error code. Value-object creation is never a resolution contract.
+3. **Aggregate invariants**: rule → aggregate factory/mutator that enforces it → validator early-feedback rule (if any) → database constraint (if any).
+4. **Error → HTTP status**: every `Error.Code` the handler returns → status (400/404/409) → `Produces*` declaration → route test name.
+5. **Persistence**: feature DbContext name, tables owned, migration root, host `MigrateAsync` call, and any Shared Kernel configurations touched with the DbContexts that need migrations for them.
+6. **Host composition**: host `<ProjectReference>`, DI registration method, endpoint map method, config keys (none in `appsettings.json` for LocalDB).
+7. **Test matrix**: test project path, required packages (`Microsoft.EntityFrameworkCore.SqlServer`, `Microsoft.AspNetCore.Mvc.Testing`), validator test file, route test file, SQL Server migration suite, and the minimum cases per file.
 
 ## Step-by-Step Implementation Guidance
 
@@ -279,6 +296,10 @@ When a slice adds project, source, or test files, verification must include a fi
 
 A slice is not complete because code exists. It is complete when the prompt's verification path has been executed and evidence has been captured or explicitly waived by a human.
 
+### Traceability Gate
+
+The implementing agent's handoff MUST include a table with one row per acceptance criterion and per Contract Sheet row: `criterion | implementing file(s) | test name(s) | status`. A row with no test, or a Contract Sheet field absent from the code, fails the slice. Verification agents re-derive this table independently rather than trusting the implementer's copy.
+
 ## Showcase and Value Demonstration
 
 Every implementation prompt must end with a human-followable showcase sequence that proves the slice's value. The showcase is part of the definition of done.
@@ -327,6 +348,28 @@ Example for a single slice:
 - Required prior slices: {{dependencies}}
 - Blocking risks: {{risks}}
 - Existing patterns to reuse: {{patterns}}
+
+## Contract Sheet
+
+| Field | Type | Required | Length/range | Normalization | Canonical owner |
+| ----- | ---- | -------- | ------------ | ------------- | --------------- |
+| {{field}} | {{type}} | {{yes/no}} | {{exact}} | {{rule}} | {{constant/factory}} |
+
+| Reference | Owning slice | Public contract | Not found | Inactive |
+| --------- | ------------ | --------------- | --------- | -------- |
+| {{field}} | {{slice}} | {{query}} | {{error}} | {{error}} |
+
+| Invariant | Aggregate enforcement | Validator | DB constraint |
+| --------- | --------------------- | --------- | ------------- |
+| {{rule}} | {{factory}} | {{rule}} | {{constraint}} |
+
+| Error code | HTTP status | Produces* | Route test |
+| ---------- | ----------- | --------- | ---------- |
+| {{code}} | {{status}} | {{declaration}} | {{test}} |
+
+- Persistence: {{dbcontext}}, tables {{tables}}, migrations at {{root}}, applied by {{host_call}}; Shared Kernel configurations touched: {{none_or_list}}
+- Host composition: {{project_reference}}, {{add_method}}, {{map_method}}
+- Test matrix: {{test_project}} with {{packages}}; {{validator_tests}}; {{route_tests}}; {{sqlserver_suite}}
 
 ## Assigned Agents and Role Boundaries
 
@@ -385,6 +428,8 @@ Example for a single slice:
 - [ ] Read-only collection members do not leak mutable backing lists
 - [ ] SQL Server setup paths avoid unconditional LocalDB fallback on non-Windows hosts
 - [ ] Showcase steps demonstrate business value
+- [ ] `eng/verify-slice.ps1` passes for the feature
+- [ ] Traceability table maps every criterion and Contract Sheet row to a file and a test
 ```
 
 ## Anti-Patterns
@@ -410,6 +455,7 @@ Before using an implementation prompt, verify:
 - [ ] The scope is one slice or one clearly bounded increment
 - [ ] Repository context files are listed explicitly
 - [ ] Dependencies, risks, and out-of-scope items are stated
+- [ ] The Contract Sheet lists every request field with exact length/range, every reference with its resolution contract, every error code with its status, the DbContext/migration owner, host composition, and the test matrix
 - [ ] Custom agent roles, outputs, and handoffs are explicit
 - [ ] Each implementation step names targets, owner, and validation
 - [ ] Acceptance criteria are observable and testable

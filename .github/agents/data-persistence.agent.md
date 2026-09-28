@@ -102,6 +102,7 @@ Persistence specialist for slice work that needs concrete schema support behind 
 - Do not redesign the overall persistence architecture without explicit scope.
 - Do not introduce schema changes unrelated to the slice just because they appear convenient.
 - Do not treat database behavior as the primary source of truth when the domain model should own the rule.
+- Do not edit a Shared Kernel entity configuration without shipping migrations for every DbContext that applies it, and do not let feature handlers write through `SharedKernelDbContext`.
 
 ## Behavior Tests
 

@@ -44,6 +44,9 @@ tags: [aspnetcore, backend, csharp, api, rest]
 - **Host Wiring**: New feature route groups and startup migrations must be mapped/invoked by the application host before the slice is considered complete
 - **Runtime reachability**: A new route is not complete until the host actually invokes the endpoint mapper and startup verification confirms it is reachable
 - **Contract parity**: If an endpoint advertises `.ProducesValidationProblem()`, `.Produces(409)`, or other specific status codes, the runtime must emit the matching response instead of a generic 500 or raw exception
+- **Error-to-status mapping**: Every `Error.Code` a handler can return maps explicitly to one declared status (validation → 400, not found → 404, duplicate/conflict → 409). Do not collapse all failures into a generic `Results.Problem(400)`; an unmapped error code is a defect.
+- **Configuration safety**: The checked-in `appsettings.json` MUST NOT contain a LocalDB or developer connection string. Keep `ConnectionStrings` empty there; put LocalDB values only in `appsettings.Development.json` or user secrets so the host's non-Windows guard is not bypassed by configuration precedence.
+- **Host project references**: When `Program.cs` calls a feature's `Add...`/`Map...` extension, the host `.csproj` MUST reference that feature project in the same change.
 
 ## File Organization
 

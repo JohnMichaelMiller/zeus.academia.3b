@@ -56,6 +56,7 @@ tags: [xunit, testing, csharp, backend, unit-tests, integration-tests]
 - MUST isolate database-backed tests from shared environments by using a unique test-scoped database name even when a connection string is supplied.
 - MUST preserve the server/instance/credentials from the environment variable and only override the catalog/database segment with a temporary test name.
 - MUST NOT execute destructive setup such as `EnsureDeleted`/`EnsureCreated` against a shared or production database unless the database name is explicitly test-scoped and temporary.
+- MUST NOT use `EnsureCreated` for a DbContext that owns migrations; use `Database.MigrateAsync()` so tests exercise the production schema path.
 - SHOULD use helpers such as `SqlConnectionStringBuilder` to mutate `Initial Catalog` safely and fail fast with actionable diagnostics when the target is unavailable.
 
 ```csharp
@@ -75,6 +76,8 @@ builder.InitialCatalog = $"ZeusTests_{Guid.NewGuid():N}";
 
 - Every new validator MUST include dedicated tests for required values, invalid ranges, invalid formats, and a success case.
 - When a route advertises validation failures (for example `.ProducesValidationProblem()` or equivalent), tests MUST verify the endpoint returns a validation result for invalid numbers, ranges, and malformed input instead of leaking an unhandled exception.
+- Every status code declared by an endpoint's `Produces*` metadata MUST have at least one route-level test (`WebApplicationFactory<Program>` or `TestServer`) that asserts the status code and response body shape. Handler tests do not satisfy this.
+- When a change touches an endpoint file that lacks route tests for its declared statuses, backfill them in the same change.
 - Validation tests MUST assert on stable failure messages or keys so the contract does not drift when rules are refactored.
 - A validator without direct coverage is a review-blocking gap, even if the command handler and mapper compile successfully.
 - A mapping or handler that duplicates normalization logic already centralized in a shared helper must be flagged by tests and review before merge.

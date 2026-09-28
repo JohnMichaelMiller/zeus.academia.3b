@@ -44,6 +44,9 @@ tags: [fluentvalidation, validation, backend, csharp, mediatr]
 - **Registration gate**: A validator must be registered in DI or the MediatR validation pipeline before the slice is considered complete; a validator file alone is not enough
 - **Single-source-of-truth rule**: Do not duplicate the same normalization, allowed-values, or range logic in both the validator and the handler or mapping layer
 - When a domain factory or value object owns normalization/range rules, validators must call that canonical API and adapt its failures to the request property; they must not reimplement equivalent checks.
+- **Format vs. existence**: a format/length rule does not validate a reference. Existence of cross-feature codes is checked through the owning slice's public query (in the validator via an async rule or in the handler), never by value-object creation alone.
+- **Exact length**: fixed-length fields use `.Length(n)` (or the canonical constant) rather than `.MaximumLength(n)`.
+- **Test gate**: every new or changed validator ships with a `<Validator>Tests.cs` using `TestValidate` that covers null/empty/whitespace, each boundary length, invalid format, unknown references, cross-field conflicts, and one valid command.
 
 ## File Organization
 
