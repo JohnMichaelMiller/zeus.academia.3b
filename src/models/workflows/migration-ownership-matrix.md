@@ -20,8 +20,8 @@ The repository records Phase 0 as a seed phase with no migrations generated, def
 
 | Table Name             | Owner DbContext             | Feature Location                               | Migration Artifacts                        | Schema State | Verified     |
 | ---------------------- | --------------------------- | ---------------------------------------------- | ------------------------------------------ | ------------ | ------------ |
-| Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Missing                                    | Fresh        | Sep 29, 2026 |
-| AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Missing                                    | Fresh        | Sep 29, 2026 |
+| Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | `20260929171605_SharedKernelInitial`       | Fresh        | Sep 29, 2026 |
+| AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | `20260929171605_SharedKernelInitial`       | Fresh        | Sep 29, 2026 |
 | Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | `20260826143646_ProvisionExtensionInitial` | Fresh        | Sep 29, 2026 |
 | Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Missing                                    | Fresh        | Sep 29, 2026 |
 | Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | Missing                                    | Fresh        | Sep 29, 2026 |
@@ -68,9 +68,9 @@ The repository records Phase 0 as a seed phase with no migrations generated, def
 
 **Constraint**: Shared Kernel migrations must run first (prerequisite for other contexts)
 
-- **Status**: Prepared; migration artifacts are required before execution
+- **Status**: ✅ PASSED
 - **Evidence**: SharedKernel tables are foundational (Academics, AcademicQualifications)
-- **Note**: Dependency chain is established, but SharedKernel migration discovery and SQL Server application remain required
+- **Note**: EF discovers `20260929171605_SharedKernelInitial`; SQL Server verification applies it to a unique test database and validates both owned tables
 
 **Constraint**: ManageRanks and ManageDegrees migrations are independent
 
@@ -108,7 +108,7 @@ The repository records Phase 0 as a seed phase with no migrations generated, def
 
 - **Status**: ✅ PASSED
 - **Evidence**:
-  - SharedKernel/Foundation: Migration artifacts missing
+  - SharedKernel/Foundation: Initial migration, Designer, and snapshot present
   - ManageRanks: Migration artifacts missing
   - ManageDegrees: Migration artifacts missing
   - ManageUniversities: Initial migration, Designer, and snapshot present
