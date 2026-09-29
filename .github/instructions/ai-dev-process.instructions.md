@@ -52,19 +52,21 @@ A failing check is a blocker for the **current** PR regardless of which change i
 
 The script owns these rules. They are deliberately absent from the self-review list below; fix them by making the script pass, not by re-reading prose:
 
-| Check                             | Enforces                                                                                        |
-| --------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `host`                            | `Program.cs` feature usage has a matching `<ProjectReference>`; every `Map*Endpoints` is called |
-| `config`                          | no LocalDB string in `appsettings.json`; no LocalDB fallback without an `IsDevelopment()` guard |
-| `concurrency`                     | claim handlers use an atomic guard instead of read-then-save                                    |
-| `nullability` / `try-pattern`     | no `null!`/`default!` placeholders; `Try*` uses nullable out values                             |
-| `persistence` / `migrations`      | feature-local DbContext ownership; migration class + Designer + snapshot ship together          |
-| `sqlserver`                       | SQL Server provider package present; tests apply `MigrateAsync()`; no `EnsureCreated`           |
-| `validator-tests` / `route-tests` | every validator has tests; every declared `Produces*` status has a route test                   |
-| `solution`                        | one declaration per project; header on line 1                                                   |
-| `doc-refs`                        | every repo-relative path cited in changed Markdown exists in the tree                           |
-| `provenance`                      | front-matter timestamps are consistent and `task_durations` is valid YAML                       |
-| `build` / `tests` / `ef`          | solution builds; feature tests pass; migrations are discovered with no pending model changes    |
+| Check                             | Enforces                                                                                                                                                                  |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `host`                            | `Program.cs` feature usage has a matching `<ProjectReference>`; every `Map*Endpoints` is called                                                                           |
+| `config`                          | no LocalDB string in `appsettings.json`; no LocalDB fallback without an `IsDevelopment()` guard                                                                           |
+| `concurrency`                     | every `ExecuteUpdateAsync` claim sits inside `try`/`catch`; no tracked-mutation claim without an atomic guard                                                             |
+| `nullability` / `try-pattern`     | no `null!`/`default!` placeholders; `Try*` uses nullable out values                                                                                                       |
+| `persistence` / `migrations`      | feature-local DbContext ownership; migration class + Designer + snapshot ship together                                                                                    |
+| `sqlserver`                       | SQL Server provider package present; tests apply `MigrateAsync()`; no `EnsureCreated`                                                                                     |
+| `validator-tests` / `route-tests` | every validator has tests; every declared `Produces*` status has a route test; every validated request field has a route test asserting its `errors` key                  |
+| `solution`                        | every `src/` and `tests/` project declared exactly once; header in the first two lines                                                                                    |
+| `doc-refs`                        | repo-relative paths in changed Markdown exist (illustrative standards and `ai-logs/` exempt); every `verify-slice.ps1 -<Param>` cited in `.github/` or `README.md` exists |
+| `provenance`                      | front-matter timestamps are consistent and `task_durations` is valid YAML                                                                                                 |
+| `build` / `tests` / `ef`          | solution builds; feature tests pass; migrations discovered and `has-pending-model-changes` clean (on by default)                                                          |
+
+This table must describe only what the script implements. Adding a row without the matching check recreates the PR 48 failure, where guidance delegated rules to checks that did not exist.
 
 Do not rely on the self-review list below as a substitute. When a new recurring review finding can be detected mechanically, add a check to the script instead of another checklist bullet.
 

@@ -100,6 +100,8 @@ public sealed class Order
 - MUST NOT use `!` null-forgiving operator without validation
 - MUST use null-conditional (`?.`) and null-coalescing (`??`) operators
 - MUST validate parameters with `ArgumentNullException.ThrowIfNull(param)` (C# 12+)
+- MUST null-guard every element of a collection parameter and every reference member of a tuple element before its first dereference, including dereferences inside duplicate checks or LINQ predicates that run before the element is passed to a delegated `Create`. Nullable annotations are not enforced at runtime, and JSON binding can produce null elements
+- MUST cover each aggregate factory that accepts a collection with one test passing a null element and asserting `ArgumentNullException`, not `NullReferenceException`
 - MUST model failing `Try*` lookup outputs with nullable out values (for example `T?`) rather than `null!`, and callers must null-check before dereferencing
 
 **Examples:**
@@ -116,6 +118,17 @@ public void ProcessOrder(Order order)
 {
     ArgumentNullException.ThrowIfNull(order);
     // Proceed with non-null order
+}
+
+public static Academic Create(IEnumerable<(Degree Degree, University University)> qualifications)
+{
+    ArgumentNullException.ThrowIfNull(qualifications);
+    foreach (var (degree, university) in qualifications)
+    {
+        ArgumentNullException.ThrowIfNull(degree);
+        ArgumentNullException.ThrowIfNull(university);
+        // Only now dereference degree.Code for duplicate checks
+    }
 }
 
 // ❌ Avoid
@@ -270,8 +283,8 @@ Use explicit state guards for success/failure wrappers so invalid states fail lo
 
 - WHEN adding EF Core migrations, keep the migration plus the standard metadata artifacts required by the project tooling (for example snapshot/Designer files) in the same change unless the work explicitly waives them
 - MUST generate migration, Designer, and snapshot files with `dotnet ef migrations add` run against the real model. Hand-authoring or hand-editing these files is prohibited; if the output looks wrong, fix the `IEntityTypeConfiguration` and regenerate
-- MUST leave `dotnet ef migrations has-pending-model-changes` clean for every migration-owning DbContext before handoff. A non-empty result means the snapshot is out of sync and the next migration will emit an invalid schema change
-- MUST preserve model-affecting fluent annotations (`ValueGeneratedNever`, `IsConcurrencyToken`, `IsRowVersion`, `HasPrecision`) across the configuration, every Designer target model, and the snapshot. A divergence between any two is a blocking defect, not a cosmetic one
+- MUST leave `dotnet ef migrations has-pending-model-changes` clean for every migration-owning DbContext before handoff (the `ef` check in `eng/verify-slice.ps1` runs it). A non-empty result means the snapshot is out of sync and the next migration will emit an invalid schema change
+- The `has-pending-model-changes` result is the sole authority on snapshot and Designer correctness. Do not compare fluent calls textually between a configuration and a snapshot: EF omits some calls from snapshots by design (for example `ValueGeneratedNever()` on a non-identity key), so a missing call in a clean snapshot is not drift and must not be hand-added
 - MUST keep domain exception types organized so file names and type names stay aligned; prefer one primary exception type per file when the exception set grows
 - MUST verify persistence rules through the EF Core model and migration output rather than relying on ad-hoc assumptions or provider-agnostic shortcuts
 - MUST enforce persistence-backed field constraints (max length, precision, scale, required normalization) in domain creation/update APIs so invalid values are rejected before persistence

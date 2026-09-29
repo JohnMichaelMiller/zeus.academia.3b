@@ -59,17 +59,33 @@ A _claim_ is any write that transitions a shared row from unowned to owned: assi
   - `ExecuteUpdateAsync` with the availability predicate in the `WHERE` clause, treating an affected-row count of `0` as the conflict outcome; or
   - marking the claimed column `IsConcurrencyToken()` and catching `DbUpdateConcurrencyException`.
 - MUST map the lost race to the slice's existing conflict error code and its declared 409 status, never to a generic 500 or a silent success.
-- MUST ship a SQL Server integration test that issues two concurrent claims for the same resource and asserts exactly one success and one conflict.
+- Zero affected rows is not the only lost-race outcome. When the claimed column or a row inserted in the same unit of work participates in any other unique index (for example a filtered unique index on `AssignedEmpNr`), the claim `ExecuteUpdateAsync` **and** `SaveChangesAsync` MUST sit inside one `try` whose `catch` handles both `DbUpdateException` and the provider unique-violation exception (`SqlException` numbers 2601/2627, which `ExecuteUpdateAsync` can surface unwrapped), rolls back, then runs the post-failure existence check. The `concurrency` check in `eng/verify-slice.ps1` fails any `ExecuteUpdateAsync` outside a `try`.
+- MUST NOT combine a tracked mutation (`entity.AssignTo(...)`) with an `ExecuteUpdateAsync` on the same row; use one mechanism.
+- MUST ship a SQL Server integration test that issues two concurrent claims for the same resource and asserts exactly one success and one conflict, plus one concurrent test per additional unique constraint the claim can violate (for example the same employee claiming two different extensions).
 - MUST NOT document a race-safety guarantee in a handoff, blog post, or PR description unless the atomic guard and the concurrency test both exist in the same change.
 
 ```csharp
-// ✅ Atomic claim
-var claimed = await _context.Extensions
-    .Where(e => e.Number == command.Extension && e.AssignedEmpNr == null)
-    .ExecuteUpdateAsync(s => s.SetProperty(e => e.AssignedEmpNr, empNr), ct);
+// ✅ Atomic claim with one translation boundary for every unique index involved
+try
+{
+    var claimed = await _context.Extensions
+        .Where(e => e.Number == command.Extension && e.AssignedEmpNr == null)
+        .ExecuteUpdateAsync(s => s.SetProperty(e => e.AssignedEmpNr, empNr), ct);
 
-if (claimed == 0)
-    return Result.Failure(RegisterAcademicErrorCodes.ExtensionUnavailable);
+    if (claimed == 0)
+        return Result.Failure(RegisterAcademicErrorCodes.ExtensionUnavailable);
+
+    _context.Academics.Add(academic);
+    await _context.SaveChangesAsync(ct);
+    await transaction.CommitAsync(ct);
+}
+catch (Exception ex) when (ex is DbUpdateException or SqlException { Number: 2601 or 2627 })
+{
+    await transaction.RollbackAsync(ct);
+    if (await _context.Academics.AsNoTracking().AnyAsync(a => a.EmpNr == empNr, ct))
+        return Result.Failure(RegisterAcademicErrorCodes.AcademicAlreadyExists);
+    throw;
+}
 
 // ❌ Race: both requests observe AssignedEmpNr == null and both saves succeed
 var extension = await _context.Extensions

@@ -244,7 +244,10 @@ The section MUST cover, when applicable:
 - environment/setup helper hygiene when scripts or infrastructure-backed tests are touched (read each environment variable once and reuse the parsed value or helper result)
 - cross-platform SQL Server setup behavior for scripts/factories (SQL Server LocalDB fallback allowed only with explicit Windows guard; on non-Windows require `ZEUS_SQLSERVER_CONNECTION` with actionable failure messaging)
 - development-only fallback gating (hard-coded connection strings, seeds, or local substitutes require an `IsDevelopment()` check in addition to any platform check; outside Development, missing configuration must fail fast)
-- claim/allocation concurrency when the slice assigns a shared row (atomic `ExecuteUpdateAsync` predicate or concurrency token, zero-row translation to the declared conflict status, and a concurrent SQL Server test)
+- claim/allocation concurrency when the slice assigns a shared row (atomic `ExecuteUpdateAsync` predicate or concurrency token, zero-row translation to the declared conflict status, one translation boundary covering every unique index the claim or its unit of work can violate, and a concurrent SQL Server test per unique constraint)
+- deployed-schema state for every table a new migration creates (fresh vs. deployed per the ownership matrix; deployed tables require a baseline plus data-preserving upgrade migrations, never a `CreateTable` initial migration)
+- per-field route validation (each validated request field names a route test and the boundary value it submits)
+- null-element guards for aggregate factories that accept collections or tuples
 
 Do not prompt for rules that `eng/verify-slice.ps1` already enforces — host wiring, `appsettings.json` LocalDB, solution-file integrity, migration artifact completeness, `has-pending-model-changes`, nullability placeholders, validator/route test presence, documented-path integrity, and provenance timestamps. Reference the script once in the verification workflow instead. See [ai-dev-process.instructions.md](ai-dev-process.instructions.md) for the check coverage table.
 

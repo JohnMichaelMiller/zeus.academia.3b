@@ -67,7 +67,7 @@ All Phase 1 slices follow the [canonical downstream consumer pattern](src/models
 
 ## Slice Verification Gate
 
-- Run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` (for example `Academics/RegisterAcademic`) before handoff or PR. It fails on missing host project references, LocalDB in `appsettings.json`, `SharedKernelDbContext` use in feature slices, incomplete migrations, missing validator or route tests, InMemory-only persistence tests, placeholder `Try*` outputs, and inconsistent provenance timestamps, then builds the solution and runs the feature tests.
+- Run `pwsh eng/verify-slice.ps1 -AllChangedFeatures` before handoff or PR (or `-Feature <Domain>/<Feature>` for one slice, for example `Academics/RegisterAcademic`). It checks solution integrity, documented paths and cited script parameters, and provenance once, builds the solution, then for every touched feature fails on missing host project references, LocalDB in `appsettings.json`, `SharedKernelDbContext` use in feature slices, incomplete migrations, pending EF model changes, claims outside a `try`/`catch`, missing validator tests, missing route tests per declared status or validated field, InMemory-only persistence tests, and placeholder `Try*` outputs, and runs the feature tests.
 - Options: `-SkipBuild`, `-SkipTests`, `-RunEfChecks` (runs `dotnet ef migrations list` per context), `-BaseRef` (default `origin/main`).
 
 ## AI-Assisted Artifacts
@@ -87,9 +87,9 @@ All Phase 1 slices follow the [canonical downstream consumer pattern](src/models
 
 ### Review-Prevention Tooling
 
-- [Slice verification script](eng/verify-slice.ps1) - Mechanical pre-handoff checks derived from PR 46 Copilot review findings ([Log](ai-logs/2026/09/28/2026-09-28-pr46-review-instruction-hardening/conversation.md))
+- [Slice verification script](eng/verify-slice.ps1) - Mechanical pre-handoff checks derived from PR 46 Copilot review findings ([Log](ai-logs/2026/09/28/2026-09-28-pr46-review-instruction-hardening/conversation.md)); extended with `-AllChangedFeatures`, default EF drift checks, and concurrency/per-field route checks from PR 48 findings ([Log](ai-logs/2026/09/29/2026-09-29-pr48-review-instruction-hardening/conversation.md))
 - [RegisterAcademic implementation prompt](.github/prompts/academia-implementation/ep-2-1-register-academic-implementation.prompt.md) - Regenerated with a Contract Sheet and traceability gate ([Log](ai-logs/2026/09/28/2026-09-28-pr46-review-instruction-hardening/conversation.md))
 
 ### Phase 0 Planning & Coordination
 
-- [Academia Slice Execution Plan](.github/prompts/academia/execution-plan.md) - Phases 0-2 delivery sequence and dependencies ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))
+- [Academia Slice Execution Plan](src/models/workflows/academia-execution-plan.md) - Phases 0-2 delivery sequence and dependencies ([Log](ai-logs/2026/04/18/2026-04-18-academia-slice-agents-and-execution-plan/conversation.md))

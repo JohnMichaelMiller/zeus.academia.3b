@@ -142,14 +142,14 @@ The Contract Sheet is the precise, tabular specification the implementation must
 
 Required tables (write `N/A` with a reason when a table does not apply):
 
-1. **Request and response fields**: name, type, required, exact length or range (min and max), normalization, canonical owner (constant/factory).
+1. **Request and response fields**: name, type, required, exact length or range (min and max), normalization, canonical owner (constant/factory), and the route test name plus boundary value that proves its 400 validation key.
 2. **Reference resolution**: reference field → owning slice → public query/contract → not-found error code → inactive error code. Value-object creation is never a resolution contract.
 3. **Aggregate invariants**: rule → aggregate factory/mutator that enforces it → validator early-feedback rule (if any) → database constraint (if any).
 4. **Error → HTTP status**: every `Error.Code` the handler returns → status (400/404/409) → `Produces*` declaration → route test name.
-5. **Persistence**: feature DbContext name, tables owned, migration root, host `MigrateAsync` call, and any Shared Kernel configurations touched with the DbContexts that need migrations for them.
+5. **Persistence**: feature DbContext name, tables owned, migration root, host `MigrateAsync` call, existing schema state per table (`fresh`, or `deployed` with the legacy columns and the baseline/upgrade migration names), and any Shared Kernel configurations touched with the DbContexts that need migrations for them.
 6. **Host composition**: host `<ProjectReference>`, DI registration method, endpoint map method, config keys (none in `appsettings.json` for LocalDB).
 7. **Test matrix**: test project path, required packages (`Microsoft.EntityFrameworkCore.SqlServer`, `Microsoft.AspNetCore.Mvc.Testing`), validator test file, route test file, SQL Server migration suite, and the minimum cases per file.
-8. **Concurrency and uniqueness**: for every shared row the slice claims, reserves, or allocates — resource → availability predicate → atomic mechanism (`ExecuteUpdateAsync` row count or concurrency token) → lost-race error code → HTTP status → concurrent-claim test name. Write `N/A — no claim operations` when the slice only inserts rows it owns.
+8. **Concurrency and uniqueness**: for every shared row the slice claims, reserves, or allocates — resource → availability predicate → atomic mechanism (`ExecuteUpdateAsync` row count or concurrency token) → every unique index the claim or its unit of work can violate → lost-race error code per index → HTTP status → concurrent-claim test name per index. Write `N/A — no claim operations` when the slice only inserts rows it owns.
 
 ## Step-by-Step Implementation Guidance
 
