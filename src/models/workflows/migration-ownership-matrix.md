@@ -18,14 +18,14 @@ The repository records Phase 0 as a seed phase with no migrations generated, def
 
 ## Ownership Matrix
 
-| Table Name             | Owner DbContext             | Feature Location                               | Migration Artifacts                         | Schema State | Verified     |
-| ---------------------- | --------------------------- | ---------------------------------------------- | ------------------------------------------- | ------------ | ------------ |
-| Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Missing                                     | Fresh        | Sep 29, 2026 |
-| AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Missing                                     | Fresh        | Sep 29, 2026 |
-| Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | `20260826143646_ProvisionExtensionInitial`   | Fresh        | Sep 29, 2026 |
-| Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Missing                                     | Fresh        | Sep 29, 2026 |
-| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | Missing                                     | Fresh        | Sep 29, 2026 |
-| Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | `20260826193208_ManageUniversitiesInitial`   | Fresh        | Sep 29, 2026 |
+| Table Name             | Owner DbContext             | Feature Location                               | Migration Artifacts                        | Schema State | Verified     |
+| ---------------------- | --------------------------- | ---------------------------------------------- | ------------------------------------------ | ------------ | ------------ |
+| Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Missing                                    | Fresh        | Sep 29, 2026 |
+| AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Missing                                    | Fresh        | Sep 29, 2026 |
+| Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | `20260826143646_ProvisionExtensionInitial` | Fresh        | Sep 29, 2026 |
+| Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Missing                                    | Fresh        | Sep 29, 2026 |
+| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | Missing                                    | Fresh        | Sep 29, 2026 |
+| Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | `20260826193208_ManageUniversitiesInitial` | Fresh        | Sep 29, 2026 |
 
 ## Key Constraints - Verification Status
 
