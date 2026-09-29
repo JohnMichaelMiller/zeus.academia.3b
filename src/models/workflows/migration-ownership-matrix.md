@@ -24,7 +24,7 @@ The repository records Phase 0 as a seed phase with no migrations generated, def
 | AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | `20260929171605_SharedKernelInitial`       | Fresh        | Sep 29, 2026 |
 | Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | `20260826143646_ProvisionExtensionInitial` | Fresh        | Sep 29, 2026 |
 | Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Missing                                    | Fresh        | Sep 29, 2026 |
-| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | `20260929172158_ManageDegreesInitial`       | Fresh        | Sep 29, 2026 |
+| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | `20260929172158_ManageDegreesInitial`      | Fresh        | Sep 29, 2026 |
 | Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | `20260826193208_ManageUniversitiesInitial` | Fresh        | Sep 29, 2026 |
 
 ## Key Constraints - Verification Status
