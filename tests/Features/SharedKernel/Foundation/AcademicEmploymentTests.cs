@@ -22,6 +22,95 @@ public sealed class AcademicEmploymentTests
     Assert.Contains("both tenured and contracted", exception.Message, StringComparison.OrdinalIgnoreCase);
   }
 
+  [Theory]
+  [InlineData("EMP01")]
+  [InlineData("EMP0001")]
+  public void Create_WithEmployeeNumberNotExactlySixCharacters_ThrowsBusinessRuleViolationException(string empNr)
+  {
+    var degree = Degree.Create("PHD");
+    var university = University.Create("MIT");
+
+    var exception = Assert.Throws<BusinessRuleViolationException>(() => Academic.Create(
+      empNr,
+      "Alex Chen",
+      Rank.P,
+      [(degree, university)]));
+
+    Assert.Contains("exactly 6 characters", exception.Message, StringComparison.OrdinalIgnoreCase);
+  }
+
+  [Fact]
+  public void Create_WithoutQualifications_ThrowsBusinessRuleViolationException()
+  {
+    var exception = Assert.Throws<BusinessRuleViolationException>(() => Academic.Create(
+      "EMP001",
+      "Alex Chen",
+      Rank.P,
+      []));
+
+    Assert.Contains("at least one qualification", exception.Message, StringComparison.OrdinalIgnoreCase);
+  }
+
+  [Fact]
+  public void Create_WithDuplicateDegreeCode_ThrowsBusinessRuleViolationException()
+  {
+    var degree = Degree.Create("PHD");
+    var firstUniversity = University.Create("MIT");
+    var secondUniversity = University.Create("UQ");
+
+    var exception = Assert.Throws<BusinessRuleViolationException>(() => Academic.Create(
+      "EMP001",
+      "Alex Chen",
+      Rank.P,
+      [(degree, firstUniversity), (degree, secondUniversity)]));
+
+    Assert.Contains("duplicate qualification", exception.Message, StringComparison.OrdinalIgnoreCase);
+  }
+
+  [Fact]
+  public void TryNormalizeEmpNr_WithValidInput_TrimsAndUppercases()
+  {
+    var isValid = Academic.TryNormalizeEmpNr(" emp001 ", out var normalizedEmpNr);
+
+    Assert.True(isValid);
+    Assert.Equal("EMP001", normalizedEmpNr);
+  }
+
+  [Fact]
+  public void TryNormalizeEmpName_WithValidInput_TrimsWhitespace()
+  {
+    var isValid = Academic.TryNormalizeEmpName(" Alex Chen ", out var normalizedEmpName);
+
+    Assert.True(isValid);
+    Assert.Equal("Alex Chen", normalizedEmpName);
+  }
+
+  [Theory]
+  [InlineData(null)]
+  [InlineData("")]
+  [InlineData("   ")]
+  [InlineData("0123456789012345")]
+  public void TryNormalizeEmpName_WithInvalidInput_ReturnsFalseAndNull(string? empName)
+  {
+    var isValid = Academic.TryNormalizeEmpName(empName, out var normalizedEmpName);
+
+    Assert.False(isValid);
+    Assert.Null(normalizedEmpName);
+  }
+
+  [Theory]
+  [InlineData(null)]
+  [InlineData("")]
+  [InlineData("EMP01")]
+  [InlineData("EMP0001")]
+  public void TryNormalizeEmpNr_WithInvalidInput_ReturnsFalseAndNull(string? empNr)
+  {
+    var isValid = Academic.TryNormalizeEmpNr(empNr, out var normalizedEmpNr);
+
+    Assert.False(isValid);
+    Assert.Null(normalizedEmpNr);
+  }
+
   [Fact]
   public void SetTenured_WhenContractAlreadyExists_ClearsContractEndDate()
   {

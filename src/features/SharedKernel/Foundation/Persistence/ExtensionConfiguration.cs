@@ -8,7 +8,10 @@ public sealed class ExtensionConfiguration : IEntityTypeConfiguration<Extension>
 {
   public void Configure(EntityTypeBuilder<Extension> builder)
   {
-    builder.ToTable("Extensions");
+    builder.ToTable("Extensions", tableBuilder =>
+      tableBuilder.HasCheckConstraint(
+        "CK_Extensions_AssignedEmpNrLength",
+        $"[AssignedEmpNr] IS NULL OR LEN([AssignedEmpNr]) = {SharedKernelFieldLengths.EmpNr}"));
 
     builder.HasKey(x => x.Number);
 

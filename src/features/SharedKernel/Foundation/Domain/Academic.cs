@@ -43,7 +43,16 @@ public sealed class Academic
   {
     ArgumentNullException.ThrowIfNull(qualifications);
 
-    var normalizedEmpNr = NormalizeEmpNr(empNr);
+    if (qualifications.Count == 0)
+    {
+      throw new BusinessRuleViolationException("Academic must have at least one qualification.");
+    }
+
+    if (!TryNormalizeEmpNr(empNr, out var normalizedEmpNr) || normalizedEmpNr is null)
+    {
+      throw new BusinessRuleViolationException($"Employee number must be exactly {SharedKernelFieldLengths.EmpNr} characters.");
+    }
+
     var normalizedName = NormalizeEmpName(empName);
 
     if (isTenured && contractEndDate is not null)
@@ -55,6 +64,11 @@ public sealed class Academic
 
     foreach (var (degree, university) in qualifications)
     {
+      if (academic._qualifications.Any(x => x.DegreeCode == degree.Code))
+      {
+        throw new BusinessRuleViolationException("Academic cannot have duplicate qualification degree codes.");
+      }
+
       academic._qualifications.Add(AcademicQualification.Create(normalizedEmpNr, degree, university));
     }
 
@@ -90,35 +104,60 @@ public sealed class Academic
 
   internal static string NormalizeEmpNr(string empNr)
   {
-    if (string.IsNullOrWhiteSpace(empNr))
+    if (!TryNormalizeEmpNr(empNr, out var normalized) || normalized is null)
     {
-      throw new ArgumentException("empNr is required.", nameof(empNr));
-    }
-
-    var normalized = empNr.Trim().ToUpperInvariant();
-
-    if (normalized.Length > SharedKernelFieldLengths.EmpNr)
-    {
-      throw new BusinessRuleViolationException($"Employee number cannot exceed {SharedKernelFieldLengths.EmpNr} characters.");
+      throw new BusinessRuleViolationException($"Employee number must be exactly {SharedKernelFieldLengths.EmpNr} characters.");
     }
 
     return normalized;
   }
 
-  private static string NormalizeEmpName(string empName)
+  public static bool TryNormalizeEmpNr(string? empNr, out string? normalizedEmpNr)
   {
-    if (string.IsNullOrWhiteSpace(empName))
+    normalizedEmpNr = null;
+
+    if (string.IsNullOrWhiteSpace(empNr))
     {
-      throw new BusinessRuleViolationException("Employee name is required.");
+      return false;
     }
 
-    var normalized = empName.Trim();
-
-    if (normalized.Length > SharedKernelFieldLengths.EmpName)
+    var normalized = empNr.Trim().ToUpperInvariant();
+    if (normalized.Length != SharedKernelFieldLengths.EmpNr)
     {
-      throw new BusinessRuleViolationException($"Employee name cannot exceed {SharedKernelFieldLengths.EmpName} characters.");
+      return false;
+    }
+
+    normalizedEmpNr = normalized;
+    return true;
+  }
+
+  private static string NormalizeEmpName(string empName)
+  {
+    if (!TryNormalizeEmpName(empName, out var normalized) || normalized is null)
+    {
+      throw new BusinessRuleViolationException(
+        $"Employee name is required and cannot exceed {SharedKernelFieldLengths.EmpName} characters.");
     }
 
     return normalized;
+  }
+
+  public static bool TryNormalizeEmpName(string? empName, out string? normalizedEmpName)
+  {
+    normalizedEmpName = null;
+
+    if (string.IsNullOrWhiteSpace(empName))
+    {
+      return false;
+    }
+
+    var normalized = empName.Trim();
+    if (normalized.Length > SharedKernelFieldLengths.EmpName)
+    {
+      return false;
+    }
+
+    normalizedEmpName = normalized;
+    return true;
   }
 }

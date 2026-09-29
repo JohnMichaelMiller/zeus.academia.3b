@@ -38,6 +38,17 @@ public sealed class SharedKernelDbContextModelTests
   }
 
   [Fact]
+  public void Academic_HasExactEmployeeNumberCheckConstraint()
+  {
+    using var context = CreateContext();
+
+    var createScript = context.Database.GenerateCreateScript();
+
+    Assert.Contains("CK_Academics_EmpNrLength", createScript, StringComparison.Ordinal);
+    Assert.Contains("LEN([EmpNr]) = 6", createScript, StringComparison.Ordinal);
+  }
+
+  [Fact]
   public void AcademicQualification_HasCompositePrimaryKey()
   {
     using var context = CreateContext();

@@ -44,10 +44,24 @@ public sealed class ProvisionExtensionDbContextModelTests
     Assert.Equal("[AssignedEmpNr] IS NOT NULL", index.GetFilter());
   }
 
+  [Fact]
+  public void Extensions_RequireAssignedEmployeeNumberToBeExactlySixCharacters()
+  {
+    using var context = CreateContext();
+    var entityType = context.Model.FindEntityType(typeof(Extension));
+
+    Assert.NotNull(entityType);
+    Assert.Equal(6, entityType!.FindProperty(nameof(Extension.AssignedEmpNr))!.GetMaxLength());
+    var createScript = context.Database.GenerateCreateScript();
+
+    Assert.Contains("CK_Extensions_AssignedEmpNrLength", createScript, StringComparison.Ordinal);
+    Assert.Contains("[AssignedEmpNr] IS NULL OR LEN([AssignedEmpNr]) = 6", createScript, StringComparison.Ordinal);
+  }
+
   private static ProvisionExtensionDbContext CreateContext()
   {
     var options = new DbContextOptionsBuilder<ProvisionExtensionDbContext>()
-      .UseInMemoryDatabase($"ProvisionExtensionModelTests-{Guid.NewGuid():N}")
+      .UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=ProvisionExtensionModelDesign;Integrated Security=True;TrustServerCertificate=True;")
       .Options;
 
     return new ProvisionExtensionDbContext(options);

@@ -43,7 +43,7 @@ public sealed class DeprovisionExtensionHandlerTests
   {
     await using var dbContext = CreateInMemoryContext();
     var extension = Extension.Create(42);
-    extension.AssignTo("123");
+    extension.AssignTo("EMP123");
     dbContext.Extensions.Add(extension);
     await dbContext.SaveChangesAsync();
 
@@ -56,7 +56,7 @@ public sealed class DeprovisionExtensionHandlerTests
 
     var persisted = await dbContext.Extensions.SingleAsync();
     Assert.Equal(42, persisted.Number);
-    Assert.Equal("123", persisted.AssignedEmpNr);
+    Assert.Equal("EMP123", persisted.AssignedEmpNr);
   }
 
   private static ProvisionExtensionDbContext CreateInMemoryContext()

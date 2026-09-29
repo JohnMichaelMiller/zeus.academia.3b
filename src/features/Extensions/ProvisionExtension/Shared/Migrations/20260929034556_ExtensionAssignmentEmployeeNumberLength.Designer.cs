@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Zeus.Academia.Features.Extensions.ProvisionExtension;
 
@@ -10,9 +11,11 @@ using Zeus.Academia.Features.Extensions.ProvisionExtension;
 namespace Zeus.Academia.Features.Extensions.ProvisionExtension.Shared.Migrations
 {
     [DbContext(typeof(ProvisionExtensionDbContext))]
-    partial class ProvisionExtensionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260929034556_ExtensionAssignmentEmployeeNumberLength")]
+    partial class ExtensionAssignmentEmployeeNumberLength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,10 +39,7 @@ namespace Zeus.Academia.Features.Extensions.ProvisionExtension.Shared.Migrations
                         .IsUnique()
                         .HasFilter("[AssignedEmpNr] IS NOT NULL");
 
-                    b.ToTable("Extensions", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_Extensions_AssignedEmpNrLength", "[AssignedEmpNr] IS NULL OR LEN([AssignedEmpNr]) = 6");
-                        });
+                    b.ToTable("Extensions", (string)null);
                 });
 #pragma warning restore 612, 618
         }
