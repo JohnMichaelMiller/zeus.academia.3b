@@ -38,7 +38,6 @@ mode: agent
 - Slice: RegisterAcademic
 - Business outcome: create an academic with valid identity, rank-derived access level, at least one qualification, and one available extension so every dependent slice has a real source record.
 - Out of scope: profile viewing, later employment changes, extension reassignment, and reporting.
-- Out of scope, tracked as PR 46 carry-overs (separate commits, not this slice): route-test backfill for `AddUniversityEndpoint`, `ProvisionExtensionEndpoint`, `DeprovisionExtensionEndpoint`; nullable `out string?` fix in `UniversityCodeCatalog.TryResolveName`; SQL Server suite for any feature still using only InMemory tests.
 
 ## Context Files to Review First
 
@@ -70,52 +69,52 @@ Route: `POST /api/academics/register` (existing route preserved).
 
 ### Request and response fields
 
-| Field | Type | Required | Length/range | Normalization | Canonical owner |
-| --- | --- | --- | --- | --- | --- |
-| `empNr` | string | yes | exactly 6 | trim, upper | `SharedKernelFieldLengths.EmpNr` + `Academic.Create` |
-| `empName` | string | yes | 1–15 | trim | `SharedKernelFieldLengths.EmpName` + `Academic.Create` |
-| `rankCode` | string | yes | `P`, `SL`, `L` | trim, upper | `RankCodeCatalog` |
-| `qualifications` | array of `{ degreeCode, universityCode }` | yes | ≥ 1 item; no duplicate pair | per item | `Academic.Create` |
-| `qualifications[].degreeCode` | string | yes | 1–10 | trim, upper | `Degree.Create` (format) + `GetDegreeByCodeQuery` (existence) |
-| `qualifications[].universityCode` | string | yes | 1–20 | trim, upper | `University.Create` (format) + `GetUniversityByCodeQuery` (existence) |
-| `extNr` | int | yes | > 0 | none | `Extension.Create` |
-| `isTenured` | bool | no (default `false`) | — | — | `Academic.Create` |
-| `contractEndDate` | `DateOnly?` | no | not with `isTenured = true` | — | `Academic.Create` |
+| Field                             | Type                                      | Required             | Length/range                | Normalization | Canonical owner                                                       |
+| --------------------------------- | ----------------------------------------- | -------------------- | --------------------------- | ------------- | --------------------------------------------------------------------- |
+| `empNr`                           | string                                    | yes                  | exactly 6                   | trim, upper   | `SharedKernelFieldLengths.EmpNr` + `Academic.Create`                  |
+| `empName`                         | string                                    | yes                  | 1–15                        | trim          | `SharedKernelFieldLengths.EmpName` + `Academic.Create`                |
+| `rankCode`                        | string                                    | yes                  | `P`, `SL`, `L`              | trim, upper   | `RankCodeCatalog`                                                     |
+| `qualifications`                  | array of `{ degreeCode, universityCode }` | yes                  | ≥ 1 item; no duplicate pair | per item      | `Academic.Create`                                                     |
+| `qualifications[].degreeCode`     | string                                    | yes                  | 1–10                        | trim, upper   | `Degree.Create` (format) + `GetDegreeByCodeQuery` (existence)         |
+| `qualifications[].universityCode` | string                                    | yes                  | 1–20                        | trim, upper   | `University.Create` (format) + `GetUniversityByCodeQuery` (existence) |
+| `extNr`                           | int                                       | yes                  | > 0                         | none          | `Extension.Create`                                                    |
+| `isTenured`                       | bool                                      | no (default `false`) | —                           | —             | `Academic.Create`                                                     |
+| `contractEndDate`                 | `DateOnly?`                               | no                   | not with `isTenured = true` | —             | `Academic.Create`                                                     |
 
 Response `201 Created`: `RegisterAcademicResponse(EmpNr, EmpName, RankCode, AccessLevel, IsTenured, ContractEndDate, Qualifications[{DegreeCode, UniversityCode}], ExtNr)`.
 
 ### Reference resolution
 
-| Reference | Owning slice | Public contract | Not found | Inactive/unavailable |
-| --- | --- | --- | --- | --- |
-| `rankCode` | ManageRanks | `RankCodeCatalog.TryParseRank` (closed enum catalog) | `InvalidRankCode` | n/a |
-| `degreeCode` | ManageDegrees | `GetDegreeByCodeQuery` (new) | `InvalidDegree` | n/a |
-| `universityCode` | ManageUniversities | `GetUniversityByCodeQuery` | `InvalidUniversity` | `UniversityNotActive` |
-| `extNr` | ProvisionExtension (table owner) | `RegisterAcademicDbContext.Extensions` (mapping-only, Shared Kernel `Extension`) | `InvalidExtension` | `ExtensionUnavailable` |
+| Reference        | Owning slice                     | Public contract                                                                  | Not found           | Inactive/unavailable   |
+| ---------------- | -------------------------------- | -------------------------------------------------------------------------------- | ------------------- | ---------------------- |
+| `rankCode`       | ManageRanks                      | `RankCodeCatalog.TryParseRank` (closed enum catalog)                             | `InvalidRankCode`   | n/a                    |
+| `degreeCode`     | ManageDegrees                    | `GetDegreeByCodeQuery` (new)                                                     | `InvalidDegree`     | n/a                    |
+| `universityCode` | ManageUniversities               | `GetUniversityByCodeQuery`                                                       | `InvalidUniversity` | `UniversityNotActive`  |
+| `extNr`          | ProvisionExtension (table owner) | `RegisterAcademicDbContext.Extensions` (mapping-only, Shared Kernel `Extension`) | `InvalidExtension`  | `ExtensionUnavailable` |
 
 ### Aggregate invariants
 
-| Invariant | Aggregate enforcement | Validator (early feedback) | DB constraint |
-| --- | --- | --- | --- |
-| `empNr` exactly 6 | `Academic.Create` | `.Length(SharedKernelFieldLengths.EmpNr)` | `HasMaxLength(6)` + `CK_Academics_EmpNrLength` (`LEN([EmpNr]) = 6`) |
-| `empName` ≤ 15 | `Academic.Create` | `.MaximumLength(SharedKernelFieldLengths.EmpName)` | `HasMaxLength(15)` |
-| ≥ 1 qualification | `Academic.Create` throws `BusinessRuleViolationException` | `NotEmpty()` | none (deferred; see ledger) |
-| no duplicate qualification pair | `Academic.Create` | unique (degreeCode, universityCode) | existing `AcademicQualifications` key |
-| tenured XOR contract | `Academic.Create` | cross-field rule | `CK_Academics_EmploymentMutualExclusion` |
-| `empNr` unique | handler pre-check | — | PK `Academics.EmpNr` |
-| extension 1:1 | `Extension.AssignTo` | — | filtered unique index on `Extensions.AssignedEmpNr` |
+| Invariant                       | Aggregate enforcement                                     | Validator (early feedback)                         | DB constraint                                                       |
+| ------------------------------- | --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------- |
+| `empNr` exactly 6               | `Academic.Create`                                         | `.Length(SharedKernelFieldLengths.EmpNr)`          | `HasMaxLength(6)` + `CK_Academics_EmpNrLength` (`LEN([EmpNr]) = 6`) |
+| `empName` ≤ 15                  | `Academic.Create`                                         | `.MaximumLength(SharedKernelFieldLengths.EmpName)` | `HasMaxLength(15)`                                                  |
+| ≥ 1 qualification               | `Academic.Create` throws `BusinessRuleViolationException` | `NotEmpty()`                                       | none (deferred; see ledger)                                         |
+| no duplicate qualification pair | `Academic.Create`                                         | unique (degreeCode, universityCode)                | existing `AcademicQualifications` key                               |
+| tenured XOR contract            | `Academic.Create`                                         | cross-field rule                                   | `CK_Academics_EmploymentMutualExclusion`                            |
+| `empNr` unique                  | handler pre-check                                         | —                                                  | PK `Academics.EmpNr`                                                |
+| extension 1:1                   | `Extension.AssignTo`                                      | —                                                  | filtered unique index on `Extensions.AssignedEmpNr`                 |
 
 Deferral ledger: ≥ 1 qualification — enforced now by aggregate + validator; not enforced in database; owning follow-up: RemoveDegreeRecord (ep-4-4); risk: direct SQL writes can orphan an academic; evidence: aggregate unit test + handler test.
 
 ### Error → HTTP status
 
-| Error code | Status | `Produces*` | Route test |
-| --- | --- | --- | --- |
-| FluentValidation failures | 400 | `.ProducesValidationProblem()` | `Register_InvalidPayload_Returns400WithFieldErrors` |
-| `InvalidRankCode`, `InvalidDegree`, `InvalidUniversity`, `UniversityNotActive`, `InvalidExtension`, `InvalidAcademicRegistration` | 400 (validation problem keyed to the request field) | `.ProducesValidationProblem()` | `Register_UnknownDegree_Returns400`, `Register_InactiveUniversity_Returns400`, `Register_UnknownExtension_Returns400` |
-| `AcademicAlreadyExists` | 409 | `.ProducesProblem(StatusCodes.Status409Conflict)` | `Register_DuplicateEmpNr_Returns409` |
-| `ExtensionUnavailable` | 409 | `.ProducesProblem(StatusCodes.Status409Conflict)` | `Register_AssignedExtension_Returns409` |
-| success | 201 | `.Produces<RegisterAcademicResponse>(StatusCodes.Status201Created)` | `Register_ValidRequest_Returns201` |
+| Error code                                                                                                                        | Status                                              | `Produces*`                                                         | Route test                                                                                                            |
+| --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| FluentValidation failures                                                                                                         | 400                                                 | `.ProducesValidationProblem()`                                      | `Register_InvalidPayload_Returns400WithFieldErrors`                                                                   |
+| `InvalidRankCode`, `InvalidDegree`, `InvalidUniversity`, `UniversityNotActive`, `InvalidExtension`, `InvalidAcademicRegistration` | 400 (validation problem keyed to the request field) | `.ProducesValidationProblem()`                                      | `Register_UnknownDegree_Returns400`, `Register_InactiveUniversity_Returns400`, `Register_UnknownExtension_Returns400` |
+| `AcademicAlreadyExists`                                                                                                           | 409                                                 | `.ProducesProblem(StatusCodes.Status409Conflict)`                   | `Register_DuplicateEmpNr_Returns409`                                                                                  |
+| `ExtensionUnavailable`                                                                                                            | 409                                                 | `.ProducesProblem(StatusCodes.Status409Conflict)`                   | `Register_AssignedExtension_Returns409`                                                                               |
+| success                                                                                                                           | 201                                                 | `.Produces<RegisterAcademicResponse>(StatusCodes.Status201Created)` | `Register_ValidRequest_Returns201`                                                                                    |
 
 Unmapped error codes are a defect; do not fall back to a generic 400 `Results.Problem`.
 
@@ -146,12 +145,12 @@ Unmapped error codes are a defect; do not fall back to a generic 400 `Results.Pr
 
 ## Assigned Agents and Role Boundaries
 
-| Role | Responsibilities | Inputs | Outputs | Escalate when |
-| --- | --- | --- | --- | --- |
-| slice-coordinator | confirm prerequisites, data compatibility for `empNr` length 6, and ownership-matrix update | execution plan, ownership matrix, current database state | approved sequence and blocker list | existing data violates the 6-character rule or any prerequisite lacks integration proof |
-| backend-domain | Shared Kernel alignment, `GetDegreeByCodeQuery`, command, validator, handler, endpoint status mapping, host composition | Contract Sheet, Shared Kernel, reference-data contracts | code matching every Contract Sheet row | a Contract Sheet row contradicts the ORM model or needs a Shared Kernel change not listed here |
-| data-persistence | `RegisterAcademicDbContext` (mapping-only) and the SharedKernel/ProvisionExtension migrations | Persistence section, ownership matrix | migrations with Designer + snapshot, updated matrix | a migration would drop data or a second context would own a table |
-| testing-verification | test matrix, `eng/verify-slice.ps1`, traceability table | implemented slice | passing tests, script output, traceability table | any criterion lacks a test or the script fails |
+| Role                 | Responsibilities                                                                                                        | Inputs                                                   | Outputs                                             | Escalate when                                                                                  |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| slice-coordinator    | confirm prerequisites, data compatibility for `empNr` length 6, and ownership-matrix update                             | execution plan, ownership matrix, current database state | approved sequence and blocker list                  | existing data violates the 6-character rule or any prerequisite lacks integration proof        |
+| backend-domain       | Shared Kernel alignment, `GetDegreeByCodeQuery`, command, validator, handler, endpoint status mapping, host composition | Contract Sheet, Shared Kernel, reference-data contracts  | code matching every Contract Sheet row              | a Contract Sheet row contradicts the ORM model or needs a Shared Kernel change not listed here |
+| data-persistence     | `RegisterAcademicDbContext` (mapping-only) and the SharedKernel/ProvisionExtension migrations                           | Persistence section, ownership matrix                    | migrations with Designer + snapshot, updated matrix | a migration would drop data or a second context would own a table                              |
+| testing-verification | test matrix, `eng/verify-slice.ps1`, traceability table                                                                 | implemented slice                                        | passing tests, script output, traceability table    | any criterion lacks a test or the script fails                                                 |
 
 ## Ordered Implementation Steps
 
@@ -189,7 +188,7 @@ Unmapped error codes are a defect; do not fall back to a generic 400 `Results.Pr
 9. Run the mechanical gate and build the traceability table.
    Command: `pwsh eng/verify-slice.ps1 -Feature <f>` for `Academics/RegisterAcademic`, `ReferenceData/ManageDegrees`, `SharedKernel/Foundation`, `Extensions/ProvisionExtension`.
    Owner: testing-verification.
-   Validation: failures in files touched by this slice block handoff; pre-existing failures are reported only if they match the listed PR 46 carry-overs.
+   Validation: any failure in a feature touched by this slice blocks handoff, including pre-existing failures. Escalate for explicit sign-off if a failure cannot be resolved in scope.
 
 ## Verification and Acceptance Criteria
 

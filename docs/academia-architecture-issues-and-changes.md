@@ -30,4 +30,4 @@ The changes added a Phase 0 implementation prompt for Application Host and Persi
 
 ## Status
 
-The planning work is complete. No application host or feature slice implementation has been added yet. The remaining implementation prerequisites are confirming the host project, migration execution strategy, and university identity contract.
+At the time this document was created (2026-08-24), planning was complete and implementation had not yet begun. This is a historical snapshot; see the [README](../README.md) for current implementation status.

@@ -16,7 +16,8 @@ source: "johnmillerATcodemag-com"
 description: "Validate context for conflicts and inconsistencies"
 context: "Instruction files, prompts, agents, and workspace context"
 expected_output: "Structured conflict analysis with recommendations"
-tools: ["search", "edit", "fetch"]
+name: check-context
+tools: ["read", "search", "fetch"]
 mode: agent
 ---
 
