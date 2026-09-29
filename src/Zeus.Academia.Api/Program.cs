@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Zeus.Academia.Features.Extensions.ProvisionExtension;
+using Zeus.Academia.Features.Academics.RegisterAcademic;
 using Zeus.Academia.Features.ReferenceData.ManageDegrees;
 using Zeus.Academia.Features.ReferenceData.ManageDegrees.Shared;
 using Zeus.Academia.Features.ReferenceData.ManageRanks;
@@ -37,7 +38,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 2. Configuration: ConnectionStrings:DefaultConnection (appsettings.json)
 // 3. Windows LocalDB fallback (development on Windows only)
 
-var connectionString = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
+var connectionString = builder.Configuration["ZEUS_SQLSERVER_CONNECTION"];
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
@@ -46,7 +47,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
-  if (OperatingSystem.IsWindows())
+  if (builder.Environment.IsDevelopment() && OperatingSystem.IsWindows())
   {
     // Windows LocalDB fallback for local development only.
     // Use the default LocalDB instance name, which is MSSQLLocalDB on standard Windows installs.
@@ -56,8 +57,8 @@ if (string.IsNullOrWhiteSpace(connectionString))
   {
     // Non-Windows platforms require explicit SQL Server connection
     throw new InvalidOperationException(
-      "SQL Server connection string not found. Set ZEUS_SQLSERVER_CONNECTION environment variable or add ConnectionStrings:DefaultConnection to appsettings.json. " +
-      "LocalDB is only available on Windows; configure a SQL Server connection string for non-Windows environments.");
+      "SQL Server connection string not found. Set ZEUS_SQLSERVER_CONNECTION or ConnectionStrings:DefaultConnection. " +
+      "The Windows LocalDB fallback is available only in Development.");
   }
 }
 
@@ -88,6 +89,10 @@ builder.Services.AddManageUniversitiesMediatR();
 // Feature 4: Provision Extension (sole migration owner for Extensions)
 builder.Services.AddProvisionExtensionPersistence(connectionString);
 builder.Services.AddProvisionExtensionMediatR();
+
+// Feature 5: Register Academic (mapping-only context; migrations remain with table owners)
+builder.Services.AddRegisterAcademicPersistence(connectionString);
+builder.Services.AddRegisterAcademicMediatR();
 
 // ============================================================================
 // Service Registration: MediatR Handlers and Validators
@@ -149,9 +154,12 @@ app.MapManageDegreesEndpoints();
 app.MapManageRanksEndpoints();
 app.MapProvisionExtensionsEndpoints();
 app.MapManageUniversitiesEndpoints();
+app.MapRegisterAcademicEndpoints();
 app.MapHealthCheck("/health");
 
 app.Run();
+
+public partial class Program;
 
 // ============================================================================
 // Health Check Endpoint

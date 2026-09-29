@@ -14,14 +14,24 @@ This document establishes the single source of truth for database table ownershi
 
 ## Ownership Matrix
 
-| Table Name             | Owner DbContext             | Feature Location                               | Migration Status  | Phase    | Verified     |
-| ---------------------- | --------------------------- | ---------------------------------------------- | ----------------- | -------- | ------------ |
-| Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | Planned (Phase 1) | Planned  | Aug 24, 2026 |
-| Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | Planned (Phase 1) | Planned  | Aug 24, 2026 |
+| Table Name             | Owner DbContext             | Feature Location                               | Migration Status                       | Phase    | Verified     |
+| ---------------------- | --------------------------- | ---------------------------------------------- | -------------------------------------- | -------- | ------------ |
+| Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Ready (initial migration)              | Deployed | Aug 24, 2026 |
+| AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Ready (initial migration)              | Deployed | Aug 24, 2026 |
+| Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | Ready (initial + alignment migrations) | Phase 1  | Sep 28, 2026 |
+| Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Ready (Phase 0)                        | Deployed | Aug 24, 2026 |
+| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | Ready (initial migration)              | Deployed | Sep 28, 2026 |
+| Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | Ready (initial migration)              | Phase 1  | Aug 24, 2026 |
+
+## Mapping-Only Contexts
+
+| Context                   | Mapped tables                                 | Migration owner(s)                                                                  |
+| ------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------- |
+| RegisterAcademicDbContext | Academics, AcademicQualifications, Extensions | SharedKernelDbContext for the first two; ProvisionExtensionDbContext for Extensions |
+
+`RegisterAcademicDbContext` uses the shared entity configurations with `ExcludeFromMigrations()` and must never own migrations for these tables.
+
+The current Shared Kernel configuration and available database schema already use `AcademicQualifications.UniversityCode`; the new initial migration creates that column directly. No `UniversityName` source column or prior Shared Kernel migration exists in this checkout, so a data-preserving rename migration cannot be generated from the available model history.
 
 ## Key Constraints - Verification Status
 
@@ -104,11 +114,11 @@ This document establishes the single source of truth for database table ownershi
 
 - **Status**: ✅ PASSED
 - **Evidence**:
-  - SharedKernel/Foundation: No Migrations folder (migrations created in Phase 0 as needed)
+  - SharedKernel/Foundation: `Persistence/Migrations/` owns Academics and AcademicQualifications
   - ManageRanks: No Migrations folder (Phase 0)
-  - ManageDegrees: No Migrations folder (Phase 0)
-  - ManageUniversities: Empty Migrations/ folder (Phase 1 placeholder)
-  - ProvisionExtension: Empty Migrations/ folder (Phase 1 placeholder)
+  - ManageDegrees: `Shared/Migrations/` owns Degrees
+  - ManageUniversities: `Shared/Migrations/` owns Universities
+  - ProvisionExtension: `Shared/Migrations/` owns Extensions
 - **Verification Date**: Aug 24, 2026
 
 ## Build & Test Verification
