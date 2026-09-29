@@ -85,6 +85,10 @@ All Phase 1 slices follow the [canonical downstream consumer pattern](src/models
 
 - [ProvisionExtension pool lifecycle slice](src/features/Extensions/ProvisionExtension/) - Adds extension provisioning and deprovisioning commands, route contract, validation, and persistence tests for duplicate protection and assignment guardrails ([Log](ai-logs/2026/08/26/2026-08-26-provision-extension-implementation/conversation.md))
 
+### Publication Artifacts
+
+- [Executing and verifying the RegisterAcademic vertical slice](CODE/2026-09-29-register-academic-implementation.blog.md) - Explains prompt execution, SQL Server verification, and the API showcase flow ([Log](ai-logs/2026/09/29/2026-09-29-register-academic-blog-execution-guide/conversation.md))
+
 ### Review-Prevention Tooling
 
 - [Slice verification script](eng/verify-slice.ps1) - Mechanical pre-handoff checks derived from PR 46 Copilot review findings ([Log](ai-logs/2026/09/28/2026-09-28-pr46-review-instruction-hardening/conversation.md)); extended with `-AllChangedFeatures`, default EF drift checks, and concurrency/per-field route checks from PR 48 findings ([Log](ai-logs/2026/09/29/2026-09-29-pr48-review-instruction-hardening/conversation.md))
