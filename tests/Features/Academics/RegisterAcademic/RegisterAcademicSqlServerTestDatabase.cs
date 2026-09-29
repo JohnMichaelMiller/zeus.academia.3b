@@ -2,6 +2,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Zeus.Academia.Features.Academics.RegisterAcademic;
 using Zeus.Academia.Features.Extensions.ProvisionExtension;
+using Zeus.Academia.Features.ReferenceData.ManageDegrees.Shared;
+using Zeus.Academia.Features.ReferenceData.ManageUniversities;
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 using Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
 
@@ -37,6 +39,21 @@ internal sealed class RegisterAcademicSqlServerTestDatabase : IAsyncDisposable
         await provisionExtensionContext.Database.MigrateAsync();
         provisionExtensionContext.Extensions.Add(Extension.Create(101));
         await provisionExtensionContext.SaveChangesAsync();
+      }
+
+      await using (var degreesContext = database.CreateManageDegreesContext())
+      {
+        await degreesContext.Database.MigrateAsync();
+        degreesContext.Degrees.Add(new DegreeRecord { Code = "PHD" });
+        await degreesContext.SaveChangesAsync();
+      }
+
+      await using (var universitiesContext = database.CreateManageUniversitiesContext())
+      {
+        await universitiesContext.Database.MigrateAsync();
+        universitiesContext.Universities.Add(
+          UniversityRecord.Create("MIT", "Massachusetts Institute of Technology"));
+        await universitiesContext.SaveChangesAsync();
       }
 
       return database;
@@ -79,6 +96,24 @@ internal sealed class RegisterAcademicSqlServerTestDatabase : IAsyncDisposable
       .Options;
 
     return new ProvisionExtensionDbContext(options);
+  }
+
+  private ManageDegreesDbContext CreateManageDegreesContext()
+  {
+    var options = new DbContextOptionsBuilder<ManageDegreesDbContext>()
+      .UseSqlServer(_connectionString)
+      .Options;
+
+    return new ManageDegreesDbContext(options);
+  }
+
+  private ManageUniversitiesDbContext CreateManageUniversitiesContext()
+  {
+    var options = new DbContextOptionsBuilder<ManageUniversitiesDbContext>()
+      .UseSqlServer(_connectionString)
+      .Options;
+
+    return new ManageUniversitiesDbContext(options);
   }
 
   private async Task DeleteBestEffortAsync()
