@@ -1,4 +1,6 @@
 using MediatR;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -10,8 +12,20 @@ public static class AddDegreeEndpoint
 {
   public static RouteGroupBuilder MapAddDegree(this RouteGroupBuilder group)
   {
-    group.MapPost("/", async (AddDegreeCommand command, ISender sender, CancellationToken ct) =>
+    group.MapPost("/", async (
+      AddDegreeCommand command,
+      IValidator<AddDegreeCommand> validator,
+      ISender sender,
+      CancellationToken ct) =>
     {
+      var validationResult = await validator.ValidateAsync(command, ct);
+      if (!validationResult.IsValid)
+      {
+        return Results.ValidationProblem(validationResult.Errors
+          .GroupBy(x => x.PropertyName)
+          .ToDictionary(x => x.Key, x => x.Select(y => y.ErrorMessage).ToArray()));
+      }
+
       try
       {
         var response = await sender.Send(command, ct);

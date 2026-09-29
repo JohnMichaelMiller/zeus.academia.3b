@@ -6,7 +6,7 @@ public static class AddDegreeMappings
 {
   public static DegreeRecord ToDegreeRecord(this AddDegreeCommand command)
   {
-    if (!DegreeCodeCatalog.TryParseDegree(command.Code, out var degree))
+    if (!DegreeCodeCatalog.TryParseDegree(command.Code, out var degree) || degree is null)
     {
       throw new ArgumentException($"Allowed values: {DegreeCodeCatalog.AllowedValuesMessage}", nameof(command.Code));
     }

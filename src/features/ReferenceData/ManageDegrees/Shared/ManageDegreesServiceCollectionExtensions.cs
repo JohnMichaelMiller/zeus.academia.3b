@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
+using FluentValidation;
+using Zeus.Academia.Features.ReferenceData.ManageDegrees.AddDegree;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageDegrees.Shared;
 
@@ -38,6 +40,7 @@ public static class ManageDegreesServiceCollectionExtensions
   public static IServiceCollection AddManageDegreesMediatR(
     this IServiceCollection services)
   {
+    services.AddScoped<IValidator<AddDegreeCommand>, AddDegreeCommandValidator>();
     services.AddMediatR(cfg =>
       cfg.RegisterServicesFromAssembly(typeof(ManageDegreesDbContext).Assembly));
 
