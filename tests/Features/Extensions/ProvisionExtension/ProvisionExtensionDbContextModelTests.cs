@@ -44,6 +44,18 @@ public sealed class ProvisionExtensionDbContextModelTests
     Assert.Equal("[AssignedEmpNr] IS NOT NULL", index.GetFilter());
   }
 
+  [Fact]
+  public void Extensions_AssignedEmpNr_HasExactSharedKernelLength()
+  {
+    using var context = CreateContext();
+    var entityType = context.Model.FindEntityType(typeof(Extension));
+
+    Assert.NotNull(entityType);
+    Assert.Equal(
+      SharedKernelFieldLengths.EmpNr,
+      entityType!.FindProperty(nameof(Extension.AssignedEmpNr))!.GetMaxLength());
+  }
+
   private static ProvisionExtensionDbContext CreateContext()
   {
     var options = new DbContextOptionsBuilder<ProvisionExtensionDbContext>()

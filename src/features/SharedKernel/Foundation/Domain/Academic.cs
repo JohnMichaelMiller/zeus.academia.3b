@@ -43,6 +43,11 @@ public sealed class Academic
   {
     ArgumentNullException.ThrowIfNull(qualifications);
 
+    if (qualifications.Count == 0)
+    {
+      throw new BusinessRuleViolationException("Academic must have at least one qualification.");
+    }
+
     var normalizedEmpNr = NormalizeEmpNr(empNr);
     var normalizedName = NormalizeEmpName(empName);
 
@@ -52,9 +57,15 @@ public sealed class Academic
     }
 
     var academic = new Academic(normalizedEmpNr, normalizedName, rank, isTenured, contractEndDate);
+    var degreeCodes = new HashSet<string>(StringComparer.Ordinal);
 
     foreach (var (degree, university) in qualifications)
     {
+      if (!degreeCodes.Add(degree.Code))
+      {
+        throw new BusinessRuleViolationException("An academic can have each degree only once.");
+      }
+
       academic._qualifications.Add(AcademicQualification.Create(normalizedEmpNr, degree, university));
     }
 
@@ -97,9 +108,9 @@ public sealed class Academic
 
     var normalized = empNr.Trim().ToUpperInvariant();
 
-    if (normalized.Length > SharedKernelFieldLengths.EmpNr)
+    if (normalized.Length != SharedKernelFieldLengths.EmpNr)
     {
-      throw new BusinessRuleViolationException($"Employee number cannot exceed {SharedKernelFieldLengths.EmpNr} characters.");
+      throw new BusinessRuleViolationException($"Employee number must be exactly {SharedKernelFieldLengths.EmpNr} characters.");
     }
 
     return normalized;

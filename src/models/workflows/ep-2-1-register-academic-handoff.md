@@ -1,23 +1,27 @@
 ---
-ai_generated: false
-operator: "slice-coordinator"
-chat_id: "phase-0-step-6-downstream-documentation"
+ai_generated: true
+model: "github/copilot@unknown"
+operator: "johnmillerATcodemag-com"
+chat_id: "edaf3bc8-e80f-4b74-b582-2aa3785f6a40"
 prompt: |
-  Create handoff document for EP-2-1 (RegisterAcademic), the first downstream slice.
-started: "2026-08-24T17:00:00Z"
-ended: "2026-08-24T17:30:00Z"
+    #file:ep-2-1-register-academic-implementation.prompt.md
+started: "2026-09-28T23:48:22.455Z"
+ended: "2026-09-29T00:37:03Z"
 task_durations:
-  - task: "define scope and dependencies"
-    duration: "00:05:00"
-  - task: "document prerequisites"
-    duration: "00:08:00"
-  - task: "provide implementation steps"
-    duration: "00:10:00"
-  - task: "list common mistakes"
-    duration: "00:07:00"
-total_duration: "00:30:00"
-ai_log: "ai-logs/2026/08/24/phase-0-step-6-downstream-documentation/conversation.md"
-source: "Phase 0 Step 6 - RegisterAcademic Handoff"
+    - task: "contract and repository analysis"
+        duration: "00:07:00"
+    - task: "feature and host implementation"
+        duration: "00:13:00"
+    - task: "migrations and SQL Server tests"
+        duration: "00:21:00"
+    - task: "mechanical gates and handoff"
+        duration: "00:07:00"
+total_duration: "00:48:00"
+ai_log: "ai-logs/2026/09/28/edaf3bc8-e80f-4b74-b582-2aa3785f6a40/conversation.md"
+source: ".github/prompts/academia-implementation/ep-2-1-register-academic-implementation.prompt.md"
+previous_version:
+    chat_id: "phase-0-step-6-downstream-documentation"
+    ai_log: "ai-logs/2026/08/24/phase-0-step-6-downstream-documentation/conversation.md"
 description: "Handoff document for EP-2-1 RegisterAcademic implementation"
 ---
 
@@ -684,7 +688,33 @@ Before opening a pull request, verify:
 
 ---
 
-**Status**: Ready for implementation
-**Estimated Effort**: 2-3 days
-**Blockers**: None (all Phase 0 prerequisites complete)
-**Next Handoff**: EP-2-2 (RecordQualification) — depends on RegisterAcademic ✅ + ManageUniversities ✅ (Phase 1)
+**Status**: Implemented and SQL Server verified on September 28, 2026
+**Delivered Surface**: `POST /api/academics/register`; no academic retrieval or update endpoint is included.
+
+## Implementation Traceability
+
+| Criterion / Contract Sheet row                                                                                                      | Implementing file(s)                                                                                                                             | Test name(s)                                                                                                                                                                                                                              | Status                  |
+| ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| Valid request returns 201; access level is rank-derived; qualifications and extension assignment persist                            | `src/features/Academics/RegisterAcademic/RegisterAcademicHandler.cs`, `RegisterAcademicEndpoints.cs`, `Persistence/RegisterAcademicDbContext.cs` | `Register_ValidRequest_Returns201`                                                                                                                                                                                                        | Passed                  |
+| `empNr` is normalized and exactly six characters                                                                                    | `src/features/SharedKernel/Foundation/Domain/SharedKernelFieldLengths.cs`, `Academic.cs`; `RegisterAcademicCommandValidator.cs`                  | `Create_WithEmployeeNumberOfInvalidLength_ThrowsBusinessRuleViolationException`; `Validate_WithEmployeeNumberOfWrongLength_HasError`; `Register_InvalidPayload_Returns400WithFieldErrors`                                                 | Passed                  |
+| At least one qualification; duplicate degree prohibited by the existing `(EmpNr, DegreeCode)` key                                   | `Academic.cs`; `RegisterAcademicCommandValidator.cs`                                                                                             | `Create_WithoutQualifications_ThrowsBusinessRuleViolationException`; `Create_WithSameDegreeMoreThanOnce_ThrowsBusinessRuleViolationException`; `Validate_WithNullOrEmptyQualifications_HasError`; `Validate_WithDuplicateDegree_HasError` | Passed                  |
+| Well-formed but unknown degree returns 400 without writes                                                                           | `ManageDegrees/GetDegreeByCode/*`; `RegisterAcademicHandler.cs`; `RegisterAcademicEndpoints.cs`                                                  | `Handle_WithUnknownCode_ReturnsNotFound`; `Register_UnknownDegree_Returns400`                                                                                                                                                             | Passed                  |
+| Unknown and inactive universities return 400; code, not name, persists                                                              | `RegisterAcademicHandler.cs`; `RegisterAcademicEndpoints.cs`; university owning query                                                            | `Register_UnknownUniversity_Returns400`; `Register_InactiveUniversity_Returns400`; success persistence assertions in `Register_ValidRequest_Returns201`                                                                                   | Passed                  |
+| Unknown extension returns 400; unavailable extension returns 409; neither creates an academic                                       | `RegisterAcademicHandler.cs`; `RegisterAcademicEndpoints.cs`                                                                                     | `Register_UnknownExtension_Returns400`; `Register_AssignedExtension_Returns409`                                                                                                                                                           | Passed                  |
+| Duplicate employee number returns 409 and preserves existing academic and extension state                                           | `RegisterAcademicHandler.cs`; `RegisterAcademicEndpoints.cs`                                                                                     | `Register_DuplicateEmpNr_Returns409`                                                                                                                                                                                                      | Passed                  |
+| Shared Kernel alignment renames `UniversityName`, tightens employee number fields, and adds exact-length constraint                 | `src/features/SharedKernel/Foundation/Persistence/Migrations/20260928235923_AcademicRegistrationAlignment.cs`                                    | `AcademicRegistrationAlignment_RenamesUniversityColumnAndPreservesData`                                                                                                                                                                   | Passed on fresh LocalDB |
+| Extension assignment length is six; migration owner remains ProvisionExtension                                                      | `src/features/Extensions/ProvisionExtension/Shared/Migrations/20260928235954_ExtensionEmployeeNumberLength.cs`; `migration-ownership-matrix.md`  | `ProvisionExtensionSqlServerIntegrationTests`                                                                                                                                                                                             | Passed                  |
+| Host references/registers feature, maps route, and does not migrate the mapping-only context; production appsettings has no LocalDB | `src/Zeus.Academia.Api/Program.cs`, `Zeus.Academia.Api.csproj`, `appsettings.json`, `appsettings.Development.json`                               | `Register_ValidRequest_Returns201`; `eng/verify-slice.ps1`                                                                                                                                                                                | Passed                  |
+
+## Verification Results
+
+- `dotnet build zeus.academia.3b.sln`: passed.
+- RegisterAcademic suite: 49 tests passed, including 11 SQL Server-backed route/migration cases, validator coverage, fresh-context persistence, failure atomicity, and migration data preservation.
+- Shared Kernel SQL Server suite: 34 tests passed.
+- ManageDegrees SQL Server suite: 24 tests passed, including TestServer route coverage for AddDegree.
+- ProvisionExtension SQL Server suite: 29 tests passed.
+- LocalDB compatibility scan: `Academics` and `AcademicQualifications` each had zero rows. The existing `Extensions` table did not have the current `AssignedEmpNr` column and the database had no migration history matching the source model; it was left untouched. Development configuration now uses `Zeus_Academia_RegisterAcademic_Dev`.
+- `eng/verify-slice.ps1 -BaseRef HEAD` passes for Academics/RegisterAcademic, ReferenceData/ManageDegrees, and SharedKernel/Foundation. ProvisionExtension passes build and tests but reports only the two explicitly listed PR 46 route-test carry-overs (`ProvisionExtensionEndpoint` and `DeprovisionExtensionEndpoint`).
+- The default `origin/main` provenance scan also reports four pre-existing duration mismatches in unrelated ManageUniversities/ProvisionExtension prompt and log files; they were not changed.
+
+**Next Handoff**: RegisterAcademic's gate passes; dependent slices may proceed after normal review. The two ProvisionExtension route-test carry-overs remain separate follow-up work.

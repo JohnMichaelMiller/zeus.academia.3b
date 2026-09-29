@@ -19,6 +19,7 @@
 
   <!-- Feature Project References -->
   <ItemGroup>
+    <ProjectReference Include="..\features\Academics\RegisterAcademic\Zeus.Academia.Features.Academics.RegisterAcademic.csproj" />
     <ProjectReference Include="..\features\SharedKernel\Foundation\Zeus.Academia.Features.SharedKernel.Foundation.csproj" />
     <ProjectReference Include="..\features\ReferenceData\ManageRanks\Zeus.Academia.Features.ReferenceData.ManageRanks.csproj" />
     <ProjectReference Include="..\features\ReferenceData\ManageDegrees\Zeus.Academia.Features.ReferenceData.ManageDegrees.csproj" />

@@ -16,9 +16,9 @@ public static class DegreeCodeCatalog
     return SupportedCodesCollection.Contains(normalizedCode, StringComparer.Ordinal);
   }
 
-  public static bool TryParseDegree(string? code, out Degree degree)
+  public static bool TryParseDegree(string? code, out Degree? degree)
   {
-    degree = null!;
+    degree = null;
 
     if (!IsAllowed(code, out var normalizedCode))
     {

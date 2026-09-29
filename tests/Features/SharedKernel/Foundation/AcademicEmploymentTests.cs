@@ -22,6 +22,51 @@ public sealed class AcademicEmploymentTests
     Assert.Contains("both tenured and contracted", exception.Message, StringComparison.OrdinalIgnoreCase);
   }
 
+  [Theory]
+  [InlineData("EMP01")]
+  [InlineData("EMP0001")]
+  public void Create_WithEmployeeNumberOfInvalidLength_ThrowsBusinessRuleViolationException(string empNr)
+  {
+    var degree = Degree.Create("PHD");
+    var university = University.Create("MIT");
+
+    var exception = Assert.Throws<BusinessRuleViolationException>(() => Academic.Create(
+      empNr,
+      "Alex Chen",
+      Rank.P,
+      [(degree, university)]));
+
+    Assert.Contains("exactly 6 characters", exception.Message, StringComparison.OrdinalIgnoreCase);
+  }
+
+  [Fact]
+  public void Create_WithoutQualifications_ThrowsBusinessRuleViolationException()
+  {
+    var exception = Assert.Throws<BusinessRuleViolationException>(() => Academic.Create(
+      "EMP001",
+      "Alex Chen",
+      Rank.P,
+      []));
+
+    Assert.Contains("at least one qualification", exception.Message, StringComparison.OrdinalIgnoreCase);
+  }
+
+  [Fact]
+  public void Create_WithSameDegreeMoreThanOnce_ThrowsBusinessRuleViolationException()
+  {
+    var degree = Degree.Create("PHD");
+    var firstUniversity = University.Create("MIT");
+    var secondUniversity = University.Create("USW");
+
+    var exception = Assert.Throws<BusinessRuleViolationException>(() => Academic.Create(
+      "EMP001",
+      "Alex Chen",
+      Rank.P,
+      [(degree, firstUniversity), (degree, secondUniversity)]));
+
+    Assert.Contains("each degree only once", exception.Message, StringComparison.OrdinalIgnoreCase);
+  }
+
   [Fact]
   public void SetTenured_WhenContractAlreadyExists_ClearsContractEndDate()
   {

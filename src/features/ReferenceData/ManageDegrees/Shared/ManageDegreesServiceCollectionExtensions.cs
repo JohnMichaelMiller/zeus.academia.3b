@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
@@ -38,6 +39,7 @@ public static class ManageDegreesServiceCollectionExtensions
   public static IServiceCollection AddManageDegreesMediatR(
     this IServiceCollection services)
   {
+    services.AddValidatorsFromAssembly(typeof(ManageDegreesDbContext).Assembly);
     services.AddMediatR(cfg =>
       cfg.RegisterServicesFromAssembly(typeof(ManageDegreesDbContext).Assembly));
 

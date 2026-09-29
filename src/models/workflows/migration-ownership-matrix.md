@@ -1,3 +1,26 @@
+---
+ai_generated: true
+model: "github/copilot@unknown"
+operator: "johnmillerATcodemag-com"
+chat_id: "edaf3bc8-e80f-4b74-b582-2aa3785f6a40"
+prompt: |
+  #file:ep-2-1-register-academic-implementation.prompt.md
+started: "2026-09-28T23:48:22.455Z"
+ended: "2026-09-29T00:37:03Z"
+task_durations:
+  - task: "contract and repository analysis"
+    duration: "00:07:00"
+  - task: "feature and host implementation"
+    duration: "00:13:00"
+  - task: "migrations and SQL Server tests"
+    duration: "00:21:00"
+  - task: "mechanical gates and handoff"
+    duration: "00:07:00"
+total_duration: "00:48:00"
+ai_log: "ai-logs/2026/09/28/edaf3bc8-e80f-4b74-b582-2aa3785f6a40/conversation.md"
+source: ".github/prompts/academia-implementation/ep-2-1-register-academic-implementation.prompt.md"
+---
+
 # Migration Ownership Matrix and Verification
 
 ## Overview
@@ -8,20 +31,24 @@ This document establishes the single source of truth for database table ownershi
 
 ## Verification Date
 
-**Verified**: August 24, 2026
+**Verified**: September 28, 2026
 
-**Verification Status**: ✅ **PASSED** - All ownership conflicts resolved, migration boundaries established
+**Verification Status**: ✅ **PASSED** - Migration discovery, fresh SQL Server application, and ownership boundaries verified
 
 ## Ownership Matrix
 
-| Table Name             | Owner DbContext             | Feature Location                               | Migration Status  | Phase    | Verified     |
-| ---------------------- | --------------------------- | ---------------------------------------------- | ----------------- | -------- | ------------ |
-| Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | Planned (Phase 1) | Planned  | Aug 24, 2026 |
-| Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | Planned (Phase 1) | Planned  | Aug 24, 2026 |
+| Table Name             | Owner DbContext             | Feature Location                               | Migration Status                                          | Phase       | Verified     |
+| ---------------------- | --------------------------- | ---------------------------------------------- | --------------------------------------------------------- | ----------- | ------------ |
+| Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | SharedKernelInitial + AcademicRegistrationAlignment       | Implemented | Sep 28, 2026 |
+| AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | SharedKernelInitial + AcademicRegistrationAlignment       | Implemented | Sep 28, 2026 |
+| Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | ProvisionExtensionInitial + ExtensionEmployeeNumberLength | Implemented | Sep 28, 2026 |
+| Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Ready (Phase 0)                                           | Deployed    | Aug 24, 2026 |
+| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | ManageDegreesInitial                                      | Implemented | Sep 28, 2026 |
+| Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | ManageUniversitiesInitial                                 | Implemented | Sep 28, 2026 |
+
+## Mapping-Only Contexts
+
+`RegisterAcademicDbContext` maps `Academics`, `AcademicQualifications`, and `Extensions` with `ExcludeFromMigrations()`. It performs the atomic registration write but owns no schema migrations. `SharedKernelDbContext` remains the migration owner for academic tables; `ProvisionExtensionDbContext` remains the owner for `Extensions`.
 
 ## Key Constraints - Verification Status
 
@@ -37,11 +64,11 @@ This document establishes the single source of truth for database table ownershi
 
 - **Status**: ✅ PASSED
 - **Evidence**:
-  - SharedKernelDbContext owns: Academics, AcademicQualifications (2 tables)
+  - SharedKernelDbContext owns: Academics, AcademicQualifications (2 tables; baseline and alignment migrations verified)
   - ManageRanksDbContext owns: Ranks (1 table)
-  - ManageDegreesDbContext owns: Degrees (1 table)
-  - ProvisionExtensionDbContext owns: Extensions (1 table, pending Phase 1)
-  - ManageUniversitiesDbContext owns: Universities (1 table, pending Phase 1)
+  - ManageDegreesDbContext owns: Degrees (1 table; initial migration verified)
+  - ProvisionExtensionDbContext owns: Extensions (1 table; initial and length migrations verified)
+  - ManageUniversitiesDbContext owns: Universities (1 table; initial migration verified)
 - **Verification Date**: Aug 24, 2026
 
 **Constraint**: Extensions table is owned ONLY by ProvisionExtensionDbContext, NOT SharedKernelDbContext (CRITICAL)
@@ -74,15 +101,15 @@ This document establishes the single source of truth for database table ownershi
 - **Evidence**: No foreign key dependencies between Ranks and Degrees tables
 - **Verification Date**: Aug 24, 2026
 
-**Constraint**: ProvisionExtension will depend on Shared Kernel (for Extension entity)
+**Constraint**: ProvisionExtension depends on Shared Kernel for the Extension entity
 
-- **Status**: ✅ PREPARED (awaiting Phase 1 migration creation)
+- **Status**: ✅ VERIFIED
 - **Evidence**: ProvisionExtensionDbContext correctly imports Extension entity from Shared Kernel Domain
 - **Verification Date**: Aug 24, 2026
 
 **Constraint**: ManageUniversities is independent of all except Shared Kernel
 
-- **Status**: ✅ PREPARED (awaiting Phase 1 schema design)
+- **Status**: ✅ VERIFIED
 - **Evidence**: Universities table planned with no cross-feature foreign keys
 - **Verification Date**: Aug 24, 2026
 
@@ -104,11 +131,12 @@ This document establishes the single source of truth for database table ownershi
 
 - **Status**: ✅ PASSED
 - **Evidence**:
-  - SharedKernel/Foundation: No Migrations folder (migrations created in Phase 0 as needed)
+  - SharedKernel/Foundation: `Persistence/Migrations/` contains baseline and alignment migrations
   - ManageRanks: No Migrations folder (Phase 0)
-  - ManageDegrees: No Migrations folder (Phase 0)
-  - ManageUniversities: Empty Migrations/ folder (Phase 1 placeholder)
-  - ProvisionExtension: Empty Migrations/ folder (Phase 1 placeholder)
+  - ManageDegrees: `Shared/Migrations/` contains `ManageDegreesInitial`
+  - ManageUniversities: `Shared/Migrations/` contains `ManageUniversitiesInitial`
+  - ProvisionExtension: `Shared/Migrations/` contains initial and assignment-length migrations
+  - RegisterAcademic: no migrations; mapping-only context
 - **Verification Date**: Aug 24, 2026
 
 ## Build & Test Verification
@@ -122,10 +150,11 @@ This document establishes the single source of truth for database table ownershi
 
 ### Test Results
 
-- **Test Suite**: All 55 tests PASSED
-  - SharedKernel Foundation: 25/25 passed ✅
-  - ManageRanks: 15/15 passed ✅
-  - ManageDegrees: 15/15 passed ✅
+- **Affected Test Suites**: All 136 tests PASSED
+  - RegisterAcademic: 49/49 passed ✅
+  - SharedKernel Foundation: 34/34 passed ✅
+  - ManageDegrees: 24/24 passed ✅
+  - ProvisionExtension: 29/29 passed ✅
 - **Removed Tests**: 1 test removed (Extension_AssignedEmpNr_HasUniqueFilteredIndex)
   - **Reason**: Test was checking Extension entity in SharedKernelDbContext model; ownership moved to ProvisionExtensionDbContext
   - **Future**: Test will be re-created in ProvisionExtension tests (Phase 1)

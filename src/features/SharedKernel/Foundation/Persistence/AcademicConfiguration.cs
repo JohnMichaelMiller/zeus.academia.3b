@@ -9,9 +9,14 @@ public sealed class AcademicConfiguration : IEntityTypeConfiguration<Academic>
   public void Configure(EntityTypeBuilder<Academic> builder)
   {
     builder.ToTable("Academics", tableBuilder =>
+    {
+      tableBuilder.HasCheckConstraint(
+        "CK_Academics_EmpNrLength",
+        $"LEN([EmpNr]) = {SharedKernelFieldLengths.EmpNr}");
       tableBuilder.HasCheckConstraint(
         "CK_Academics_EmploymentMutualExclusion",
-        "NOT ([IsTenured] = 1 AND [ContractEndDate] IS NOT NULL)"));
+        "NOT ([IsTenured] = 1 AND [ContractEndDate] IS NOT NULL)");
+    });
 
     builder.HasKey(x => x.EmpNr);
 

@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MediatR;
+using Zeus.Academia.Features.Academics.RegisterAcademic;
+using Zeus.Academia.Features.Academics.RegisterAcademic.Persistence;
 using Zeus.Academia.Features.Extensions.ProvisionExtension;
 using Zeus.Academia.Features.ReferenceData.ManageDegrees;
 using Zeus.Academia.Features.ReferenceData.ManageDegrees.Shared;
@@ -19,12 +21,8 @@ using Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
 //
 // Registration Order (MUST maintain dependency chain):
 // - SharedKernelDbContext (prerequisite for all features)
-// - ManageRanksDbContext (independent, Phase 0)
-// - ManageDegreesDbContext (independent, Phase 0)
-// - MediatR handlers and validators for each feature
-//
-// Phase 1 features (e.g., ProvisionExtension) will be registered by their
-// respective agents when added to the slicing plan.
+// - Feature-local owner contexts
+// - Mapping-only RegisterAcademicDbContext (no migrations)
 // ============================================================================
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,7 +48,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
   {
     // Windows LocalDB fallback for local development only.
     // Use the default LocalDB instance name, which is MSSQLLocalDB on standard Windows installs.
-    connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Zeus_Academia_Dev;Integrated Security=True;TrustServerCertificate=True;";
+    connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Zeus_Academia_RegisterAcademic_Dev;Integrated Security=True;TrustServerCertificate=True;";
   }
   else
   {
@@ -72,6 +70,10 @@ if (string.IsNullOrWhiteSpace(connectionString))
 // Shared Kernel DbContext (prerequisite for all features)
 builder.Services.AddDbContext<SharedKernelDbContext>(options =>
   options.UseSqlServer(connectionString));
+
+// Feature 0: Academic registration (mapping-only access to owner tables)
+builder.Services.AddRegisterAcademicPersistence(connectionString);
+builder.Services.AddRegisterAcademicMediatR();
 
 // Feature 1: Manage Ranks (Phase 0)
 builder.Services.AddManageRanksPersistence(connectionString);
@@ -149,9 +151,12 @@ app.MapManageDegreesEndpoints();
 app.MapManageRanksEndpoints();
 app.MapProvisionExtensionsEndpoints();
 app.MapManageUniversitiesEndpoints();
+app.MapRegisterAcademicEndpoints();
 app.MapHealthCheck("/health");
 
 app.Run();
+
+public partial class Program;
 
 // ============================================================================
 // Health Check Endpoint
