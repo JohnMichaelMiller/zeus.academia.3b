@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using Zeus.Academia.Features.SharedKernel.Foundation.Domain;
 
 namespace Zeus.Academia.Features.ReferenceData.ManageDegrees.Shared;
@@ -16,9 +17,9 @@ public static class DegreeCodeCatalog
     return SupportedCodesCollection.Contains(normalizedCode, StringComparer.Ordinal);
   }
 
-  public static bool TryParseDegree(string? code, out Degree degree)
+  public static bool TryParseDegree(string? code, [NotNullWhen(true)] out Degree? degree)
   {
-    degree = null!;
+    degree = null;
 
     if (!IsAllowed(code, out var normalizedCode))
     {

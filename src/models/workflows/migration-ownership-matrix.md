@@ -24,7 +24,7 @@ The repository records Phase 0 as a seed phase with no migrations generated, def
 | AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | `20260929171605_SharedKernelInitial`       | Fresh        | Sep 29, 2026 |
 | Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | `20260826143646_ProvisionExtensionInitial` | Fresh        | Sep 29, 2026 |
 | Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Missing                                    | Fresh        | Sep 29, 2026 |
-| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | Missing                                    | Fresh        | Sep 29, 2026 |
+| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | `20260929172158_ManageDegreesInitial`       | Fresh        | Sep 29, 2026 |
 | Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | `20260826193208_ManageUniversitiesInitial` | Fresh        | Sep 29, 2026 |
 
 ## Key Constraints - Verification Status
@@ -74,8 +74,9 @@ The repository records Phase 0 as a seed phase with no migrations generated, def
 
 **Constraint**: ManageRanks and ManageDegrees migrations are independent
 
-- **Status**: Ownership verified; migration artifacts are missing
+- **Status**: ManageDegrees passed; ManageRanks migration artifacts are missing
 - **Evidence**: No foreign key dependencies between Ranks and Degrees tables
+- **ManageDegrees Evidence**: EF discovers `20260929172158_ManageDegreesInitial`; SQL Server verification applies it to a unique test database and validates the owned table and constraint
 - **Verification Date**: Sep 29, 2026
 
 **Constraint**: ProvisionExtension will depend on Shared Kernel (for Extension entity)
@@ -110,7 +111,7 @@ The repository records Phase 0 as a seed phase with no migrations generated, def
 - **Evidence**:
   - SharedKernel/Foundation: Initial migration, Designer, and snapshot present
   - ManageRanks: Migration artifacts missing
-  - ManageDegrees: Migration artifacts missing
+  - ManageDegrees: Initial migration, Designer, and snapshot present
   - ManageUniversities: Initial migration, Designer, and snapshot present
   - ProvisionExtension: Initial migration, Designer, and snapshot present
 - **Verification Date**: Sep 29, 2026
@@ -137,7 +138,7 @@ The repository records Phase 0 as a seed phase with no migrations generated, def
 
 ## Migration Verification Commands
 
-### Fresh Schemas Missing Migration Artifacts
+### Fresh Schemas
 
 **Shared Kernel (Academics + AcademicQualifications)**:
 
