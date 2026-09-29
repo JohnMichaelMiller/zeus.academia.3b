@@ -83,6 +83,8 @@ All Phase 1 slices follow the [canonical downstream consumer pattern](src/models
 
 ### Phase 1 Feature Slice
 
+- [RegisterAcademic slice](src/features/Academics/RegisterAcademic/) - Registers academics with verified reference data and atomically assigns an available extension through a mapping-only context ([Log](ai-logs/2026/09/28/edaf3bc8-e80f-4b74-b582-2aa3785f6a40/conversation.md))
+- [AIAGSD Part 12: Registering Academics Across Vertical Slices](jekyll-src/_posts/2026-09-28-AIAGSD12-RegisterAcademic.blog.md) - Describes the RegisterAcademic route, owner-managed reference resolution, atomic persistence, and migration boundaries ([Log](ai-logs/2026/09/28/edaf3bc8-e80f-4b74-b582-2aa3785f6a40/conversation.md))
 - [ProvisionExtension pool lifecycle slice](src/features/Extensions/ProvisionExtension/) - Adds extension provisioning and deprovisioning commands, route contract, validation, and persistence tests for duplicate protection and assignment guardrails ([Log](ai-logs/2026/08/26/2026-08-26-provision-extension-implementation/conversation.md))
 
 ### Review-Prevention Tooling
