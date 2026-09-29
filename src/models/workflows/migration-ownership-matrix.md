@@ -6,22 +6,26 @@ This document establishes the single source of truth for database table ownershi
 
 **Key Principle**: Each table is owned by exactly one DbContext. That context is solely responsible for generating and managing migrations for that table. No two DbContexts may create migrations for the same table.
 
+Migration artifact state and deployed-schema state are separate concerns. An implemented DbContext is not evidence that its schema has been deployed.
+
 ## Verification Date
 
-**Verified**: August 24, 2026
+**Verified**: September 29, 2026
 
-**Verification Status**: ✅ **PASSED** - All ownership conflicts resolved, migration boundaries established
+**Verification Status**: Ownership boundaries verified. Migration artifacts and schema state corrected from repository evidence.
+
+The repository records Phase 0 as a seed phase with no migrations generated, defers SQL Server migration application to a later phase, and contains no deployment workflow. Therefore, the tables below are classified as `Fresh` for migration planning. If an external database containing any table is identified, stop migration generation and change that table to `Deployed` before creating a baseline migration.
 
 ## Ownership Matrix
 
-| Table Name             | Owner DbContext             | Feature Location                               | Migration Status  | Phase    | Verified     |
-| ---------------------- | --------------------------- | ---------------------------------------------- | ----------------- | -------- | ------------ |
-| Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | Planned (Phase 1) | Planned  | Aug 24, 2026 |
-| Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | Ready (Phase 0)   | Deployed | Aug 24, 2026 |
-| Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | Planned (Phase 1) | Planned  | Aug 24, 2026 |
+| Table Name             | Owner DbContext             | Feature Location                               | Migration Artifacts                         | Schema State | Verified     |
+| ---------------------- | --------------------------- | ---------------------------------------------- | ------------------------------------------- | ------------ | ------------ |
+| Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Missing                                     | Fresh        | Sep 29, 2026 |
+| AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | Missing                                     | Fresh        | Sep 29, 2026 |
+| Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | `20260826143646_ProvisionExtensionInitial`   | Fresh        | Sep 29, 2026 |
+| Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Missing                                     | Fresh        | Sep 29, 2026 |
+| Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | Missing                                     | Fresh        | Sep 29, 2026 |
+| Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | `20260826193208_ManageUniversitiesInitial`   | Fresh        | Sep 29, 2026 |
 
 ## Key Constraints - Verification Status
 
@@ -64,15 +68,15 @@ This document establishes the single source of truth for database table ownershi
 
 **Constraint**: Shared Kernel migrations must run first (prerequisite for other contexts)
 
-- **Status**: ✅ PASSED (Phase 0 only)
+- **Status**: Prepared; migration artifacts are required before execution
 - **Evidence**: SharedKernel tables are foundational (Academics, AcademicQualifications)
-- **Note**: Dependency chain fully established once Phase 1 contexts create migrations
+- **Note**: Dependency chain is established, but SharedKernel migration discovery and SQL Server application remain required
 
 **Constraint**: ManageRanks and ManageDegrees migrations are independent
 
-- **Status**: ✅ PASSED
+- **Status**: Ownership verified; migration artifacts are missing
 - **Evidence**: No foreign key dependencies between Ranks and Degrees tables
-- **Verification Date**: Aug 24, 2026
+- **Verification Date**: Sep 29, 2026
 
 **Constraint**: ProvisionExtension will depend on Shared Kernel (for Extension entity)
 
@@ -104,12 +108,12 @@ This document establishes the single source of truth for database table ownershi
 
 - **Status**: ✅ PASSED
 - **Evidence**:
-  - SharedKernel/Foundation: No Migrations folder (migrations created in Phase 0 as needed)
-  - ManageRanks: No Migrations folder (Phase 0)
-  - ManageDegrees: No Migrations folder (Phase 0)
-  - ManageUniversities: Empty Migrations/ folder (Phase 1 placeholder)
-  - ProvisionExtension: Empty Migrations/ folder (Phase 1 placeholder)
-- **Verification Date**: Aug 24, 2026
+  - SharedKernel/Foundation: Migration artifacts missing
+  - ManageRanks: Migration artifacts missing
+  - ManageDegrees: Migration artifacts missing
+  - ManageUniversities: Initial migration, Designer, and snapshot present
+  - ProvisionExtension: Initial migration, Designer, and snapshot present
+- **Verification Date**: Sep 29, 2026
 
 ## Build & Test Verification
 
@@ -133,7 +137,7 @@ This document establishes the single source of truth for database table ownershi
 
 ## Migration Verification Commands
 
-### Deployed Contexts (Phase 0)
+### Fresh Schemas Missing Migration Artifacts
 
 **Shared Kernel (Academics + AcademicQualifications)**:
 
@@ -201,7 +205,7 @@ Future CI/CD pipeline must verify:
 
 1. **Uniqueness Check**: Each table appears in exactly one DbContext's migrations
 2. **Extensions Ownership**: ProvisionExtensionDbContext is the sole owner of Extensions migrations
-3. **Deployment Check**: No pending migrations exist for deployed contexts
+3. **Deployment Check**: Migration-owning contexts have complete artifacts, no pending model changes, and successful SQL Server application evidence
 4. **Matrix Sync**: Migration ownership matrix is kept in sync with actual DbContext implementations
 
 ### Recommended CI Job
@@ -241,19 +245,15 @@ jobs:
 
 ### EP-1-3: Implement ManageUniversities
 
-1. When EP-1-3 creates migrations:
-   - Generate initial migration for Universities table via ManageUniversitiesDbContext
-   - Update this matrix with migration ID
-   - Update status to ✅ Deployed
+1. EP-1-3 created `20260826193208_ManageUniversitiesInitial` for the Universities table via ManageUniversitiesDbContext.
+2. Apply and verify the migration against SQL Server before changing the schema state to `Deployed`.
 
 ### EP-1-4: Implement ProvisionExtension
 
-1. When EP-1-4 creates migrations:
-   - Generate initial migration for Extensions table via ProvisionExtensionDbContext
-   - **VERIFY**: SharedKernelDbContext still has no Extensions migration (CRITICAL)
-   - Update this matrix with migration ID
-   - Update status to ✅ Deployed
-   - Add test: `Extension_AssignedEmpNr_HasUniqueFilteredIndex` to ProvisionExtension tests
+1. EP-1-4 created `20260826143646_ProvisionExtensionInitial` for the Extensions table via ProvisionExtensionDbContext.
+2. **VERIFY**: SharedKernelDbContext still has no Extensions migration (CRITICAL).
+3. Apply and verify the migration against SQL Server before changing the schema state to `Deployed`.
+4. Retain the `Extension_AssignedEmpNr_HasUniqueFilteredIndex` test in ProvisionExtension tests.
 
 ### Future Slices
 
@@ -271,8 +271,10 @@ For all future slices:
 - **Migration Owner**: The DbContext responsible for creating and managing EF Core migrations for a specific table
 - **Feature Context**: DbContext specific to a single feature domain; one DbContext per feature
 - **Shared Kernel**: Foundation feature providing reusable entities (Academic, AcademicQualification, Extension)
-- **Phase 0**: Initial deployment (SharedKernel, ManageRanks, ManageDegrees)
-- **Phase 1**: Planned implementation (ManageUniversities, ProvisionExtension)
+- **Fresh**: No repository evidence that the table exists in an external database; an ordinary initial migration is permitted
+- **Deployed**: The table exists in an external database; the first tracked migration must be a baseline and upgrades must preserve data
+- **Phase 0**: Initial implementation phase (SharedKernel, ManageRanks, ManageDegrees)
+- **Phase 1**: Subsequent implementation phase (ManageUniversities, ProvisionExtension)
 
 ---
 
