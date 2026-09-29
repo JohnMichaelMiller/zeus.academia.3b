@@ -48,7 +48,35 @@ Implementation rules for Command Query Responsibility Segregation pattern using 
 - Publish `IDomainEvent` after `SaveChangesAsync()`
 - Persistence-bearing entities and DbContext mappings must define a real primary key before any migration is applied or startup is treated as success.
 - Model validation must fail explicitly when a required key is missing; placeholder or stub persistence models are not acceptable in committed code.
-- SQL Server/LocalDB availability checks must be explicit and environment-aware; LocalDB fallback is allowed only on confirmed Windows setups, while non-Windows hosts require a concrete connection string.
+- SQL Server/LocalDB availability checks must be explicit and environment-aware. A LocalDB fallback requires **both** a Windows platform check and an `IsDevelopment()` check; a platform check alone is insufficient because Production on Windows is the common case. See [aspnetcore-implementation.instructions.md](aspnetcore-implementation.instructions.md) for the canonical rule.
+
+### Claim Operations (Concurrent Resource Assignment)
+
+A _claim_ is any write that transitions a shared row from unowned to owned: assigning an extension, reserving a seat, allocating a number. Read-then-save is always a race — two requests read the same "available" row and both saves succeed.
+
+- MUST NOT implement a claim as `FirstOrDefaultAsync(x => x.Owner == null)` → assign → `SaveChangesAsync()`.
+- MUST make the claim atomic by one of:
+  - `ExecuteUpdateAsync` with the availability predicate in the `WHERE` clause, treating an affected-row count of `0` as the conflict outcome; or
+  - marking the claimed column `IsConcurrencyToken()` and catching `DbUpdateConcurrencyException`.
+- MUST map the lost race to the slice's existing conflict error code and its declared 409 status, never to a generic 500 or a silent success.
+- MUST ship a SQL Server integration test that issues two concurrent claims for the same resource and asserts exactly one success and one conflict.
+- MUST NOT document a race-safety guarantee in a handoff, blog post, or PR description unless the atomic guard and the concurrency test both exist in the same change.
+
+```csharp
+// ✅ Atomic claim
+var claimed = await _context.Extensions
+    .Where(e => e.Number == command.Extension && e.AssignedEmpNr == null)
+    .ExecuteUpdateAsync(s => s.SetProperty(e => e.AssignedEmpNr, empNr), ct);
+
+if (claimed == 0)
+    return Result.Failure(RegisterAcademicErrorCodes.ExtensionUnavailable);
+
+// ❌ Race: both requests observe AssignedEmpNr == null and both saves succeed
+var extension = await _context.Extensions
+    .FirstOrDefaultAsync(e => e.Number == command.Extension && e.AssignedEmpNr == null, ct);
+extension.AssignedEmpNr = empNr;
+await _context.SaveChangesAsync(ct);
+```
 
 ### Template
 

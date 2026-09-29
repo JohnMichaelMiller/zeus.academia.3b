@@ -44,7 +44,7 @@ Hard boundaries:
 
 Required review checks:
 
-- Run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` for each changed feature; every failure is blocking.
+- Run `pwsh eng/verify-slice.ps1 -AllChangedFeatures`; every failure is blocking for the current PR, including failures in a touched feature that predate this change. Reject handoffs that record such failures as carry-overs.
 - Re-derive the acceptance traceability table from the slice prompt's Contract Sheet and acceptance criteria; flag any missing request field, exact-length rule, reference resolution, error-to-status mapping, or test.
 - Verify every `Map...Endpoints()` call is invoked from the application composition root.
 - Verify a route is not considered complete when the host file compiles but the mapper is never called.

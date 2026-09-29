@@ -234,20 +234,19 @@ The section MUST cover, when applicable:
 - database key/constraint intent without redundancy (for example, avoid unique indexes that duplicate the primary key columns)
 - named check-constraint semantics (for example, use XOR naming only for strict exactly-one predicates; otherwise use mutual-exclusion naming)
 - ownership-safe association mutations (for example, releasing an extension must validate it belongs to the target academic; assignment must not overwrite an existing different assignment)
-- EF Core migration hygiene when schema changes are part of the slice (required migration artifacts, model snapshot, and metadata files must be part of the deliverable unless explicitly waived)
-- EF Core migration artifact completeness when schema changes are part of the slice (never commit snapshot-only metadata; require migration class, Designer metadata, and snapshot as one coherent set unless explicitly waived as mapping-only)
-- Executable migration evidence when the host invokes `Database.MigrateAsync()`: require `dotnet ef migrations list`, generated SQL inspection, and successful application to a fresh SQL Server database; unit or model tests alone are insufficient.
+- Executable migration evidence when the host invokes `Database.MigrateAsync()`: require generated SQL inspection and successful application to a fresh SQL Server database; unit or model tests alone are insufficient.
 - Provider-backed integration evidence for persistence-bearing slices: prompts must name the test project, harness artifact or approved shared harness, SQL Server provider package, unique database strategy, migration setup, fresh-context read-back, required behavior cases, and best-effort cleanup.
 - persistence-exception translation specificity (only translate `DbUpdateException` or equivalent persistence failures into business conflicts when the exact conflict is proven or provider handling is narrow enough to avoid masking unrelated failures)
 - model metadata testing that inspects `context.Model` directly rather than relying on `IDesignTimeModel` from the service provider in normal tests
-- migration metadata integrity checks that fail verification when snapshot, migration class, and Designer files are not committed together for schema-changing work
 - exception organization hygiene (domain exceptions should be split into dedicated files/types so file names and type names stay aligned as the exception set grows)
 - scope-to-surface alignment for prompts and PR language (claims like CRUD, get-by-id, or admin seeding must map to explicit steps, endpoints, handlers, and verification; otherwise the prompt must describe the narrower implemented scope)
-- solution-file integrity when `.sln` is touched (no duplicate project name/path entries and no duplicate configuration blocks for equivalent projects)
 - scaffold cleanup and naming hygiene (no leftover placeholder starter files; file names must match their primary type or test behavior)
-- solution-file encoding hygiene when `.sln` is touched (no BOM-only line or blank line ahead of the required Visual Studio header)
 - environment/setup helper hygiene when scripts or infrastructure-backed tests are touched (read each environment variable once and reuse the parsed value or helper result)
 - cross-platform SQL Server setup behavior for scripts/factories (SQL Server LocalDB fallback allowed only with explicit Windows guard; on non-Windows require `ZEUS_SQLSERVER_CONNECTION` with actionable failure messaging)
+- development-only fallback gating (hard-coded connection strings, seeds, or local substitutes require an `IsDevelopment()` check in addition to any platform check; outside Development, missing configuration must fail fast)
+- claim/allocation concurrency when the slice assigns a shared row (atomic `ExecuteUpdateAsync` predicate or concurrency token, zero-row translation to the declared conflict status, and a concurrent SQL Server test)
+
+Do not prompt for rules that `eng/verify-slice.ps1` already enforces — host wiring, `appsettings.json` LocalDB, solution-file integrity, migration artifact completeness, `has-pending-model-changes`, nullability placeholders, validator/route test presence, documented-path integrity, and provenance timestamps. Reference the script once in the verification workflow instead. See [ai-dev-process.instructions.md](ai-dev-process.instructions.md) for the check coverage table.
 
 Bad:
 
@@ -325,7 +324,7 @@ End the prompt with a checklist that verifies prompt quality before use.
 
 - [ ] The prompt targets exactly one slice.
 - [ ] The Contract Sheet is complete and consistent with the ORM model (exact lengths, references, error-to-status mapping, persistence owner, host composition, test matrix).
-- [ ] Verification requires `eng/verify-slice.ps1` and an acceptance traceability table.
+- [ ] Verification requires `eng/verify-slice.ps1 -AllChangedFeatures` and an acceptance traceability table, and does not restate the script's own checks as criteria.
 - [ ] Required repo instructions are listed in pre-work.
 - [ ] Custom agents are named by role, not implied.
 - [ ] Missing custom agents are called out explicitly.
@@ -340,8 +339,7 @@ End the prompt with a checklist that verifies prompt quality before use.
 - [ ] Shared result contracts include invariant access rules for success/failure payloads.
 - [ ] Result semantics explicitly reserve `Error.None` for success and forbid empty-error failures.
 - [ ] Prompted factory-enforced invariants keep constructors non-public so validation cannot be bypassed.
-- [ ] Schema-changing prompts require migration artifacts and metadata hygiene for EF Core work.
-- [ ] Host-migrated contexts have named EF discovery, generated-SQL, and fresh SQL Server application checks.
+- [ ] Host-migrated contexts have named generated-SQL and fresh SQL Server application checks.
 - [ ] Persistence-bearing prompts distinguish unit tests from provider-backed integration tests and name the required harness and behavior cases.
 - [ ] Model metadata checks use the EF Core model directly rather than a design-time service lookup in normal tests.
 - [ ] Domain exception types are organized into dedicated files/types with aligned names.
@@ -349,7 +347,8 @@ End the prompt with a checklist that verifies prompt quality before use.
 - [ ] Prompted domain create/update flows enforce persistence-backed field limits before persistence (max length, precision, scale, normalization).
 - [ ] Prompted read-only collection exposure prevents mutable backing-list or backing-array escape.
 - [ ] Prompted required string validation covers null/empty/whitespace and preserves the required-message path before format/allowed-values checks.
-- [ ] Prompted SQL Server setup behavior forbids unconditional LocalDB fallback on non-Windows hosts.
+- [ ] Prompted SQL Server setup behavior for scripts and design-time factories forbids unconditional LocalDB fallback on non-Windows hosts and outside Development.
+- [ ] Prompts that assign a shared row require an atomic claim guard and a concurrent SQL Server test.
 
 ## Anti-Patterns
 

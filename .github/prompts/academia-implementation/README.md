@@ -16,12 +16,12 @@ task_durations:
     duration: "00:10:00"
 total_duration: "01:00:00"
 ai_log: "ai-logs/2026/04/20/616990b5-0c5d-4735-a876-23fd1ebb4ff6/conversation.md"
-source: ".github/models/workflows/academia-execution-plan.md"
+source: "src/models/workflows/academia-execution-plan.md"
 ---
 
 # Academia Implementation Prompts
 
-Implementation prompt set derived from `.github/models/workflows/academia-execution-plan.md`.
+Implementation prompt set derived from `src/models/workflows/academia-execution-plan.md`.
 
 ## Phase 0
 
@@ -85,5 +85,5 @@ Execution maps:
 ## Notes
 
 - Every prompt is slice-scoped and follows `.github/instructions/implementation-prompt.instructions.md`.
-- The prompts assume the dependency order in `.github/models/workflows/academia-execution-plan.md` remains authoritative.
+- The prompts assume the dependency order in `src/models/workflows/academia-execution-plan.md` remains authoritative.
 - If the codebase folder layout differs from the plan, update the prompt targets before implementation rather than forcing the code into a mismatched structure.

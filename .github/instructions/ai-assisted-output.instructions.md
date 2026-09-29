@@ -449,6 +449,8 @@ Before committing AI-assisted content, verify:
 - [ ] Exact prompt text captured verbatim
 - [ ] Timestamps present for start and end times
 - [ ] Timestamps are real and consistent: `ended` is later than `started`, `ended - started >= total_duration`, and task durations sum to `total_duration` (no copied placeholder timestamps)
+- [ ] Front matter parses as valid YAML. In `task_durations`, each `duration:` key is aligned with the `task:` key of the same list item, not indented beneath its value
+- [ ] `summary.md` chronology is internally consistent: any "Created" or "Summary Version" timestamp is at or after `ended`, and after every event the summary describes
 - [ ] Task durations recorded and total calculated
 - [ ] Conversation log saved under `ai-logs/` structure
 - [ ] Summary file created: `ai-logs/yyyy/mm/dd/<chat-id>/summary.md`

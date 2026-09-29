@@ -33,19 +33,40 @@ applyTo: "**"
 
 Each rule family has one canonical file. Other instruction files, prompts, and agents link to it rather than restating it; fix wording drift in the canonical file only.
 
-| Rule family | Canonical file |
-| --- | --- |
-| Persistence ownership, migrations, host composition | [vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) §1 |
-| Invariant ownership, `Try*`, fixed-length identifiers, format vs. existence | [csharp-implementation.instructions.md](csharp-implementation.instructions.md) |
-| Endpoint status mapping, configuration safety | [aspnetcore-implementation.instructions.md](aspnetcore-implementation.instructions.md) |
-| Validator rules and validator test gate | [fluentvalidation-implementation.instructions.md](fluentvalidation-implementation.instructions.md) |
-| Route tests, SQL Server integration tests | [xunit-implementation.instructions.md](xunit-implementation.instructions.md) |
-| Slice prompt Contract Sheet and traceability | [implementation-prompt.instructions.md](implementation-prompt.instructions.md) |
-| Provenance metadata | [ai-assisted-output.instructions.md](ai-assisted-output.instructions.md) |
+| Rule family                                                                 | Canonical file                                                                                     |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Persistence ownership, migrations, host composition                         | [vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) §1  |
+| Invariant ownership, `Try*`, fixed-length identifiers, format vs. existence | [csharp-implementation.instructions.md](csharp-implementation.instructions.md)                     |
+| Endpoint status mapping, configuration safety                               | [aspnetcore-implementation.instructions.md](aspnetcore-implementation.instructions.md)             |
+| Claim concurrency, EF Core command/handler rules                            | [cqrs-mediatr-efcore.instructions.md](cqrs-mediatr-efcore.instructions.md)                         |
+| Validator rules and validator test gate                                     | [fluentvalidation-implementation.instructions.md](fluentvalidation-implementation.instructions.md) |
+| Route tests, SQL Server integration tests                                   | [xunit-implementation.instructions.md](xunit-implementation.instructions.md)                       |
+| Slice prompt Contract Sheet and traceability                                | [implementation-prompt.instructions.md](implementation-prompt.instructions.md)                     |
+| Provenance metadata                                                         | [ai-assisted-output.instructions.md](ai-assisted-output.instructions.md)                           |
 
 ## Mechanical Verification Gate
 
-Before handoff or PR, run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` for every changed feature. A failing check is a blocker; do not rely on the self-review list below as a substitute. When a new recurring review finding can be detected mechanically, add a check to the script instead of another checklist bullet.
+Before handoff or PR, run `pwsh eng/verify-slice.ps1 -AllChangedFeatures`. This discovers every feature touched by the branch and runs the full check set for each.
+
+A failing check is a blocker for the **current** PR regardless of which change introduced it. There is no carry-over, pre-existing-failure, or follow-up-slice exemption: if your branch touches `Extensions/ProvisionExtension`, that feature must pass before handoff. If a failure genuinely cannot be fixed in scope, escalate and get explicit sign-off — do not record it in a handoff as a known carry-over.
+
+The script owns these rules. They are deliberately absent from the self-review list below; fix them by making the script pass, not by re-reading prose:
+
+| Check                             | Enforces                                                                                        |
+| --------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `host`                            | `Program.cs` feature usage has a matching `<ProjectReference>`; every `Map*Endpoints` is called |
+| `config`                          | no LocalDB string in `appsettings.json`; no LocalDB fallback without an `IsDevelopment()` guard |
+| `concurrency`                     | claim handlers use an atomic guard instead of read-then-save                                    |
+| `nullability` / `try-pattern`     | no `null!`/`default!` placeholders; `Try*` uses nullable out values                             |
+| `persistence` / `migrations`      | feature-local DbContext ownership; migration class + Designer + snapshot ship together          |
+| `sqlserver`                       | SQL Server provider package present; tests apply `MigrateAsync()`; no `EnsureCreated`           |
+| `validator-tests` / `route-tests` | every validator has tests; every declared `Produces*` status has a route test                   |
+| `solution`                        | one declaration per project; header on line 1                                                   |
+| `doc-refs`                        | every repo-relative path cited in changed Markdown exists in the tree                           |
+| `provenance`                      | front-matter timestamps are consistent and `task_durations` is valid YAML                       |
+| `build` / `tests` / `ef`          | solution builds; feature tests pass; migrations are discovered with no pending model changes    |
+
+Do not rely on the self-review list below as a substitute. When a new recurring review finding can be detected mechanically, add a check to the script instead of another checklist bullet.
 
 ## AI Code Generation
 
@@ -66,13 +87,9 @@ Before handoff or PR, run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>
 
 **Pre-PR Review-Prevention Checks (Required):**
 
-- MUST verify reference integrity for every documented command/path before commit:
-  - If documentation or agent guidance references a file, that file must be committed in the same change.
-  - If guidance references an editor task (for example a VS Code task), the corresponding task file must exist in the repository; otherwise reference a committed script command instead.
+- MUST verify reference integrity for claims the `doc-refs` check cannot see: a referenced editor task (for example a VS Code task) must have its task file committed, or the guidance must cite a committed script command instead.
 - MUST validate platform assumptions for runtime tooling:
-  - SQL Server local-development fallbacks (for example SQL Server LocalDB) must be explicitly guarded.
-  - On non-Windows, require explicit environment configuration instead of silent fallback.
-  - Design-time DbContext factories and verification scripts must use the same SQL Server-specific platform guard behavior as runtime verification (no unconditional LocalDB fallback on non-Windows hosts).
+  - Design-time DbContext factories and verification scripts must use the same SQL Server platform and environment guard behavior as runtime verification (no unconditional LocalDB fallback on non-Windows hosts, and no fallback outside Development). See [aspnetcore-implementation.instructions.md](aspnetcore-implementation.instructions.md) for the canonical rule.
 - MUST run a focused self-review for common correctness regressions before opening PR:
   - Vertical slice layout and boundaries match [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md).
   - Placeholder scaffolding artifacts are removed or renamed before review; do not leave `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter files in committed slices.
@@ -86,18 +103,8 @@ Before handoff or PR, run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>
   - Backing `List<T>` collections are not exposed directly; read-only members return immutable/read-only wrappers (for example `AsReadOnly()`).
   - Database exception translation is narrow and evidence-based; do not collapse every `DbUpdateException` into a duplicate/conflict result unless a targeted post-failure existence check proves that specific conflict.
   - No duplicate uniqueness enforcement on the same database key path (for example PK + duplicate unique index).
-  - Any EF Core model, configuration, or `DbSet` addition that changes schema ships with the matching migration artifacts and updated model snapshot unless the change is explicitly documented as mapping-only.
-  - Do not commit a standalone EF Core model snapshot; when migrations are in scope, include the migration class plus its Designer metadata alongside the snapshot (or omit all migration artifacts when explicitly waived as mapping-only).
-  - If a slice introduces or changes route groups, verify the application host maps them explicitly before review; do not rely on implicit discovery.
-  - If `Program.cs` uses a feature namespace, the host `.csproj` references that feature project and the full solution builds.
-  - The checked-in `appsettings.json` contains no LocalDB or developer connection string.
   - Every acceptance criterion in the slice prompt appears in the handoff traceability table with an implementing file and a test; an omitted request field or criterion is a blocker, not a follow-up.
-  - If the application host calls `Database.MigrateAsync()` for a feature DbContext, ensure the feature includes matching migration artifacts or the migration owner is explicitly documented.
-  - For every host-migrated feature DbContext, run `dotnet ef migrations list` and verify it discovers at least one migration; generate migration SQL and confirm it contains the expected tables and constraints. Treat “No migrations were found” or failed fresh-database application as a blocking defect.
   - When a canonical domain helper normalizes input before validation, run length/shape checks on the normalized value rather than the raw string.
-  - Do not use `null!` to satisfy failing lookup helpers; nullable out values are required when the failure path is real.
-  - No duplicate project declarations in solution files; project name/path pairs must appear once with one GUID and one configuration block.
-  - Any touched solution file must keep the required Visual Studio header as the first line with no leading blank line or stray BOM-only line.
   - Test/setup helpers and verification scripts read environment configuration once per value and reuse the parsed result instead of duplicating environment-variable lookups across branches.
   - Database constraint names must match predicate semantics; reserve "Xor" naming for strict exactly-one rules and use explicit mutual-exclusion naming when both-false is allowed.
   - Method and type naming remains compliant with language conventions (for example PascalCase in C#).
@@ -107,7 +114,7 @@ Before handoff or PR, run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>
   - Value-object parse/creation APIs reject lossy coercion (for example silently truncating fractional inputs) unless the behavior is explicitly required and tested.
   - Domain creation/update paths enforce persistence-backed field limits (for example max length, precision, scale) at creation-time so invalid objects are rejected before persistence.
   - Integration tests that provision external resources (databases, containers, queues, files) perform best-effort cleanup in `finally` blocks.
-  - Any persistence-bearing feature change must include provider-backed SQL Server integration tests in the feature test project; unit or EF Core InMemory tests alone do not satisfy the persistence gate. The handoff must report the executed integration test count and any blocked infrastructure checks.
+  - The handoff reports the executed SQL Server integration test count and any blocked infrastructure checks; unit or EF Core InMemory tests alone do not satisfy the persistence gate.
   - Public/shared parse or mapping APIs retain direct acceptance tests when touched; do not remove only-path coverage without replacement.
   - Constrained-code parse/validation failures remain actionable by including allowed values (prefer constants over inline literals).
   - Validation messages must derive allowed values from a single source of truth rather than duplicating hard-coded literals across exception messages.

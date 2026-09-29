@@ -63,7 +63,7 @@ Every implementation prompt must explicitly require the implementation team to d
 - verify that a feature-local DbContext or migration path is explicitly owned and invoked from the host when startup applies migrations
 - include a verification step for `Produces*` response contracts when the route advertises validation or conflict responses
 - when a feature owns reference data needed by downstream slices, name its public query/response contract and prohibit direct consumer access to that feature's DbContext or persistence entity
-- run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` and report its output; a failing check blocks handoff
+- run `pwsh eng/verify-slice.ps1 -AllChangedFeatures` and report its output; a failing check blocks handoff for every touched feature, with no carry-over exemption
 - produce an acceptance traceability table (criterion → implementing file → test name); any criterion without a test is not done
 
 If the slice adds a Minimal API or route aggregation file, the acceptance criteria must include the startup mapping call and a verification step proving the path is reachable.
@@ -149,6 +149,7 @@ Required tables (write `N/A` with a reason when a table does not apply):
 5. **Persistence**: feature DbContext name, tables owned, migration root, host `MigrateAsync` call, and any Shared Kernel configurations touched with the DbContexts that need migrations for them.
 6. **Host composition**: host `<ProjectReference>`, DI registration method, endpoint map method, config keys (none in `appsettings.json` for LocalDB).
 7. **Test matrix**: test project path, required packages (`Microsoft.EntityFrameworkCore.SqlServer`, `Microsoft.AspNetCore.Mvc.Testing`), validator test file, route test file, SQL Server migration suite, and the minimum cases per file.
+8. **Concurrency and uniqueness**: for every shared row the slice claims, reserves, or allocates — resource → availability predicate → atomic mechanism (`ExecuteUpdateAsync` row count or concurrency token) → lost-race error code → HTTP status → concurrent-claim test name. Write `N/A — no claim operations` when the slice only inserts rows it owns.
 
 ## Step-by-Step Implementation Guidance
 
@@ -174,6 +175,8 @@ Use this step format:
 ## Acceptance Criteria Standards
 
 Acceptance criteria must be observable and testable by both agents and humans. Write them as outcomes, not intentions.
+
+Do not restate rules that `eng/verify-slice.ps1` already enforces (host wiring, `appsettings.json` LocalDB, solution hygiene, migration artifact completeness, `has-pending-model-changes`, nullability placeholders, validator/route test presence, documented-path integrity, provenance timestamps). Prompts cite the script once in the verification workflow; repeating its checks as criteria dilutes the criteria that need human judgement. See [ai-dev-process.instructions.md](ai-dev-process.instructions.md) for the check coverage table.
 
 Required coverage:
 
@@ -201,20 +204,17 @@ Required coverage:
 - Shared result/failure factories guard non-null failure payload invariants in both generic and non-generic forms
 - Result semantics reserve `Error.None` for success only; failed results must carry actionable details and cannot be constructed with an empty success sentinel.
 - Factory-enforced invariant paths retain constructor visibility guards (types that rely on `Create`/`TryCreate` or equivalent do not expose public constructors that bypass validation)
-- EF Core schema changes require migration artifacts and metadata hygiene (for example, migration plus snapshot/Designer files when the project uses migrations) unless the prompt explicitly waives them and explains the tradeoff.
-- EF Core migration metadata must be internally consistent: never add or keep a model snapshot by itself; schema-changing slices must include the migration class, Designer metadata, and snapshot together (unless the prompt explicitly waives migrations as mapping-only work).
 - Persistence-exception translation must stay specific to the contract being returned; duplicate/conflict responses require proof of that exact conflict after the failed save or provider-specific handling narrow enough to avoid masking unrelated write failures.
 - Model metadata verification should inspect `context.Model` directly instead of relying on `context.GetService<IDesignTimeModel>()` in normal tests.
 - Exception types should be split into dedicated files/types with names that stay aligned as the exception set grows.
 - Slice language and delivered surface must stay aligned: if a prompt or PR claims CRUD, get-by-id, admin seeding, or other concrete operations, the ordered steps and acceptance criteria must name and verify each operation explicitly; otherwise narrow the wording to the implemented subset.
-- Solution hygiene when `.sln` files change: no duplicate project name/path entries, no duplicate GUID configuration blocks.
-- Solution-file format hygiene when `.sln` files change: the `Microsoft Visual Studio Solution File` header remains on line 1 with no leading blank line.
 - Foundational primitive coverage when shared base types are touched (for example `Result` and `Result<T>`): direct tests for non-generic and generic success/failure invariants.
 - Scaffold cleanup and naming hygiene when new files are introduced: no leftover `Class1.cs`, `UnitTest1.cs`, `Placeholder` types, or similar starter artifacts; file names must match the primary type or test behavior.
 - Script and setup-helper hygiene when verification touches infrastructure configuration: environment variables are read once per value and reused through a local variable or helper instead of duplicated lookups.
 - Teardown failure isolation for integration tests: cleanup runs as best-effort in `finally` and teardown exceptions must not replace the primary assertion failure signal.
-- InMemory tests may supplement persistence tests but cannot replace SQL Server integration evidence when a feature owns a DbContext or migration set.
 - Cross-platform SQL Server setup behavior for scripts/factories: SQL Server LocalDB fallback is allowed only behind explicit Windows checks; on non-Windows hosts require `ZEUS_SQLSERVER_CONNECTION` and fail with actionable diagnostics.
+- Claim/allocation concurrency: atomic guard (`ExecuteUpdateAsync` row count or concurrency token), zero-row translation to the declared conflict status, and a concurrent SQL Server test — required whenever the slice assigns a shared resource.
+- Development-only fallbacks are gated on `IsDevelopment()` in addition to any platform check; outside Development, missing configuration fails fast instead of resolving to a local default.
 
 For each non-trivial business rule, the prompt must also name the intended enforcement layers. At minimum, state whether the rule is enforced in the aggregate, validator, handler, database constraint, or some explicit combination of those layers.
 
@@ -351,21 +351,21 @@ Example for a single slice:
 
 ## Contract Sheet
 
-| Field | Type | Required | Length/range | Normalization | Canonical owner |
-| ----- | ---- | -------- | ------------ | ------------- | --------------- |
-| {{field}} | {{type}} | {{yes/no}} | {{exact}} | {{rule}} | {{constant/factory}} |
+| Field     | Type     | Required   | Length/range | Normalization | Canonical owner      |
+| --------- | -------- | ---------- | ------------ | ------------- | -------------------- |
+| {{field}} | {{type}} | {{yes/no}} | {{exact}}    | {{rule}}      | {{constant/factory}} |
 
-| Reference | Owning slice | Public contract | Not found | Inactive |
-| --------- | ------------ | --------------- | --------- | -------- |
-| {{field}} | {{slice}} | {{query}} | {{error}} | {{error}} |
+| Reference | Owning slice | Public contract | Not found | Inactive  |
+| --------- | ------------ | --------------- | --------- | --------- |
+| {{field}} | {{slice}}    | {{query}}       | {{error}} | {{error}} |
 
-| Invariant | Aggregate enforcement | Validator | DB constraint |
-| --------- | --------------------- | --------- | ------------- |
-| {{rule}} | {{factory}} | {{rule}} | {{constraint}} |
+| Invariant | Aggregate enforcement | Validator | DB constraint  |
+| --------- | --------------------- | --------- | -------------- |
+| {{rule}}  | {{factory}}           | {{rule}}  | {{constraint}} |
 
-| Error code | HTTP status | Produces* | Route test |
-| ---------- | ----------- | --------- | ---------- |
-| {{code}} | {{status}} | {{declaration}} | {{test}} |
+| Error code | HTTP status | Produces\*      | Route test |
+| ---------- | ----------- | --------------- | ---------- |
+| {{code}}   | {{status}}  | {{declaration}} | {{test}}   |
 
 - Persistence: {{dbcontext}}, tables {{tables}}, migrations at {{root}}, applied by {{host_call}}; Shared Kernel configurations touched: {{none_or_list}}
 - Host composition: {{project_reference}}, {{add_method}}, {{map_method}}
@@ -428,7 +428,7 @@ Example for a single slice:
 - [ ] Read-only collection members do not leak mutable backing lists
 - [ ] SQL Server setup paths avoid unconditional LocalDB fallback on non-Windows hosts
 - [ ] Showcase steps demonstrate business value
-- [ ] `eng/verify-slice.ps1` passes for the feature
+- [ ] `eng/verify-slice.ps1 -AllChangedFeatures` passes for every feature the branch touches
 - [ ] Traceability table maps every criterion and Contract Sheet row to a file and a test
 ```
 

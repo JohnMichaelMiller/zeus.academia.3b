@@ -113,8 +113,7 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 - [ ] `chat_id` matches conversation log filename pattern
 - [ ] `ai_log` path exists and contains `conversation.md` + `summary.md`
 - [ ] `model` format: `<provider>/<model>@<version>`
-- [ ] Timestamps are valid ISO8601
-- [ ] Durations sum to `total_duration`
+- [ ] Timestamp and duration consistency is covered by the `provenance` check in `eng/verify-slice.ps1`; do not re-verify by hand
 
 **Repository-Level Checks:**
 
@@ -228,6 +227,7 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 
 **Before Review Request:**
 
+- [ ] `pwsh eng/verify-slice.ps1 -AllChangedFeatures` passes; its failures are blocking with no carry-over exemption (see [ai-dev-process.instructions.md](ai-dev-process.instructions.md) for the check coverage table)
 - [ ] Branch updated with latest main (rebase or merge)
 - [ ] All commits signed (if repository requires)
 - [ ] Commit messages use conventional format: `<type>(<scope>): <subject>`
@@ -236,7 +236,7 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 - [ ] Slice changes comply with [.github/instructions/vertical-slice-implementation.instructions.md](vertical-slice-implementation.instructions.md) and keep use-case artifacts co-located under the feature-domain tree
 - [ ] Tests added/updated for all functional changes
 - [ ] Integration tests that create external resources include deterministic best-effort cleanup (`finally` teardown)
-- [ ] Each changed persistence-bearing feature includes provider-backed SQL Server integration evidence, with isolated database names, migration application, cleanup, and the executed test count recorded
+- [ ] The executed SQL Server integration test count and any blocked infrastructure checks are recorded in the PR or handoff
 - [ ] No secrets, credentials, or PII in diff
 - [ ] Linting passes (`eslint`, `pylint`, `clippy`, etc.)
 - [ ] Type checking passes (TypeScript, mypy, etc.)
@@ -299,7 +299,7 @@ Add this reference under existing standards entries, maintaining alphabetical or
 
 **PR Template Auto-Population:**
 
-- Use `.github/pull_request_template.md` with AI provenance section
+- Use a pull-request template with an AI provenance section; if none is configured, include that section in the PR description.
 - Auto-detect AI-generated files and pre-fill metadata summary
 
 **Branch Protection Settings:**

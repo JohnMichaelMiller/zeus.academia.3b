@@ -50,12 +50,14 @@ Standards for implementing feature domains as collections of self-contained use-
 - Migration readiness gate: when the host invokes `Database.MigrateAsync()` for a feature DbContext, the owning project must contain a migration class, matching Designer metadata, and model snapshot under its named migration root. Verification must run `dotnet ef migrations list`, generate a migration script, and apply the migration to a fresh SQL Server database; a passing model test, build, or unit test alone is insufficient.
 - Migration discovery failure: a feature is blocked when `dotnet ef migrations list` reports no migrations for a host-migrated DbContext, when the generated script omits expected schema objects, or when the migration cannot be applied to the target SQL Server provider.
 - Contract parity gate: if an endpoint advertises validation or conflict responses, the runtime must return the declared 4xx response instead of surfacing raw exceptions or 500s.
+- Claim concurrency gate: any handler that transitions a shared row from unowned to owned must use an atomic guard (`ExecuteUpdateAsync` with the availability predicate, or a concurrency token), translate the lost race to the declared conflict status, and ship a concurrent SQL Server test. Read-then-save claims are defects even when tests pass sequentially.
+- No-carry-over gate: `eng/verify-slice.ps1` must pass for **every** feature the branch touches, not just the feature being added. Pre-existing failures in a touched feature are blockers for the current PR, not documented carry-overs.
 
 ## Runtime and Integration Completion Checklist
 
 Before a slice is considered ready for review or merge, verify all of the following:
 
-- [ ] `eng/verify-slice.ps1 -Feature <Domain>/<Feature>` passes.
+- [ ] `eng/verify-slice.ps1 -AllChangedFeatures` passes for every feature the branch touches.
 - [ ] Every feature namespace used by the host has a `<ProjectReference>` and the solution builds.
 - [ ] Every new `Map...Endpoints()` or endpoint group is called from `Program.cs` or the composition root.
 - [ ] Startup or integration verification confirms the route is reachable at runtime.
@@ -426,7 +428,7 @@ public sealed class SendEnrollmentConfirmationHandler(IEmailService email)
 
 ## 8. Testing Conventions
 
-- Mirror the source layout in tests: `tests/features/Enrollment/CreateEnrollment/CreateEnrollmentHandlerTests.cs`.
+- For example, mirror the source layout in tests: `tests/features/Enrollment/CreateEnrollment/CreateEnrollmentHandlerTests.cs`.
 - Never mock `DbContext`; use a real SQL Server-backed test environment or a SQL Server test container.
 - Cover the full use-case path from request through persistence.
 - Test validators separately for failure-path detail.

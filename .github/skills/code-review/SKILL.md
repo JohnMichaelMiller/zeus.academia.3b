@@ -26,7 +26,7 @@ Use this skill when reviewing a change that introduces routes, handlers, validat
 ## Required review checks
 
 0. Mechanical gate
-   - Run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` for each changed feature and report every failure as blocking before manual review.
+   - Run `pwsh eng/verify-slice.ps1 -AllChangedFeatures` and report every failure as blocking before manual review. A failure in a feature the branch merely touches is still blocking; it is not a carry-over.
    - Compare the changed code against the slice prompt's Contract Sheet: every request field, exact length, reference resolution contract, error-to-status row, DbContext owner, and test-matrix entry must be present.
    - Reject reference validation that only calls a value-object `Create` (format) without resolving the code through the owning slice's public query (existence).
    - Reject aggregate invariants enforced only in a validator; the aggregate factory must enforce them too.

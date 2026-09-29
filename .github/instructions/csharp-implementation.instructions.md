@@ -269,6 +269,9 @@ Use explicit state guards for success/failure wrappers so invalid states fail lo
 **Rules:**
 
 - WHEN adding EF Core migrations, keep the migration plus the standard metadata artifacts required by the project tooling (for example snapshot/Designer files) in the same change unless the work explicitly waives them
+- MUST generate migration, Designer, and snapshot files with `dotnet ef migrations add` run against the real model. Hand-authoring or hand-editing these files is prohibited; if the output looks wrong, fix the `IEntityTypeConfiguration` and regenerate
+- MUST leave `dotnet ef migrations has-pending-model-changes` clean for every migration-owning DbContext before handoff. A non-empty result means the snapshot is out of sync and the next migration will emit an invalid schema change
+- MUST preserve model-affecting fluent annotations (`ValueGeneratedNever`, `IsConcurrencyToken`, `IsRowVersion`, `HasPrecision`) across the configuration, every Designer target model, and the snapshot. A divergence between any two is a blocking defect, not a cosmetic one
 - MUST keep domain exception types organized so file names and type names stay aligned; prefer one primary exception type per file when the exception set grows
 - MUST verify persistence rules through the EF Core model and migration output rather than relying on ad-hoc assumptions or provider-agnostic shortcuts
 - MUST enforce persistence-backed field constraints (max length, precision, scale, required normalization) in domain creation/update APIs so invalid values are rejected before persistence

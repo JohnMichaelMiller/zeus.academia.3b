@@ -39,8 +39,8 @@ mode: agent
 ## Context Files to Review First
 
 - `.github/prompts/academia-implementation/ep-0-1-shared-kernel-implementation.prompt.md`
-- `.github/models/workflows/academia-execution-plan.md`
-- `.github/models/workflows/academia-implementation-plan.md`
+- `src/models/workflows/academia-execution-plan.md`
+- `src/models/workflows/academia-implementation-plan.md`
 - `.github/instructions/project-overview.instructions.md`
 - `.github/instructions/vertical-slice-implementation.instructions.md`
 - `.github/instructions/aspnetcore-implementation.instructions.md`

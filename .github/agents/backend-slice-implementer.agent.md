@@ -49,7 +49,7 @@ Hard boundaries:
 - Do not rely on `null!` for lookup helpers; model failure paths with nullable outputs and explicit caller checks.
 - Implement exactly the slice prompt's Contract Sheet; if a field, reference contract, or error mapping is missing or contradicts the ORM model, escalate instead of guessing or dropping it.
 - Write through the feature-local DbContext only; never inject `SharedKernelDbContext` into a feature handler.
-- Before handoff, run `pwsh eng/verify-slice.ps1 -Feature <Domain>/<Feature>` until it passes and include the acceptance traceability table (criterion → file → test) in Verification Results.
+- Before handoff, run `pwsh eng/verify-slice.ps1 -AllChangedFeatures` until it passes for every feature the branch touches, and include the acceptance traceability table (criterion → file → test) in Verification Results.
 
 Required output structure when invoked:
 
@@ -80,7 +80,7 @@ Required output structure when invoked:
 | Implement backend slice files and tests                | Simple  | —                                            |
 | Run focused build and test commands                    | Simple  | —                                            |
 | Escalate when shared-kernel prerequisites are missing  | Simple  | —                                            |
-| Execute dependency-ordered rollout of slice prompts    | Complex | `.github/prompts/academia/execution-plan.md` |
+| Execute dependency-ordered rollout of slice prompts    | Complex | `src/models/workflows/academia-execution-plan.md` |
 
 ## Expertise
 

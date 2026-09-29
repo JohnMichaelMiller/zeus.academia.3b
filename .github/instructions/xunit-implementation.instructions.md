@@ -64,6 +64,11 @@ var builder = new SqlConnectionStringBuilder(connectionString);
 builder.InitialCatalog = $"ZeusTests_{Guid.NewGuid():N}";
 ```
 
+## Concurrency Coverage
+
+- MUST cover claim/allocation handlers with a concurrent SQL Server test that starts two claims for the same resource on separate `DbContext` instances and asserts exactly one success and one conflict. A sequential two-call test does not satisfy this.
+- MUST assert the losing request returns the slice's declared conflict error code and status, not a generic failure.
+
 ## Integration Resource Lifecycle
 
 - Tests that create external resources (SQL databases, containers, queues, files, temp schemas) MUST clean them up in a `finally` block.
