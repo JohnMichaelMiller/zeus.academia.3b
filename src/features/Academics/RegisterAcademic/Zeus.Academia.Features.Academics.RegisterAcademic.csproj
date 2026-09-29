@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.9.2" />
+    <PackageReference Include="MediatR" Version="12.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SharedKernel\Foundation\Zeus.Academia.Features.SharedKernel.Foundation.csproj" />
+    <ProjectReference Include="..\..\ReferenceData\ManageDegrees\Zeus.Academia.Features.ReferenceData.ManageDegrees.csproj" />
+    <ProjectReference Include="..\..\ReferenceData\ManageRanks\Zeus.Academia.Features.ReferenceData.ManageRanks.csproj" />
+    <ProjectReference Include="..\..\ReferenceData\ManageUniversities\Zeus.Academia.Features.ReferenceData.ManageUniversities.csproj" />
+    <ProjectReference Include="..\..\Extensions\ProvisionExtension\Zeus.Academia.Features.Extensions.ProvisionExtension.csproj" />
+  </ItemGroup>
+
+</Project>
