@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MediatR;
+using Zeus.Academia.Features.Academics.RegisterAcademic;
 using Zeus.Academia.Features.Extensions.ProvisionExtension;
 using Zeus.Academia.Features.ReferenceData.ManageDegrees;
 using Zeus.Academia.Features.ReferenceData.ManageDegrees.Shared;
@@ -89,6 +90,10 @@ builder.Services.AddManageUniversitiesMediatR();
 builder.Services.AddProvisionExtensionPersistence(connectionString);
 builder.Services.AddProvisionExtensionMediatR();
 
+// Feature 5: Register Academic
+builder.Services.AddRegisterAcademicPersistence(connectionString);
+builder.Services.AddRegisterAcademicMediatR();
+
 // ============================================================================
 // Service Registration: MediatR Handlers and Validators
 // ============================================================================
@@ -157,9 +162,12 @@ app.MapManageDegreesEndpoints();
 app.MapManageRanksEndpoints();
 app.MapProvisionExtensionsEndpoints();
 app.MapManageUniversitiesEndpoints();
+app.MapRegisterAcademicEndpoints();
 app.MapHealthCheck("/health");
 
 app.Run();
+
+public partial class Program;
 
 // ============================================================================
 // Health Check Endpoint

@@ -24,6 +24,7 @@
     <ProjectReference Include="..\features\ReferenceData\ManageDegrees\Zeus.Academia.Features.ReferenceData.ManageDegrees.csproj" />
     <ProjectReference Include="..\features\ReferenceData\ManageUniversities\Zeus.Academia.Features.ReferenceData.ManageUniversities.csproj" />
     <ProjectReference Include="..\features\Extensions\ProvisionExtension\Zeus.Academia.Features.Extensions.ProvisionExtension.csproj" />
+    <ProjectReference Include="..\features\Academics\RegisterAcademic\Zeus.Academia.Features.Academics.RegisterAcademic.csproj" />
   </ItemGroup>
 
 </Project>

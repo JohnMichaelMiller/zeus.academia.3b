@@ -46,9 +46,23 @@ public sealed class Academic
     var normalizedEmpNr = NormalizeEmpNr(empNr);
     var normalizedName = NormalizeEmpName(empName);
 
+    if (qualifications.Count == 0)
+    {
+      throw new BusinessRuleViolationException("Academic must include at least one qualification.");
+    }
+
     if (isTenured && contractEndDate is not null)
     {
       throw new BusinessRuleViolationException("Academic cannot be both tenured and contracted.");
+    }
+
+    var seenPairs = new HashSet<(string degreeCode, string universityCode)>(
+      qualifications.Select(x => (x.degree.Code, x.university.Code)),
+      new QualificationPairComparer());
+
+    if (seenPairs.Count != qualifications.Count)
+    {
+      throw new BusinessRuleViolationException("Qualification pairs must be unique.");
     }
 
     var academic = new Academic(normalizedEmpNr, normalizedName, rank, isTenured, contractEndDate);
@@ -88,7 +102,7 @@ public sealed class Academic
     EmpName = NormalizeEmpName(empName);
   }
 
-  internal static string NormalizeEmpNr(string empNr)
+  public static string NormalizeEmpNr(string empNr)
   {
     if (string.IsNullOrWhiteSpace(empNr))
     {
@@ -97,15 +111,15 @@ public sealed class Academic
 
     var normalized = empNr.Trim().ToUpperInvariant();
 
-    if (normalized.Length > SharedKernelFieldLengths.EmpNr)
+    if (normalized.Length != SharedKernelFieldLengths.EmpNr)
     {
-      throw new BusinessRuleViolationException($"Employee number cannot exceed {SharedKernelFieldLengths.EmpNr} characters.");
+      throw new BusinessRuleViolationException($"Employee number must be exactly {SharedKernelFieldLengths.EmpNr} characters.");
     }
 
     return normalized;
   }
 
-  private static string NormalizeEmpName(string empName)
+  public static string NormalizeEmpName(string empName)
   {
     if (string.IsNullOrWhiteSpace(empName))
     {
@@ -120,5 +134,17 @@ public sealed class Academic
     }
 
     return normalized;
+  }
+
+  private sealed class QualificationPairComparer : IEqualityComparer<(string degreeCode, string universityCode)>
+  {
+    public bool Equals((string degreeCode, string universityCode) x, (string degreeCode, string universityCode) y)
+      => string.Equals(x.degreeCode, y.degreeCode, StringComparison.OrdinalIgnoreCase)
+      && string.Equals(x.universityCode, y.universityCode, StringComparison.OrdinalIgnoreCase);
+
+    public int GetHashCode((string degreeCode, string universityCode) obj)
+      => HashCode.Combine(
+        StringComparer.OrdinalIgnoreCase.GetHashCode(obj.degreeCode),
+        StringComparer.OrdinalIgnoreCase.GetHashCode(obj.universityCode));
   }
 }
