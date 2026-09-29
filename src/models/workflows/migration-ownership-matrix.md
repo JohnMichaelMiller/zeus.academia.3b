@@ -22,7 +22,7 @@ The repository records Phase 0 as a seed phase with no migrations generated, def
 | ---------------------- | --------------------------- | ---------------------------------------------- | ------------------------------------------ | ------------ | ------------ |
 | Academics              | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | `20260929171605_SharedKernelInitial`       | Fresh        | Sep 29, 2026 |
 | AcademicQualifications | SharedKernelDbContext       | src/features/SharedKernel/Foundation/          | `20260929171605_SharedKernelInitial`       | Fresh        | Sep 29, 2026 |
-| Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | `20260826143646_ProvisionExtensionInitial` | Fresh        | Sep 29, 2026 |
+| Extensions             | ProvisionExtensionDbContext | src/features/Extensions/ProvisionExtension/    | `20260929173653_ProvisionExtensionInitial` | Fresh        | Sep 29, 2026 |
 | Ranks                  | ManageRanksDbContext        | src/features/ReferenceData/ManageRanks/        | Missing                                    | Fresh        | Sep 29, 2026 |
 | Degrees                | ManageDegreesDbContext      | src/features/ReferenceData/ManageDegrees/      | `20260929172158_ManageDegreesInitial`      | Fresh        | Sep 29, 2026 |
 | Universities           | ManageUniversitiesDbContext | src/features/ReferenceData/ManageUniversities/ | `20260826193208_ManageUniversitiesInitial` | Fresh        | Sep 29, 2026 |
@@ -251,7 +251,7 @@ jobs:
 
 ### EP-1-4: Implement ProvisionExtension
 
-1. EP-1-4 created `20260826143646_ProvisionExtensionInitial` for the Extensions table via ProvisionExtensionDbContext.
+1. EP-1-4 created `20260929173653_ProvisionExtensionInitial` for the Extensions table via ProvisionExtensionDbContext.
 2. **VERIFY**: SharedKernelDbContext still has no Extensions migration (CRITICAL).
 3. Apply and verify the migration against SQL Server before changing the schema state to `Deployed`.
 4. Retain the `Extension_AssignedEmpNr_HasUniqueFilteredIndex` test in ProvisionExtension tests.

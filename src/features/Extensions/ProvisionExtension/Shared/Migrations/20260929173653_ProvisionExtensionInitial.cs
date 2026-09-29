@@ -15,7 +15,7 @@ namespace Zeus.Academia.Features.Extensions.ProvisionExtension.Shared.Migrations
                 columns: table => new
                 {
                     Number = table.Column<int>(type: "int", nullable: false),
-                    AssignedEmpNr = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                    AssignedEmpNr = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: true)
                 },
                 constraints: table =>
                 {

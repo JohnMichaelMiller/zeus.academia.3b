@@ -85,7 +85,7 @@ public sealed class ProvisionExtensionSqlServerIntegrationTests
     await using var database = await ProvisionExtensionSqlServerTestDatabase.CreateAsync();
     await using var seedContext = database.CreateContext();
     var extension = Extension.Create(42);
-    extension.AssignTo("123");
+    extension.AssignTo("A00123");
     seedContext.Extensions.Add(extension);
     await seedContext.SaveChangesAsync();
 
@@ -97,6 +97,6 @@ public sealed class ProvisionExtensionSqlServerIntegrationTests
 
     await using var readContext = database.CreateContext();
     var persisted = await readContext.Extensions.SingleAsync(x => x.Number == 42);
-    Assert.Equal("123", persisted.AssignedEmpNr);
+    Assert.Equal("A00123", persisted.AssignedEmpNr);
   }
 }

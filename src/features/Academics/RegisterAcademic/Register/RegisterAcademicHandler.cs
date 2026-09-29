@@ -110,9 +110,25 @@ public sealed class RegisterAcademicHandler : IRequestHandler<RegisterAcademicCo
         request.IsTenured,
         request.ContractEndDate);
 
-      extension.AssignTo(normalizedEmpNr);
-      _dbContext.Academics.Add(academic);
-      await _dbContext.SaveChangesAsync(cancellationToken);
+      if (_dbContext.Database.IsRelational())
+      {
+        var claimResult = await PersistWithAtomicExtensionClaimAsync(
+          academic,
+          request.ExtNr,
+          normalizedEmpNr,
+          cancellationToken);
+
+        if (claimResult is not null)
+        {
+          return claimResult;
+        }
+      }
+      else
+      {
+        extension.AssignTo(normalizedEmpNr);
+        _dbContext.Academics.Add(academic);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+      }
 
       var response = new RegisterAcademicResponse(
         academic.EmpNr,
@@ -137,6 +153,56 @@ public sealed class RegisterAcademicHandler : IRequestHandler<RegisterAcademicCo
     {
       return Result<RegisterAcademicResponse>.Failure(
         Error.Create("InvalidAcademicRegistration", ex.Message));
+    }
+  }
+
+  private async Task<Result<RegisterAcademicResponse>?> PersistWithAtomicExtensionClaimAsync(
+    Academic academic,
+    int extensionNumber,
+    string normalizedEmpNr,
+    CancellationToken cancellationToken)
+  {
+    await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+    try
+    {
+      var claimedRows = await _dbContext.Extensions
+        .Where(extension => extension.Number == extensionNumber && extension.AssignedEmpNr == null)
+        .ExecuteUpdateAsync(
+          updates => updates.SetProperty(extension => extension.AssignedEmpNr, normalizedEmpNr),
+          cancellationToken);
+
+      if (claimedRows == 0)
+      {
+        return Result<RegisterAcademicResponse>.Failure(
+          Error.Create("ExtensionUnavailable", $"Extension number '{extensionNumber}' is already assigned."));
+      }
+
+      _dbContext.Academics.Add(academic);
+      await _dbContext.SaveChangesAsync(cancellationToken);
+      await transaction.CommitAsync(cancellationToken);
+      return null;
+    }
+    catch (DbUpdateException)
+    {
+      await transaction.RollbackAsync(cancellationToken);
+      _dbContext.ChangeTracker.Clear();
+
+      if (await _dbContext.Academics.AsNoTracking()
+        .AnyAsync(existing => existing.EmpNr == normalizedEmpNr, cancellationToken))
+      {
+        return Result<RegisterAcademicResponse>.Failure(
+          Error.Create("AcademicAlreadyExists", $"Academic '{normalizedEmpNr}' is already registered."));
+      }
+
+      if (await _dbContext.Extensions.AsNoTracking()
+        .AnyAsync(existing => existing.AssignedEmpNr == normalizedEmpNr, cancellationToken))
+      {
+        return Result<RegisterAcademicResponse>.Failure(
+          Error.Create("ExtensionUnavailable", $"An extension is already assigned to academic '{normalizedEmpNr}'."));
+      }
+
+      throw;
     }
   }
 }

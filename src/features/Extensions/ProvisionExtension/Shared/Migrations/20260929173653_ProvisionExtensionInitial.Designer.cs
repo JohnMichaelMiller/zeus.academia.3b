@@ -11,7 +11,7 @@ using Zeus.Academia.Features.Extensions.ProvisionExtension;
 namespace Zeus.Academia.Features.Extensions.ProvisionExtension.Shared.Migrations
 {
     [DbContext(typeof(ProvisionExtensionDbContext))]
-    [Migration("20260826143646_ProvisionExtensionInitial")]
+    [Migration("20260929173653_ProvisionExtensionInitial")]
     partial class ProvisionExtensionInitial
     {
         /// <inheritdoc />
@@ -27,12 +27,11 @@ namespace Zeus.Academia.Features.Extensions.ProvisionExtension.Shared.Migrations
             modelBuilder.Entity("Zeus.Academia.Features.SharedKernel.Foundation.Domain.Extension", b =>
                 {
                     b.Property<int>("Number")
-                        .ValueGeneratedNever()
                         .HasColumnType("int");
 
                     b.Property<string>("AssignedEmpNr")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.HasKey("Number");
 
