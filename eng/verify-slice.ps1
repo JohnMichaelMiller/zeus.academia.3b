@@ -245,6 +245,16 @@ Write-Check "Configuration safety"
 if ((Get-Content $appSettings -Raw) -match '(?i)\(localdb\)') {
   Add-Failure "config" "appsettings.json contains a LocalDB connection string; move it to appsettings.Development.json or user secrets"
 }
+if ($programText -match '(?i)\(localdb\)') {
+  if ($programText -notmatch '(?s)IsDevelopment\(\)\s*&&\s*OperatingSystem\.IsWindows\(\)\)\s*\{[^}]*\(localdb\)') {
+    Add-Failure "config" "Program.cs LocalDB fallback must be guarded by builder.Environment.IsDevelopment() (and OperatingSystem.IsWindows()); unconditional LocalDB fallback can silently mask missing production configuration"
+  }
+}
+if ($programText -match 'Database\.MigrateAsync\s*\(\s*\)') {
+  if ($programText -notmatch [regex]::Escape('args.Contains("--migrate"')) {
+    Add-Failure "config" "Program.cs applies migrations without gating on an explicit '--migrate' pipeline switch; startup migration must not run unconditionally"
+  }
+}
 
 Write-Check "Nullability and Try* contracts"
 foreach ($hit in ($sourceFiles | Select-String -Pattern '(=\s*null!|=\s*default!)' | Where-Object Line -notmatch '\bDbSet<')) {

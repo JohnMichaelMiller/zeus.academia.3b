@@ -223,6 +223,23 @@ Summary: ai-logs/<yyyy>/<mm>/<dd>/<chat-id>/summary.md
 - Update project board/issue tracker
 - Trigger deployment pipeline (if applicable)
 
+## Deployment Pipeline: Database Migrations
+
+The application host does not apply migrations on normal startup (see [aspnetcore-implementation.instructions.md](aspnetcore-implementation.instructions.md)). Migrations run only when the host is invoked with the `--migrate` switch, as a distinct, single-instance step that MUST complete before app instances are started or scaled.
+
+**Deployment sequence (required order):**
+
+1. Build and publish the application host artifact.
+2. Run a single instance of the host with `--migrate` (for example `dotnet Zeus.Academia.Api.dll --migrate`) against the target environment's connection string. This step applies pending migrations for every registered DbContext and exits; it does not serve traffic.
+3. Fail the deployment if the migration step exits non-zero; do not proceed to rolling out app instances.
+4. Only after the migration step succeeds, deploy/restart the app instances normally (without `--migrate`).
+
+**Requirements:**
+
+- The migration step MUST run exactly once per deployment, not per instance, to avoid concurrent-migration lock contention.
+- The migration step MUST use the same resolved connection string (`ZEUS_SQLSERVER_CONNECTION` or `ConnectionStrings:DefaultConnection`) as the app instances it precedes.
+- CI/CD pipeline definitions MUST include an explicit migration job/stage gating the deployment job; do not fold migration into app startup or health-check scripts.
+
 ## Quality Gates (PRs)
 
 **Before Review Request:**
@@ -296,6 +313,7 @@ Add this reference under existing standards entries, maintaining alphabetical or
 - `lint` job: Run configured linters
 - `security-scan` job: Check dependencies for vulnerabilities
 - `docs-build` job: Validate documentation compiles
+- `migrate` job (deploy pipeline only): Run the host with `--migrate` and gate the deploy job on its success (see [Deployment Pipeline: Database Migrations](#deployment-pipeline-database-migrations))
 
 **PR Template Auto-Population:**
 

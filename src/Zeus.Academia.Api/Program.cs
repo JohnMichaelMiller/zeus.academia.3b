@@ -14,7 +14,7 @@ using Zeus.Academia.Features.SharedKernel.Foundation.Persistence;
 // This host orchestrates:
 // 1. Service registration (persistence, MediatR, validators)
 // 2. Configuration management (connection strings, environment settings)
-// 3. Database migration execution on startup
+// 3. Database migration execution via an explicit --migrate pipeline step
 // 4. Minimal API route configuration (route definitions in feature projects)
 //
 // Registration Order (MUST maintain dependency chain):
@@ -35,7 +35,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Priority:
 // 1. Environment variable: ZEUS_SQLSERVER_CONNECTION (CI/CD, non-Windows)
 // 2. Configuration: ConnectionStrings:DefaultConnection (appsettings.json)
-// 3. Windows LocalDB fallback (development on Windows only)
+// 3. Windows LocalDB fallback (Development environment on Windows only)
 
 var connectionString = Environment.GetEnvironmentVariable("ZEUS_SQLSERVER_CONNECTION");
 
@@ -46,7 +46,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
-  if (OperatingSystem.IsWindows())
+  if (builder.Environment.IsDevelopment() && OperatingSystem.IsWindows())
   {
     // Windows LocalDB fallback for local development only.
     // Use the default LocalDB instance name, which is MSSQLLocalDB on standard Windows installs.
@@ -54,10 +54,10 @@ if (string.IsNullOrWhiteSpace(connectionString))
   }
   else
   {
-    // Non-Windows platforms require explicit SQL Server connection
+    // Production/staging must configure an explicit connection string; never silently fall back to LocalDB.
     throw new InvalidOperationException(
       "SQL Server connection string not found. Set ZEUS_SQLSERVER_CONNECTION environment variable or add ConnectionStrings:DefaultConnection to appsettings.json. " +
-      "LocalDB is only available on Windows; configure a SQL Server connection string for non-Windows environments.");
+      "LocalDB fallback is only available in the Development environment on Windows.");
   }
 }
 
@@ -107,36 +107,44 @@ builder.Services.AddMediatR(cfg =>
 var app = builder.Build();
 
 // ============================================================================
-// Database Migration Orchestration
+// Database Migration Orchestration (explicit pipeline step, not startup)
 // ============================================================================
-// Automatically apply pending migrations for all registered DbContexts on
-// startup. Failures are NOT suppressed; they indicate configuration or
-// dependency issues that must be resolved before the app can run.
+// Migrations are NOT applied automatically when the app starts serving
+// traffic. Running MigrateAsync() on every instance at startup risks
+// concurrent-migration lock contention across scaled-out instances and
+// turns a schema issue into a full outage. Instead, invoke this host with
+// `--migrate` as a dedicated, single-instance deployment step before the
+// app instances are started. Failures are NOT suppressed.
 
-using (var scope = app.Services.CreateScope())
+if (args.Contains("--migrate", StringComparer.OrdinalIgnoreCase))
 {
-  var serviceProvider = scope.ServiceProvider;
+  using (var scope = app.Services.CreateScope())
+  {
+    var serviceProvider = scope.ServiceProvider;
 
-  // Migration order (matches registration order):
-  // 1. Shared Kernel (prerequisite)
-  var sharedKernelContext = serviceProvider.GetRequiredService<SharedKernelDbContext>();
-  await sharedKernelContext.Database.MigrateAsync();
+    // Migration order (matches registration order):
+    // 1. Shared Kernel (prerequisite)
+    var sharedKernelContext = serviceProvider.GetRequiredService<SharedKernelDbContext>();
+    await sharedKernelContext.Database.MigrateAsync();
 
-  // 2. Manage Ranks
-  var manageRanksContext = serviceProvider.GetRequiredService<ManageRanksDbContext>();
-  await manageRanksContext.Database.MigrateAsync();
+    // 2. Manage Ranks
+    var manageRanksContext = serviceProvider.GetRequiredService<ManageRanksDbContext>();
+    await manageRanksContext.Database.MigrateAsync();
 
-  // 3. Manage Degrees
-  var manageDegreesContext = serviceProvider.GetRequiredService<ManageDegreesDbContext>();
-  await manageDegreesContext.Database.MigrateAsync();
+    // 3. Manage Degrees
+    var manageDegreesContext = serviceProvider.GetRequiredService<ManageDegreesDbContext>();
+    await manageDegreesContext.Database.MigrateAsync();
 
-  // 4. Manage Universities
-  var manageUniversitiesContext = serviceProvider.GetRequiredService<ManageUniversitiesDbContext>();
-  await manageUniversitiesContext.Database.MigrateAsync();
+    // 4. Manage Universities
+    var manageUniversitiesContext = serviceProvider.GetRequiredService<ManageUniversitiesDbContext>();
+    await manageUniversitiesContext.Database.MigrateAsync();
 
-  // 5. Provision Extension (sole migration owner for Extensions)
-  var provisionExtensionContext = serviceProvider.GetRequiredService<ProvisionExtensionDbContext>();
-  await provisionExtensionContext.Database.MigrateAsync();
+    // 5. Provision Extension (sole migration owner for Extensions)
+    var provisionExtensionContext = serviceProvider.GetRequiredService<ProvisionExtensionDbContext>();
+    await provisionExtensionContext.Database.MigrateAsync();
+  }
+
+  return;
 }
 
 // ============================================================================
