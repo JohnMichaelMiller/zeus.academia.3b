@@ -54,6 +54,19 @@ Standards for implementing feature domains as collections of self-contained use-
 - Claim concurrency gate: any handler that transitions a shared row from unowned to owned must use an atomic guard (`ExecuteUpdateAsync` with the availability predicate, or a concurrency token), translate the lost race to the declared conflict status, and ship a concurrent SQL Server test. Read-then-save claims are defects even when tests pass sequentially.
 - No-carry-over gate: `eng/verify-slice.ps1` must pass for **every** feature the branch touches, not just the feature being added. Pre-existing failures in a touched feature are blockers for the current PR, not documented carry-overs.
 
+### Regeneration and Impact Closure
+
+- Use regeneration terms precisely: **slice regeneration** closes the slice PR, deletes its local and remote branches, creates a fresh slice branch from the approved base, then reruns the slice prompt; **complete regeneration** creates a new solution with approved non-implementation assets and begins at slice 0; **complete restart** creates a new workspace with only `.github` and begins by specifying requirements.
+- Closing a PR, deleting branches, or replacing a workspace is destructive/external state mutation. Inventory dirty/unpushed work, present exact targets, and obtain explicit approval before execution. Switch to the base branch before deleting the local slice branch. Never overwrite the current workspace for complete regeneration/restart without separate approval and recoverable backup evidence.
+- The regeneration manifest governs implementation after the selected reset lifecycle establishes its starting point; it does not replace PR/branch cleanup or workspace bootstrap.
+- Before regenerating a slice, record a regeneration manifest containing the current branch and base ref, target feature folders, prerequisite feature gates, every Shared Kernel configuration or constant the slice can change, every DbContext that applies those configurations, migration owners, test projects, and required host/solution entries.
+- For slice regeneration, verify the prompt and prerequisites exist on the new branch and the discarded implementation does not. Outside regeneration, a slice or prerequisite found only on another branch or commit is a blocker; do not report it as implemented or silently merge unrelated branch history.
+- Run `eng/verify-slice.ps1 -Feature <feature>` for every prerequisite before implementation. A prerequisite that compiles but fails its feature gate is not ready.
+- A Shared Kernel constant or `IEntityTypeConfiguration` change expands the impact set to every DbContext that consumes it, even when Git has not yet changed those feature folders. Regenerate or add migrations for every impacted migration owner and run `has-pending-model-changes` for each owner before downstream implementation continues.
+- Resolve schema state before migration generation. `Fresh` permits a normal initial migration; `Deployed` requires external-database evidence plus a baseline/data-preserving upgrade path. Prompt prose must not prescribe rename/upgrade behavior that contradicts the ownership matrix.
+- Migration IDs recorded in `migration-ownership-matrix.md` must match a migration class, Designer file, and owner snapshot on disk. Update the matrix only after discovery, model-drift, and SQL Server application checks pass.
+- Regeneration is complete only when explicit manifest features and Git-detected changed features both pass verification. An empty `-AllChangedFeatures` result does not verify a non-empty regeneration manifest.
+
 ## Runtime and Integration Completion Checklist
 
 Before a slice is considered ready for review or merge, verify all of the following:
@@ -71,6 +84,7 @@ Before a slice is considered ready for review or merge, verify all of the follow
 - [ ] Cross-feature reference data is consumed through a public query or service contract; consumers do not reference the owning feature's DbContext or persistence entity.
 - [ ] Found/not-found and active/inactive semantics are explicit and covered by contract tests.
 - [ ] Endpoint `Produces*` contracts match actual runtime responses, especially validation, conflict, and parse failures.
+- [ ] The regeneration manifest is complete, every explicit impact feature passed its gate, and `-AllChangedFeatures` did not succeed vacuously.
 
 Use the following terms consistently:
 

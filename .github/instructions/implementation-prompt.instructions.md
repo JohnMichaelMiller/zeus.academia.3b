@@ -136,6 +136,21 @@ Each implementation prompt must use this section order:
 
 Keep the section order stable so humans and agents can scan prompts quickly.
 
+## Regeneration Manifest
+
+Prompts that can create or regenerate code MUST include a manifest before the Contract Sheet with:
+
+- current target branch and base ref placeholders
+- target feature folders and test projects
+- required prerequisite features and their preflight gate commands
+- Shared Kernel constants/configurations that may change
+- every DbContext consuming those shared definitions
+- migration owners and current schema state from the ownership matrix
+- required host project references, DI calls, route map calls, and solution entries
+- the explicit final `verify-slice.ps1 -Features` impact set
+
+The prompt must stop when a target or prerequisite exists only on another branch/commit, when schema state is unverified, or when the manifest contradicts repository evidence. It must not silently merge branch history or infer `Deployed` from implementation phase labels.
+
 ## Contract Sheet
 
 The Contract Sheet is the precise, tabular specification the implementation must match. Derive every value from the ORM model, execution plan, or an existing slice; never from prose paraphrase. Anything the Contract Sheet omits is out of scope, so omissions are prompt defects.
@@ -150,6 +165,10 @@ Required tables (write `N/A` with a reason when a table does not apply):
 6. **Host composition**: host `<ProjectReference>`, DI registration method, endpoint map method, config keys (none in `appsettings.json` for LocalDB).
 7. **Test matrix**: test project path, required packages (`Microsoft.EntityFrameworkCore.SqlServer`, `Microsoft.AspNetCore.Mvc.Testing`), validator test file, route test file, SQL Server migration suite, and the minimum cases per file.
 8. **Concurrency and uniqueness**: for every shared row the slice claims, reserves, or allocates — resource → availability predicate → atomic mechanism (`ExecuteUpdateAsync` row count or concurrency token) → every unique index the claim or its unit of work can violate → lost-race error code per index → HTTP status → concurrent-claim test name per index. Write `N/A — no claim operations` when the slice only inserts rows it owns.
+
+Prompt validation MUST reject a Contract Sheet that omits any of the eight tables, uses `N/A` without a reason, records a migration owner without schema state, or describes a claim operation without an atomic mechanism and SQL Server race test.
+
+For `Fresh` schema, require a normal initial migration and prohibit baseline/rename-upgrade instructions. For `Deployed` schema, require external evidence, legacy column shape, baseline migration, and data-preserving upgrade names. A prompt containing both states for the same table is invalid.
 
 ## Step-by-Step Implementation Guidance
 

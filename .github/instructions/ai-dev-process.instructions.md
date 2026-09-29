@@ -48,6 +48,8 @@ Each rule family has one canonical file. Other instruction files, prompts, and a
 
 Before handoff or PR, run `pwsh eng/verify-slice.ps1 -AllChangedFeatures`. This discovers every feature touched by the branch and runs the full check set for each.
 
+For regeneration or cross-context work, also pass the manifest impact set explicitly with `pwsh eng/verify-slice.ps1 -Features <feature-a>,<feature-b>`. Git discovery is a supplement, not a substitute: the explicit set must include prerequisite increments and every migration owner affected through Shared Kernel configuration reuse. A non-empty regeneration manifest paired with `Changed features: (none)` is a failed verification, not success.
+
 A failing check is a blocker for the **current** PR regardless of which change introduced it. There is no carry-over, pre-existing-failure, or follow-up-slice exemption: if your branch touches `Extensions/ProvisionExtension`, that feature must pass before handoff. If a failure genuinely cannot be fixed in scope, escalate and get explicit sign-off — do not record it in a handoff as a known carry-over.
 
 The script owns these rules. They are deliberately absent from the self-review list below; fix them by making the script pass, not by re-reading prose:
@@ -65,6 +67,8 @@ The script owns these rules. They are deliberately absent from the self-review l
 | `doc-refs`                        | repo-relative paths in changed Markdown exist (illustrative standards and `ai-logs/` exempt); every `verify-slice.ps1 -<Param>` cited in `.github/` or `README.md` exists |
 | `provenance`                      | front-matter timestamps are consistent and `task_durations` is valid YAML                                                                                                 |
 | `build` / `tests` / `ef`          | solution builds; feature tests pass; migrations discovered and `has-pending-model-changes` clean (on by default)                                                          |
+| `manifest`                        | explicit regeneration features exist and are verified even when Git detection is empty                                                                                   |
+| `migration-matrix`                | recorded migration IDs resolve to migration + Designer + snapshot artifacts                                                                                               |
 
 This table must describe only what the script implements. Adding a row without the matching check recreates the PR 48 failure, where guidance delegated rules to checks that did not exist.
 

@@ -26,11 +26,14 @@ Use this skill when reviewing a change that introduces routes, handlers, validat
 ## Required review checks
 
 0. Mechanical gate
+   - When the change regenerates a slice, read `.github/skills/vertical-slice-regeneration/SKILL.md`, reconstruct its impact manifest, and run `pwsh eng/verify-slice.ps1 -Features <manifest-features>` before Git-detected verification.
    - Run `pwsh eng/verify-slice.ps1 -AllChangedFeatures` and report every failure as blocking before manual review. A failure in a feature the branch merely touches is still blocking; it is not a carry-over.
+   - Reject an empty/narrower Git-detected feature set when the manifest is non-empty; both explicit and changed-feature gates must pass.
    - Compare the changed code against the slice prompt's Contract Sheet: every request field, exact length, reference resolution contract, error-to-status row, DbContext owner, and test-matrix entry must be present.
    - Reject reference validation that only calls a value-object `Create` (format) without resolving the code through the owning slice's public query (existence).
    - Reject aggregate invariants enforced only in a validator; the aggregate factory must enforce them too.
    - Reject edits to Shared Kernel entity configurations that ship without migrations for every DbContext applying them.
+   - Confirm every migration ID recorded in `migration-ownership-matrix.md` resolves to a migration class, Designer, and owner snapshot.
 
 1. Startup wiring
    - Confirm every new `Map...Endpoints()` or route aggregator is registered in the app host or composition root.
@@ -54,13 +57,19 @@ Use this skill when reviewing a change that introduces routes, handlers, validat
    - Verify the same runtime dependency does not split across incompatible configuration sources (for example `ZEUS_SQLSERVER_CONNECTION` vs `ConnectionStrings:DefaultConnection`).
    - Confirm feature-local DbContexts that participate in `Database.MigrateAsync()` declare migration ownership and host invocation explicitly.
    - If the feature changes schema, ensure migration artifacts and ownership are present before approval.
+   - Distinguish `Fresh` from evidenced `Deployed` schema; reject baseline/rename upgrades for fresh schema and create-table initial migrations for deployed schema.
 
 5. Runtime reachability and contract parity
    - Treat compile-only success as insufficient evidence for route-based work.
    - Require a startup or integration verification step for endpoint changes.
    - If `.ProducesValidationProblem()`, `.Produces(409)`, or similar status codes are declared, confirm the route actually returns that result instead of leaking a raw exception or 500.
+   - Confirm each status assertion is attributable to the endpoint being reviewed rather than an unrelated route in the same feature test project.
 
-6. Drift prevention
+6. Claims and provider evidence
+   - For claims/reservations/allocations, require an explicit transaction, atomic predicate update or concurrency token, affected-row conflict handling, narrow uniqueness translation, and a concurrent SQL Server test using separate claimant contexts.
+   - Do not accept WebApplicationFactory with InMemory as migration, transaction, or concurrency evidence; require owner migrations and fresh-context SQL Server read-back.
+
+7. Drift prevention
    - Look for neighboring slices or prior implementations that already solved the same rule and reuse that pattern.
    - Flag drift when the same invariant is implemented in multiple places with slightly different logic.
 

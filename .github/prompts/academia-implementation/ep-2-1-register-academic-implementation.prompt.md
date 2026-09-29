@@ -63,6 +63,21 @@ mode: agent
 - Existing patterns to reuse: `GetUniversityByCodeQuery` (found then active), `RankCodeCatalog.TryParseRank`, `Extension.AssignTo`, `ProvisionExtensionSqlServerTestDatabase` harness shape.
 - Prohibited: injecting `SharedKernelDbContext`, `ProvisionExtensionDbContext`, `ManageDegreesDbContext`, or `ManageUniversitiesDbContext` into RegisterAcademic; validating degree existence with `Degree.Create` alone.
 
+## Regeneration Manifest
+
+| Concern                    | Required value                                                                                                                                                              |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Target branch/base         | Record `git branch --show-current` and resolved `BaseRef` before editing; stop if RegisterAcademic exists only on another branch or commit                                  |
+| Target features            | `Academics/RegisterAcademic`, bounded `ReferenceData/ManageDegrees` query increment                                                                                         |
+| Prerequisite gates         | `ReferenceData/ManageRanks`, `ReferenceData/ManageDegrees`, `ReferenceData/ManageUniversities`, `Extensions/ProvisionExtension`, `SharedKernel/Foundation`                  |
+| Shared definitions changed | `SharedKernelFieldLengths.EmpNr`, `AcademicConfiguration`, `AcademicQualificationConfiguration`, `ExtensionConfiguration`                                                   |
+| Impacted DbContexts        | `SharedKernelDbContext`, `ProvisionExtensionDbContext`, mapping-only `RegisterAcademicDbContext`                                                                            |
+| Schema state               | Read from `migration-ownership-matrix.md`; current repository state is `Fresh`, so generate/regenerate normal initial migrations and do not author baseline/rename upgrades |
+| Host/solution closure      | API project reference, DI registration, route map, source/test projects each declared once in the solution                                                                  |
+| Explicit final feature set | `Academics/RegisterAcademic`, `ReferenceData/ManageDegrees`, `SharedKernel/Foundation`, `Extensions/ProvisionExtension`                                                     |
+
+Before implementation, run the feature gate for every prerequisite. Do not proceed from compile-only evidence. After cross-context schema edits, rerun the owner feature gate before implementing downstream behavior.
+
 ## Contract Sheet
 
 Route: `POST /api/academics/register` (existing route preserved).
@@ -122,11 +137,18 @@ Unmapped error codes are a defect; do not fall back to a generic 400 `Results.Pr
 
 - Feature context: `RegisterAcademicDbContext` in `src/features/Academics/RegisterAcademic/Persistence/`. Applies `AcademicConfiguration`, `AcademicQualificationConfiguration`, and `ExtensionConfiguration`, each mapped with `ExcludeFromMigrations()`. It owns no migrations.
 - Migration owners stay unchanged: `SharedKernelDbContext` → `Academics`, `AcademicQualifications`; `ProvisionExtensionDbContext` → `Extensions`.
-- Atomicity: academic, qualifications, and extension assignment are saved with one `SaveChangesAsync` on `RegisterAcademicDbContext`.
+- Atomicity: on relational providers, claim the extension with an availability-predicate `ExecuteUpdateAsync` inside a transaction; zero rows maps to `ExtensionUnavailable`; save the academic and qualifications in the same transaction; roll back before translating uniqueness failures. A tracked read-then-`AssignTo` save is not acceptable production behavior.
 - Shared Kernel configurations touched and required migrations (migration class + Designer + snapshot for each):
-  - `SharedKernelDbContext`: `Academics.EmpNr` and `AcademicQualifications.EmpNr` to length 6 with `CK_Academics_EmpNrLength`; `AcademicQualifications.UniversityName` → `UniversityCode` via `RenameColumn` (not drop/add), length 20.
+  - `SharedKernelDbContext`: `Academics.EmpNr` and `AcademicQualifications.EmpNr` length 6 with `CK_Academics_EmpNrLength`; for current `Fresh` state regenerate/create the initial migration from the final model.
   - `ProvisionExtensionDbContext`: `Extensions.AssignedEmpNr` to length 6.
 - Update `migration-ownership-matrix.md` to list `RegisterAcademicDbContext` as mapping-only.
+
+### Concurrency and uniqueness
+
+| Resource/index                                        | Availability predicate                       | Atomic mechanism                                                    | Lost-race result        | HTTP | SQL Server evidence                                                                                                  |
+| ----------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------- | ----------------------- | ---- | -------------------------------------------------------------------------------------------------------------------- |
+| `Extensions.Number` / filtered unique `AssignedEmpNr` | requested number and `AssignedEmpNr IS NULL` | transaction + `ExecuteUpdateAsync`; require affected row count `1`  | `ExtensionUnavailable`  | 409  | two handlers, separate contexts, same extension; exactly one success and one conflict; fresh third-context read-back |
+| `Academics.EmpNr` primary key                         | no existing normalized `EmpNr`               | database PK plus narrow post-failure existence check after rollback | `AcademicAlreadyExists` | 409  | concurrent/duplicate SQL Server path does not retain a claimed extension for the loser                               |
 
 ### Host composition
 
@@ -136,7 +158,7 @@ Unmapped error codes are a defect; do not fall back to a generic 400 `Results.Pr
 
 ### Test matrix
 
-- Project: `tests/Features/Academics/RegisterAcademic/Zeus.Academia.Tests.Features.Academics.RegisterAcademic.csproj` with `Microsoft.EntityFrameworkCore.SqlServer`, `Microsoft.AspNetCore.Mvc.Testing`, and FluentValidation `TestHelper`.
+- Project: `tests/Features/Academics/RegisterAcademic/Zeus.Academia.Tests.Features.Academics.RegisterAcademic.csproj` with `Microsoft.EntityFrameworkCore.SqlServer` and `Microsoft.AspNetCore.Mvc.Testing`; use available repository validator APIs rather than assuming an unavailable `TestHelper` package.
 - `RegisterAcademicCommandValidatorTests.cs`: null/empty/whitespace for each string; `empNr` lengths 5, 6, 7; `empName` lengths 15 and 16; invalid rank; empty and null `qualifications`; duplicate pair; `extNr` 0 and -1; tenured with contract date; one valid command.
 - `RegisterAcademicEndpointsTests.cs` (`WebApplicationFactory<Program>` against an isolated SQL Server database): every route test in the Error → HTTP status table, asserting status and body shape.
 - `RegisterAcademicSqlServerTestDatabase.cs` + `RegisterAcademicSqlServerIntegrationTests.cs`: unique database, `MigrateAsync` for every owner context (SharedKernel, ProvisionExtension, ManageDegrees, ManageUniversities), fresh-context read-back, no partial writes for each failure case, best-effort `EnsureDeletedAsync` in `finally`. No `EnsureCreated`.
@@ -157,7 +179,7 @@ Unmapped error codes are a defect; do not fall back to a generic 400 `Results.Pr
 1. Confirm prerequisites and data compatibility.
    Targets: ownership matrix, existing `EmpNr`/`AssignedEmpNr` values, reference-data availability.
    Owner: slice-coordinator.
-   Validation before next step: no stored identifier violates the 6-character rule; blockers listed.
+   Validation before next step: branch/base and manifest recorded; every prerequisite feature gate passes; no stored identifier violates the 6-character rule; blockers listed.
 2. Align Shared Kernel invariants.
    Targets: `SharedKernelFieldLengths.cs`, `Academic.cs`, Shared Kernel tests.
    Owner: backend-domain.
@@ -165,7 +187,7 @@ Unmapped error codes are a defect; do not fall back to a generic 400 `Results.Pr
 3. Author migrations and the mapping-only feature context.
    Targets: SharedKernel and ProvisionExtension `Migrations/`, `RegisterAcademic/Persistence/RegisterAcademicDbContext.cs`, `migration-ownership-matrix.md`.
    Owner: data-persistence.
-   Validation before next step: `dotnet ef migrations list` discovers the new migration for each owner context; generated SQL renames (not drops) `UniversityName`; `RegisterAcademicDbContext` produces no migration.
+   Validation before next step: `dotnet ef migrations list` and `has-pending-model-changes` pass for each owner; SQL Server applies owner migrations to a fresh database; matrix IDs resolve to class + Designer + snapshot; `RegisterAcademicDbContext` produces no migration.
 4. Add `GetDegreeByCodeQuery` to ManageDegrees.
    Targets: `ManageDegrees/GetDegreeByCode/`.
    Owner: backend-domain.
@@ -177,7 +199,7 @@ Unmapped error codes are a defect; do not fall back to a generic 400 `Results.Pr
 6. Implement handler and endpoint.
    Targets: `RegisterAcademicHandler.cs`, `RegisterAcademicEndpoints.cs`.
    Owner: backend-domain.
-   Validation before next step: every reference is resolved through its public contract; every error code maps to its declared status.
+   Validation before next step: every reference is resolved through its public contract; every error code maps to its declared status; relational extension assignment uses the concurrency table mechanism and the SQL race test passes.
 7. Compose the host.
    Targets: `Zeus.Academia.Api.csproj`, `Program.cs`, `appsettings.json`, `appsettings.Development.json`, `RegisterAcademicServiceCollectionExtensions.cs`.
    Owner: backend-domain.
@@ -186,7 +208,7 @@ Unmapped error codes are a defect; do not fall back to a generic 400 `Results.Pr
    Owner: testing-verification.
    Validation before next step: all listed test files exist and pass against SQL Server.
 9. Run the mechanical gate and build the traceability table.
-   Command: `pwsh eng/verify-slice.ps1 -Feature <f>` for `Academics/RegisterAcademic`, `ReferenceData/ManageDegrees`, `SharedKernel/Foundation`, `Extensions/ProvisionExtension`.
+   Commands: `pwsh eng/verify-slice.ps1 -Features Academics/RegisterAcademic,ReferenceData/ManageDegrees,SharedKernel/Foundation,Extensions/ProvisionExtension`, then `pwsh eng/verify-slice.ps1 -AllChangedFeatures`.
    Owner: testing-verification.
    Validation: any failure in a feature touched by this slice blocks handoff, including pre-existing failures. Escalate for explicit sign-off if a failure cannot be resolved in scope.
 
@@ -227,4 +249,5 @@ Handoff must include the traceability table: `criterion / Contract Sheet row | i
 - [ ] `RegisterAcademicCommandValidatorTests.cs` covers every validator branch listed in the test matrix.
 - [ ] Host `.csproj` references the feature project; the solution builds; `appsettings.json` has no LocalDB value.
 - [ ] `eng/verify-slice.ps1` output is attached to the handoff.
+- [ ] Regeneration manifest features and Git-detected changed features both pass; neither verification result is vacuous.
 - [ ] Dependent slices stay blocked until registration verification passes.

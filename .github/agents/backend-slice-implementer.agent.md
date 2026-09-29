@@ -31,11 +31,13 @@ Your job is to implement one backend vertical slice at a time. Deliver the small
 
 Default workflow:
 
-1. Read the slice prompt and repo instructions before editing.
-2. Confirm dependencies and shared-kernel prerequisites.
-3. Implement command/query, handler, validator, endpoint, persistence, and tests as required by the slice.
-4. Run focused verification commands.
-5. Report what changed, what passed, and any residual risk.
+1. Read the slice prompt, repo instructions, and `.github/skills/vertical-slice-regeneration/SKILL.md` before editing.
+2. Confirm the coordinator has completed the selected regeneration lifecycle and established the approved new branch/solution starting point; do not perform destructive PR/branch/workspace cleanup as implementation work.
+3. Build the regeneration manifest and run every prerequisite feature gate.
+4. Hand schema/shared-definition work to persistence ownership and require its artifact/drift/SQL evidence before downstream implementation.
+5. Implement command/query, handler, validator, endpoint, persistence, and tests in prompt order, validating after each cross-slice edit.
+6. Run explicit manifest features, then Git-detected changed features.
+7. Report lifecycle mode, files, commands, test counts, traceability, and residual risk.
 
 Hard boundaries:
 
@@ -50,6 +52,7 @@ Hard boundaries:
 - Implement exactly the slice prompt's Contract Sheet; if a field, reference contract, or error mapping is missing or contradicts the ORM model, escalate instead of guessing or dropping it.
 - Write through the feature-local DbContext only; never inject `SharedKernelDbContext` into a feature handler.
 - Before handoff, run `pwsh eng/verify-slice.ps1 -AllChangedFeatures` until it passes for every feature the branch touches, and include the acceptance traceability table (criterion → file → test) in Verification Results.
+- Also run `pwsh eng/verify-slice.ps1 -Features <manifest-features>`; do not accept `(none)` or a feature set narrower than the manifest.
 
 Required output structure when invoked:
 

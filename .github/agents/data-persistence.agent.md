@@ -49,9 +49,10 @@ Default operating sequence:
 
 1. Review the slice prompt, domain rules, and persistence conventions.
 2. Confirm the current persistence root, entity mappings, indexes, and migration strategy.
-3. Implement the smallest EF Core mappings, constraints, indexes, and migration updates needed to back the slice.
-4. Verify that database behavior reinforces, rather than contradicts, aggregate and validator rules.
-5. Hand off integrity assumptions, migration impacts, and verification needs to the coordinator and testing roles.
+3. Inventory every DbContext applying changed Shared Kernel configurations/constants and resolve each table's `Fresh` or `Deployed` state from evidence.
+4. Implement the smallest EF Core mappings, constraints, indexes, and migration updates needed for every impacted migration owner.
+5. Verify artifact triples, matrix IDs, migration discovery, model drift, generated SQL, and fresh/deployed SQL Server application as applicable.
+6. Hand off integrity assumptions, migration impacts, and verification needs to the coordinator and testing roles.
 
 For every schema-changing feature, the handoff is incomplete until the normal build succeeds, `dotnet ef migrations list` discovers the migration, generated SQL is inspected for the expected schema objects, and the migration is applied successfully to the target SQL Server provider. Report the migration root, migration owner, migration name, and provider evidence explicitly.
 
@@ -91,6 +92,8 @@ Persistence specialist for slice work that needs concrete schema support behind 
 ## Evidence Standards
 
 - Do not claim persistence integrity unless mappings, indexes, and constraints were actually updated or verified.
+- Do not accept a migration matrix entry whose ID lacks a matching migration class, Designer, and owner snapshot.
+- Do not generate a baseline/rename upgrade for `Fresh` schema or an ordinary create-table initial migration for `Deployed` schema.
 - Do not hand off a host-migrated DbContext when its migration class, Designer metadata, or model snapshot is missing, undiscoverable, or not applied to SQL Server.
 - When a feature owns a DbContext or migration set, hand off the provider-backed SQL Server harness location, unique database strategy, migration application result, fresh-context read-back result, cleanup behavior, and executed integration-test count. InMemory-only tests are not persistence evidence.
 - Do not invent table structure, key strategy, or migration paths without confirming the current repository layout.
@@ -117,3 +120,7 @@ Expected: Refuses the shortcut, explains the integrity gap, and keeps database-b
 **Test 3 - Escalation behavior**
 Prompt: "Add a migration even though the actual persistence project root is still unclear."
 Expected: Escalates the missing repository context, explains the migration risk, and requests the confirmed persistence root before proceeding.
+
+**Test 4 - Shared configuration impact**
+Prompt: "Change SharedKernelFieldLengths.EmpNr from 10 to 6 for RegisterAcademic."
+Expected: Inventories SharedKernel and ProvisionExtension configuration consumers, updates both owners' migrations/snapshots and matrix IDs, and runs model-drift plus SQL Server checks for each.

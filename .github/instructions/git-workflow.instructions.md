@@ -68,6 +68,24 @@ applyTo: "**"
 
 ## AI-Generated Code Branching
 
+### Regeneration Lifecycles
+
+**Slice regeneration** replays one slice from a new branch:
+
+1. Inventory the slice PR, local/remote branch names, base branch, dirty files, and unpushed commits.
+2. Preserve required logs and review evidence.
+3. Obtain explicit approval for the listed destructive operations.
+4. Close the pull request.
+5. Switch to and update the approved base branch.
+6. Delete the local slice branch, then the remote slice branch.
+7. Create a new slice branch from the approved base and run the slice prompt from its beginning.
+
+**Complete regeneration** creates a new solution/workspace, copies approved non-implementation assets, excludes source/tests/migrations/generated solution artifacts, and begins with slice 0.
+
+**Complete restart** creates a new workspace containing only `.github`, begins with requirements specification, and generates plans/prompts only after requirements approval.
+
+Never delete the checked-out branch, silently restore code from a discarded slice branch, or replace an existing workspace without explicit target approval and recoverable backup/remote evidence.
+
 ### Branch Metadata
 
 **Commit Messages** must reference AI provenance:

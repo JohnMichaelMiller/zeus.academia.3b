@@ -14,6 +14,8 @@ source: ".github/instructions/ai-dev-process.instructions.md#mechanical-verifica
   pwsh eng/verify-slice.ps1 -AllChangedFeatures
 .EXAMPLE
   pwsh eng/verify-slice.ps1 -Feature Academics/RegisterAcademic
+.EXAMPLE
+  pwsh eng/verify-slice.ps1 -Features Academics/RegisterAcademic,SharedKernel/Foundation
 #>
 [CmdletBinding(DefaultParameterSetName = "Single")]
 param(
@@ -21,6 +23,8 @@ param(
   [string]$Feature,
   [Parameter(Mandatory, ParameterSetName = "All")]
   [switch]$AllChangedFeatures,
+  [Parameter(Mandatory, ParameterSetName = "Explicit")]
+  [string[]]$Features,
   [string]$Configuration = "Debug",
   [string]$BaseRef = "origin/main",
   [switch]$SkipBuild,
@@ -90,6 +94,27 @@ function Invoke-RepoChecks([string[]]$changedPaths) {
   foreach ($project in $projects) {
     $relative = [System.IO.Path]::GetRelativePath($repoRoot, $project.FullName).Replace('\', '/')
     if ($declared -notcontains $relative) { Add-Failure "solution" "$relative is not declared in zeus.academia.3b.sln" }
+  }
+
+  Write-Check "Migration ownership matrix artifacts"
+  $matrixPath = Join-Path $repoRoot "src/models/workflows/migration-ownership-matrix.md"
+  $matrixText = Get-Content $matrixPath -Raw
+  foreach ($match in [regex]::Matches(
+      $matrixText,
+      '(?m)^\|\s*[^|]+\|\s*(?<context>\w+DbContext)\s*\|[^|]+\|\s*`(?<migration>\d+_\w+)`\s*\|')) {
+    $context = $match.Groups['context'].Value
+    $migration = $match.Groups['migration'].Value
+    $migrationFile = Get-ChildItem (Join-Path $repoRoot "src/features") -Recurse -Filter "${migration}.cs" |
+    Where-Object { $_.Name -notlike "*.Designer.cs" }
+    $designerFile = Get-ChildItem (Join-Path $repoRoot "src/features") -Recurse -Filter "${migration}.Designer.cs"
+    $snapshotFile = Get-ChildItem (Join-Path $repoRoot "src/features") -Recurse -Filter "${context}ModelSnapshot.cs"
+
+    if (-not $migrationFile) { Add-Failure "migration-matrix" "$migration for $context has no migration class" }
+    if (-not $designerFile) { Add-Failure "migration-matrix" "$migration for $context has no Designer file" }
+    elseif (-not (Select-String -Path $designerFile.FullName -Pattern "DbContext\(typeof\($context\)\)" -Quiet)) {
+      Add-Failure "migration-matrix" "$migration Designer does not target $context"
+    }
+    if (-not $snapshotFile) { Add-Failure "migration-matrix" "$migration for $context has no ${context}ModelSnapshot.cs" }
   }
 
   Write-Check "verify-slice.ps1 parameters cited in guidance"
@@ -166,19 +191,32 @@ function Invoke-RepoChecks([string[]]$changedPaths) {
   }
 }
 
-if ($AllChangedFeatures) {
+if ($AllChangedFeatures -or $Features) {
   $changedPaths = @(Get-ChangedPaths)
-  $features = @($changedPaths | ForEach-Object {
+  $detectedFeatures = @($changedPaths | ForEach-Object {
       if ($_ -match '^(?:src/features|tests/Features)/([^/]+)/([^/]+)/') { "$($Matches[1])/$($Matches[2])" }
     } | Sort-Object -Unique | Where-Object {
       $dir = Join-Path $repoRoot "src/features/$_"
       (Test-Path $dir) -and (Get-ChildItem $dir -Filter *.csproj)
     })
-  Write-Host "Changed features: $(if ($features) { $features -join ', ' } else { '(none)' })"
+  $explicitFeatures = @($Features | ForEach-Object { $_ -split ',' } |
+    ForEach-Object { $_.Trim() } | Where-Object { $_ } | Sort-Object -Unique)
+  foreach ($explicitFeature in $explicitFeatures) {
+    $explicitDir = Join-Path $repoRoot "src/features/$explicitFeature"
+    if (-not (Test-Path $explicitDir) -or -not (Get-ChildItem $explicitDir -Filter *.csproj)) {
+      Add-Failure "manifest" "Explicit feature '$explicitFeature' does not exist on the current branch"
+    }
+  }
+  $featuresToVerify = @(($detectedFeatures + $explicitFeatures) | Sort-Object -Unique)
+  Write-Host "Changed features: $(if ($detectedFeatures) { $detectedFeatures -join ', ' } else { '(none)' })"
+  if ($Features) {
+    Write-Host "Manifest features: $(if ($explicitFeatures) { $explicitFeatures -join ', ' } else { '(none)' })"
+    if (-not $explicitFeatures) { Add-Failure "manifest" "-Features resolved to an empty feature set" }
+  }
 
   Invoke-RepoChecks $changedPaths
   $failedFeatures = [System.Collections.Generic.List[string]]::new()
-  foreach ($changedFeature in $features) {
+  foreach ($changedFeature in $featuresToVerify) {
     Write-Host "`n#### $changedFeature" -ForegroundColor Magenta
     $childArgs = @{
       Feature = $changedFeature; Configuration = $Configuration; BaseRef = $BaseRef
@@ -196,7 +234,8 @@ if ($AllChangedFeatures) {
     $failedFeatures | ForEach-Object { Write-Host "  [feature] $_ failed; see its section above" }
     exit 1
   }
-  Write-Host "verify-slice: all checks passed for $($features.Count) changed feature(s)" -ForegroundColor Green
+  $scopeLabel = if ($Features) { "explicit/changed" } else { "changed" }
+  Write-Host "verify-slice: all checks passed for $($featuresToVerify.Count) $scopeLabel feature(s)" -ForegroundColor Green
   exit 0
 }
 
@@ -310,11 +349,34 @@ foreach ($file in ($sourceFiles | Where-Object { $_.FullName -notmatch '[\\/]Mig
     if (-not (Test-InsideTry $text $call.Index)) {
       Add-Failure "concurrency" "${relative}: ExecuteUpdateAsync runs outside try/catch; a unique-index violation from the claim escapes as 500"
     }
+    if ($text -notmatch '\bBeginTransactionAsync\s*\(' -or
+      $text -notmatch '\bCommitAsync\s*\(' -or
+      $text -notmatch '\bRollbackAsync\s*\(') {
+      Add-Failure "concurrency" "${relative}: atomic claim must begin, commit, and roll back an explicit transaction"
+    }
+    $assignment = [regex]::Match(
+      $text,
+      '(?s)\bvar\s+(?<result>\w+)\s*=\s*await(?:(?!;).)*?\.ExecuteUpdateAsync\s*\(')
+    if (-not $assignment.Success) {
+      Add-Failure "concurrency" "${relative}: ExecuteUpdateAsync claim must capture the affected-row count"
+    }
+    else {
+      $result = [regex]::Escape($assignment.Groups['result'].Value)
+      if ($text -notmatch "\b$result\s*==\s*0\b") {
+        Add-Failure "concurrency" "${relative}: zero affected rows must translate the lost claim to a conflict"
+      }
+    }
   }
   if ($text -match '\bSaveChangesAsync\s*\(' -and
     $text -match '\.\s*(Assign|Claim|Reserve|Allocate)\w*\s*\(' -and
     $text -notmatch 'ExecuteUpdateAsync|DbUpdateConcurrencyException') {
     Add-Failure "concurrency" "${relative}: claim is a tracked mutation + SaveChangesAsync with no ExecuteUpdateAsync predicate or concurrency token"
+  }
+}
+$hasAtomicClaim = [bool]($sourceFiles | Select-String -Pattern '\.ExecuteUpdateAsync\s*\(' | Select-Object -First 1)
+if ($hasAtomicClaim) {
+  if ($testText -notmatch '\bTask\.WhenAll\s*\(' -or $testText -notmatch 'SqlServer') {
+    Add-Failure "concurrency" "Atomic claim has no concurrent SQL Server test using simultaneous claimant tasks"
   }
 }
 
@@ -331,25 +393,31 @@ $statusNames = @{
   200 = 'OK'; 201 = 'Created'; 204 = 'NoContent'; 400 = 'BadRequest'
   401 = 'Unauthorized'; 403 = 'Forbidden'; 404 = 'NotFound'; 409 = 'Conflict'; 422 = 'UnprocessableEntity'
 }
-$routeTestText = ($testFiles | Where-Object {
+$routeTestFiles = @($testFiles | Where-Object {
     Select-String -Path $_.FullName -Pattern 'WebApplicationFactory|TestServer' -Quiet
-  } | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
+  })
+$routeTestText = ($routeTestFiles | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
 foreach ($endpoint in ($sourceFiles | Where-Object { Select-String -Path $_.FullName -Pattern '\.Produces' -Quiet })) {
   $text = Get-Content $endpoint.FullName -Raw
+  $endpointStem = $endpoint.BaseName -replace 'Endpoints?$', ''
+  $endpointRouteText = ($routeTestFiles | Where-Object {
+      $_.BaseName -match [regex]::Escape($endpointStem) -or
+      (Get-Content $_.FullName -Raw) -match [regex]::Escape($endpointStem)
+    } | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
   $codes = [System.Collections.Generic.HashSet[int]]::new()
   if ($text -match 'ProducesValidationProblem\s*\(') { [void]$codes.Add(400) }
   foreach ($m in [regex]::Matches($text, 'Produces(?:Problem)?(?:<[^>]+>)?\s*\(\s*(?:StatusCodes\.Status)?(\d{3})')) {
     [void]$codes.Add([int]$m.Groups[1].Value)
   }
-  if ($codes.Count -gt 0 -and -not $routeTestText) {
-    Add-Failure "route-tests" "$($endpoint.Name) declares statuses but no WebApplicationFactory/TestServer tests exist"
+  if ($codes.Count -gt 0 -and -not $endpointRouteText) {
+    Add-Failure "route-tests" "$($endpoint.Name) declares statuses but has no attributable WebApplicationFactory/TestServer route tests"
     continue
   }
   foreach ($code in $codes) {
     $name = $statusNames[$code]
     $pattern = "\b$code\b|StatusCodes\.Status$code"
     if ($name) { $pattern += "|HttpStatusCode\.$name\b" }
-    if ($routeTestText -notmatch $pattern) {
+    if ($endpointRouteText -notmatch $pattern) {
       Add-Failure "route-tests" "$($endpoint.Name) declares $code but no route test asserts it"
     }
   }
@@ -358,11 +426,16 @@ foreach ($endpoint in ($sourceFiles | Where-Object { Select-String -Path $_.Full
 $advertisesValidation = [bool]($sourceFiles | Select-String -Pattern 'ProducesValidationProblem\s*\(' -Quiet)
 if ($advertisesValidation -and $routeTestText) {
   foreach ($validator in ($sourceFiles | Where-Object Name -like "*Validator.cs")) {
+    $validatorStem = $validator.BaseName -replace '(Command|Query)?Validator$', ''
+    $validatorRouteText = ($routeTestFiles | Where-Object {
+        $_.BaseName -match [regex]::Escape($validatorStem) -or
+        (Get-Content $_.FullName -Raw) -match [regex]::Escape($validatorStem)
+      } | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
     $properties = Select-String -Path $validator.FullName -Pattern 'RuleFor(?:Each)?\(\s*\w+\s*=>\s*\w+\.(\w+)' -AllMatches |
     ForEach-Object { $_.Matches } | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique
     foreach ($property in $properties) {
       $key = $property.Substring(0, 1).ToLowerInvariant() + $property.Substring(1)
-      if ($routeTestText -notmatch "`"(?:[\w\[\]]+\.)*$key(?:[\.\[][^`"]*)?`"") {
+      if ($validatorRouteText -notmatch "`"(?:[\w\[\]]+\.)*$key(?:[\.\[][^`"]*)?`"") {
         Add-Failure "route-tests" "$($validator.Name) validates $property but no route test asserts a '$key' validation error key"
       }
     }

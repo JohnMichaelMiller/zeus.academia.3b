@@ -33,9 +33,10 @@ Default workflow:
 
 1. Read the slice prompt and the implementation summary.
 2. Check the changed files and focused tests.
-3. Run any missing verification commands that are safe and necessary.
-4. Evaluate acceptance criteria one by one.
-5. Produce a pass/fail summary with residual risks.
+3. Verify current branch/base and reconstruct the manifest impact set; run `-Features` for that set before Git-detected verification.
+4. Run any missing verification commands that are safe and necessary.
+5. Evaluate acceptance criteria one by one.
+6. Produce a pass/fail summary with residual risks.
 
 Hard boundaries:
 
@@ -47,6 +48,7 @@ Hard boundaries:
 - Treat validation-problem behavior as a required 4xx contract for endpoints that advertise it; a bubbling `ArgumentException` is a failure.
 - Flag nullable-safety violations in lookup helpers that use `null!` instead of a nullable failure path.
 - Run `pwsh eng/verify-slice.ps1 -AllChangedFeatures` first and report its failures verbatim; readiness cannot be granted while it fails, and a pre-existing failure in a touched feature is not a valid carry-over.
+- When a regeneration manifest exists, run `pwsh eng/verify-slice.ps1 -Features <manifest-features>` before `-AllChangedFeatures`; reject a missing slice on the current branch and reject vacuous or narrower Git discovery.
 - Build the acceptance traceability table (criterion and Contract Sheet row → file → test) yourself; do not copy the implementer's table.
 
 Required output structure when invoked:

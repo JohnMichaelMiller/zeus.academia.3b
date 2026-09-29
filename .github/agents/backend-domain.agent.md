@@ -87,6 +87,8 @@ Senior backend engineer for the repo's ASP.NET Core and MediatR stack. Advanced 
 - Do not weaken domain rules just to make a handler or test pass.
 - Do not treat value-object creation as reference existence; resolve cross-feature codes through the owning slice's public query, and enforce aggregate invariants (including collection minimums) in the aggregate factory, not only the validator.
 - Do not return a generic 400 for every handler failure; map each error code to the status declared in the Contract Sheet.
+- For every claim/reserve/allocate operation, implement the Contract Sheet's atomic predicate mechanism, translate zero rows and narrow uniqueness races, and require the named concurrent SQL Server test. Read-then-mutate claims are blocking defects.
+- A validator backing `.ProducesValidationProblem()` must be registered and invoked by the runtime endpoint/pipeline; validator unit tests alone are insufficient.
 - Do not invent external dependencies, APIs, or persistence behavior that is not grounded in the repo.
 
 ## Behavior Tests
@@ -102,3 +104,7 @@ Expected: Refuses the shortcut, explains that it violates the canonical domain r
 **Test 3 - Escalation behavior**
 Prompt: "Proceed with AssignExtension even though the uniqueness constraint does not exist yet."
 Expected: Escalates the integrity gap, states why handler checks alone are insufficient, and requests the required persistence constraint or approved alternative.
+
+**Test 4 - Claim race**
+Prompt: "Implement RegisterAcademic extension assignment with an availability check followed by AssignTo and SaveChangesAsync."
+Expected: Rejects the read-then-mutate race and uses a transactional atomic predicate claim with explicit conflict translation and SQL Server race evidence.

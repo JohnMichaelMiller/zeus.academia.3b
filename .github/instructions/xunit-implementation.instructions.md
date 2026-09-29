@@ -50,6 +50,8 @@ tags: [xunit, testing, csharp, backend, unit-tests, integration-tests]
 - When a test asserts on keys, indexes, or check constraints, it should target the model metadata that the context actually exposes rather than a design-time service dependency.
 - Schema or migration assertions MUST verify the intended model shape and emitted migration output, not only an in-memory database configuration. When the host applies migrations for the context, verification MUST also prove that EF discovers the migration and can apply it to SQL Server.
 - Every persistence-bearing feature must include a provider-backed SQL Server integration suite in its feature test project. The suite must use `Microsoft.EntityFrameworkCore.SqlServer`, `SqlConnectionStringBuilder`, a unique test database name, `Database.MigrateAsync()`, and fresh DbContext instances for persistence read-back. A feature test project containing only InMemory tests is incomplete.
+- `WebApplicationFactory` tests may replace a feature DbContext with InMemory to prove routing, binding, validation registration, and status mapping, but they are not persistence, migration, transaction, or concurrency evidence. Keep provider-backed SQL Server tests separate and execute both suites.
+- A mapping-only feature test must apply migrations through every actual owner context needed by its tables before creating the mapping-only context. Calling `MigrateAsync()` on an unrelated context does not satisfy migration evidence.
 
 ## Database Test Safety
 
@@ -68,6 +70,7 @@ builder.InitialCatalog = $"ZeusTests_{Guid.NewGuid():N}";
 
 - MUST cover claim/allocation handlers with a concurrent SQL Server test that starts two claims for the same resource on separate `DbContext` instances and asserts exactly one success and one conflict. A sequential two-call test does not satisfy this.
 - MUST assert the losing request returns the slice's declared conflict error code and status, not a generic failure.
+- Concurrent claim tests MUST exercise the production relational branch, apply owner migrations first, and assert persisted state from a fresh third context after both claimant tasks complete.
 
 ## Integration Resource Lifecycle
 
@@ -76,6 +79,7 @@ builder.InitialCatalog = $"ZeusTests_{Guid.NewGuid():N}";
 - Cleanup failures SHOULD surface as warnings when possible, but must not hide the original assertion failure.
 - EF Core InMemory tests may support fast handler tests, but they are not persistence evidence. Persistence-bearing slices require a SQL Server-backed migration or integration check; missing provider evidence is a review blocker.
 - Integration test setup failures MUST fail the test run with actionable diagnostics; tests must not skip when SQL Server is unavailable. Test output or the verification handoff must report the provider-backed integration test count.
+- Test fixtures and seed values MUST derive from or demonstrably satisfy current canonical invariants. When a shared identifier length or format changes, search and update every affected fixture before accepting downstream test results.
 
 ## Validator and Endpoint Contract Coverage
 
@@ -83,6 +87,7 @@ builder.InitialCatalog = $"ZeusTests_{Guid.NewGuid():N}";
 - When a route advertises validation failures (for example `.ProducesValidationProblem()` or equivalent), tests MUST verify the endpoint returns a validation result for invalid numbers, ranges, and malformed input instead of leaking an unhandled exception.
 - Every status code declared by an endpoint's `Produces*` metadata MUST have at least one route-level test (`WebApplicationFactory<Program>` or `TestServer`) that asserts the status code and response body shape. Handler tests do not satisfy this.
 - One 400 test does not cover other fields. For every request field with a validator rule, at least one route-level test MUST submit an invalid value and assert 400 with a `ValidationProblemDetails.errors` key for that field (the `route-tests` check enforces the key). Pick the boundary the rule guards: `0` and a negative value for positive ranges, length ±1 for exact lengths, empty for required, and a well-formed but unknown code for reference lookups. A key asserted only via an unknown-reference case does not cover the field's range or format rule.
+- Route tests MUST be attributable to the endpoint under test; a status assertion in an unrelated endpoint test does not satisfy that endpoint's contract.
 - When a change touches an endpoint file that lacks route tests for its declared statuses, backfill them in the same change.
 - Validation tests MUST assert on stable failure messages or keys so the contract does not drift when rules are refactored.
 - A validator without direct coverage is a review-blocking gap, even if the command handler and mapper compile successfully.
