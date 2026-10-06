@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">RegisterAcademic vertical slice</title>
+  <desc id="description">Reference contracts feed validated domain rules, atomic SQL Server persistence, and API verification.</desc>
+  <rect width="1200" height="630" fill="#102a43"/>
+  <path d="M0 475 C220 390 380 535 590 450 S940 355 1200 435 V630 H0Z" fill="#1f7a8c"/>
+  <g fill="none" stroke="#f4f1de" stroke-width="4">
+    <rect x="90" y="190" width="235" height="115" rx="10"/>
+    <rect x="483" y="190" width="235" height="115" rx="10"/>
+    <rect x="876" y="190" width="235" height="115" rx="10"/>
+    <path d="M325 247h158M718 247h158"/>
+    <path d="m460 232 23 15-23 15M853 232l23 15-23 15"/>
+  </g>
+  <g fill="#f4f1de" font-family="Segoe UI, sans-serif" text-anchor="middle">
+    <text x="600" y="100" font-size="42" font-weight="700">RegisterAcademic</text>
+    <text x="207" y="238" font-size="25">Reference data</text>
+    <text x="207" y="274" font-size="19">rank, degree, university</text>
+    <text x="600" y="238" font-size="25">Domain contract</text>
+    <text x="600" y="274" font-size="19">identity, qualification, extension</text>
+    <text x="993" y="238" font-size="25">Verified result</text>
+    <text x="993" y="274" font-size="19">atomic write · tested API</text>
+    <text x="600" y="555" font-size="24">From implementation plan to provider-backed proof</text>
+  </g>
+</svg>
